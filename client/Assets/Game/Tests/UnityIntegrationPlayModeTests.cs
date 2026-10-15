@@ -49,13 +49,14 @@ namespace Game.Tests
             Assert.IsNotNull(core, "GameCore 實例應已建立");
 
             // 給予足夠資源進行操作測試
+            core.Player.AddItem("gem", 3000);
             core.Player.AddItem("item_dia_free", 3000);
             core.Player.AddItem("exp_s", 10);
             core.Player.Encounter.Stamina = 100;
 
             // 2. 轉蛋操作：十連抽
             var gachaRes = core.PullGacha("banner_std", 10);
-            Assert.IsTrue(gachaRes.Ok, "轉蛋應成功執行");
+            Assert.IsTrue(gachaRes.Ok, $"轉蛋應成功執行: {gachaRes.Error}");
             Assert.AreEqual(10, gachaRes.Value.Count);
             int charCountAfterGacha = core.Player.Characters.Count;
 

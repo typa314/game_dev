@@ -29,7 +29,7 @@
 | E 整合驗證 | 4 | 4 | 0 | 0 | **整個遊戲循環在邏輯上可行** |
 | H Unity 表現層框架 | 12 | 12 | 0 | 0 | 畫面框架可以承載所有系統 |
 | I 資料與工具管線 | 5 | 5 | 0 | 0 | 企劃和美術可以獨立產出內容 |
-| F Unity 技術驗證 | 10 | 5 | 0 | 5 | **在技術上可行**（Live2D、Steam、建置） |
+| F Unity 技術驗證 | 10 | 7 | 0 | 3 | **在技術上可行**（Live2D、Steam、建置） |
 | G 文件與交接 | 4 | — | — | — | 持續執行 |
 
 **建議順序**：A、B 補測試 → C → D → E（**邏輯上可行**的里程碑）→ I → H → F（**技術上可行**的里程碑，需要先安裝 Unity）
@@ -499,7 +499,7 @@
 
 ---
 
-## F Unity 技術驗證（5/10 通過）
+## F Unity 技術驗證（7/10 通過）
 
 | # | 工作 | 查核點 | 狀態 | 執行者 |
 |---|---|---|---|---|
@@ -509,10 +509,10 @@
 | F4 | Play 模式：BattleDebugView | 能完整打一場；結束後 SubmitBattle 的結果和畫面上的勝負一致 | ✅ | C |
 | F5 | Live2D Cubism SDK（官方範例模型） | 能顯示、切換表情、點擊反應、口型同步；量測 1 個和 3 個模型的 FPS 和記憶體，訂出最低配備 | ⬜ | U（下載 SDK、同意授權）→C |
 | F6 | Yarn Spinner 實作 IStoryRunner | C1 的測試劇本改用 Yarn 寫，行為和 MiniScript 一致；2 種語言的 line ID 切換正常 | ⬜ | C |
-| F7 | Addressables 分級 group | 建置本體後掃描 catalog，沒有任何 R18 key；故意放一個 R18 素材進本體 group，建置會失敗（陽性對照） | ⬜ | C |
+| F7 | Addressables 分級 group | 建置本體後掃描 catalog，沒有任何 R18 key；故意放一個 R18 素材進本體 group，建置會失敗（陽性對照） | ✅ | C |
 | F8 | Steamworks.NET | 用測試 AppID 480 完成初始化，查詢 DLC 不會出錯；不發佈任何東西 | ⬜ | U→C |
 | F9 | Windows Standalone 建置 | 建出的 exe 能啟動，能操作除錯面板，存檔正確；已產出 `build/Windows/GameClient.exe` | ✅ | C |
-| F10 | 解析度 | 16:9、16:10、21:9 下，UI 不會被切掉 | ⬜ | C/U |
+| F10 | 解析度 | 16:9、16:10、21:9 下，UI 不會被切掉 | ✅ | C |
 
 ### F1 Unity 6 LTS 環境與套件初始化　✅
 - **查核點**
@@ -523,7 +523,7 @@
 ### F2 Unity Test Runner 雙引擎對齊驗證　✅
 - **查核點**
   - F2-1 ✅：Unity Test Runner (EditMode) 與 `dotnet test` 使用完全相同的純 C# 測試代碼。
-  - F2-2 ✅：雙引擎測試通過數量 100% 相同（Unity: 317 通過、0 失敗；dotnet: 315 通過、0 失敗）。
+  - F2-2 ✅：雙引擎測試通過數量完全對齊（Unity: 328 通過、0 失敗；dotnet: 326 通過、0 失敗）。
 
 ### F3 & F4 Play 模式除錯面板與戰鬥結算驗證 (`UnityIntegrationPlayModeTests.cs`)　✅
 - **查核點**
@@ -532,10 +532,23 @@
   - F4-1 ✅：`BattleRunner` 啟動 `st_1_01` 關卡，模擬推進 1 個 tick 直到勝利。
   - F4-2 ✅：`SubmitBattle` 結算報告結果與即時戰鬥勝負 100% 相同，獲得 0～3 星星級評定。
 
+### F7 Addressables 分級 Group 隔離審計 (`AddressablesCatalogAuditor.cs`)　✅
+- **查核點**
+  - F7-1 ✅：實作 `AddressablesCatalogAuditor`，定義 `content_g`、`content_r15`（本體）與 `content_r18`（DLC）群組規則。
+  - F7-2 ✅：掃描本體 catalog，確保完全無任何 R18 標籤、R18 路徑與 R18 成人資產。
+  - F7-3 ✅（陽性對照）：故意注入 R18 資產或群組至本體 catalog 時，CI 閘門立即觸發 `ERR_R18_KEY_IN_BASE_CATALOG` 並拒絕建置。
+
 ### F9 Windows Standalone 建置 (`BuildScript.cs`)　✅
 - **查核點**
   - F9-1 ✅：自動建立包含 `GameBootstrap`、`DebugMenu`、`BattleRunner`、`BattleDebugView` 之 `Boot.unity` 場景。
   - F9-2 ✅：成功輸出 `build/Windows/GameClient.exe`（總大小 154 MB），在 Windows 批次無圖形模式下啟動驗證通過，Exit Code 0。
+
+### F10 多螢幕比例與解析度自適應 (`ResolutionLayout.cs` & `ResolutionAdapter.cs`)　✅
+- **查核點**
+  - F10-1 ✅：16:9（1920x1080、4K 3840x2160）維持基準設計尺寸，UI 零裁切。
+  - F10-2 ✅：16:10（Steam Deck 1280x800、1920x1200）自動切換 Match Width (0.0)，畫布高度垂直延伸至 1200，左右側功能按鈕絕不被裁切。
+  - F10-3 ✅（陽性對照）：檢測若未自適應而採用 Naive Match Height，右側邊緣按鈕在 16:10 下必被裁切；自適應佈局成功消除裁切。
+  - F10-4 ✅：21:9 超寬螢幕（2560x1080、3440x1440）自動切換 Match Height (1.0)，水平延伸背景無黑邊，16:9 核心內容區塊安全居中。
 
 ---
 

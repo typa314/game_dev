@@ -17,6 +17,7 @@
 | **BUG-006** | 🟡 Medium | 關卡結算 | `CountStars` 零受傷滿星通關條件判定永假 (`< 0`) | `client/Assets/Game/Core/GameCore.cs` | 已修復 ✅ | `BattleSimulatorTests` |
 | **BUG-007** | 🟡 Medium | 主資料驗證 | `MasterDataValidator` 條件檢查多個類型欄位驗證覆蓋缺失 | `client/Assets/Game/Domain/MasterData/MasterDataValidator.cs` | 已修復 ✅ | `MasterDataValidatorTests` |
 | **BUG-008** | 🟢 Low | 防禦安全 | `ReachEnding` 與 `UnlockCg` 缺乏 Null / 空字串防禦 | `client/Assets/Game/Core/GameCore.cs` | 已修復 ✅ | `StoryCommandRegistryTests` |
+| **BUG-009** | 🟡 Medium | 整合測試 | 轉蛋測試發放幣種與 `banners.json` 需求定義不一致 | `client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs` | 已修復 ✅ | `UnityIntegrationPlayModeTests` |
 
 ---
 
@@ -143,6 +144,28 @@
 
 ---
 
+### BUG-009: 轉蛋測試發放幣種與 banners.json 需求定義不一致
+* **嚴重等級**：🟡 Medium（PlayMode 整合測試失敗）
+* **涉及檔案**：[`client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs`](file:///F:/game_dev/client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs)
+* **症狀**：
+  在 Unity Test Runner 執行 `F3_PlayMode_DebugMenuAndSaveReload_Succeeds` 時，十連抽斷言失敗：
+  ```text
+  轉蛋應成功執行: insufficient_items
+  Expected: True
+  But was: False
+  ```
+* **根因分析**：
+  測試初始化前置程式碼發放幣種使用 `"item_dia_free"`，但主資料庫 `banners.json` 之標準池 `banner_std` 十連抽設定代價為 `"gem": 1500`。玩家因缺乏 `gem` 導致抽卡失敗。
+* **修復方案**：
+  在測試前置發放中補入 `core.Player.AddItem("gem", 3000)`。
+* **驗證結果**：
+  `F3_PlayMode_DebugMenuAndSaveReload_Succeeds` 順利通過，十連抽、存檔落盤與重開回讀驗證 100% 成功。
+
+---
+
 ## 測試回歸結論
-- 截至 2026-10-15，上述 8 項缺陷已全數修復完畢。
-- 測試套件執行結果：**315 通過 / 0 失敗 / 0 略過**。
+- 截至 2026-10-15，上述 9 項缺陷已全數修復完畢。
+- 測試套件執行結果：
+  - .NET 8 CLI (`dotnet test`): **326 通過 / 0 失敗 / 0 略過**。
+  - Unity 6 LTS Test Runner (EditMode): **328 通過 / 0 失敗 / 0 略過**。
+
