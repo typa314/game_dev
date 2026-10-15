@@ -1,0 +1,261 @@
+{
+  "StageId": "st_1_01",
+  "Seed": 7,
+  "Team": [
+    "char04_elysia",
+    "char05_rin"
+  ],
+  "Commands": [
+    {
+      "Tick": 38,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 83,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 125,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 163,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 208,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 250,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 288,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 333,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 375,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 413,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 458,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 500,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 538,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 583,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 625,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 663,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 708,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 750,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 788,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 833,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 875,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 913,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 958,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1000,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1038,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1083,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1125,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1163,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1208,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1250,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1288,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1333,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1375,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1413,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1458,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1500,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1538,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1583,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1625,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1663,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1708,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1750,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1788,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1833,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1875,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 1913,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 1958,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 2000,
+      "Type": 0,
+      "Slot": 0
+    },
+    {
+      "Tick": 2038,
+      "Type": 0,
+      "Slot": 1
+    },
+    {
+      "Tick": 2083,
+      "Type": 0,
+      "Slot": 1
+    }
+  ],
+  "MasterDataVersion": 1
+}

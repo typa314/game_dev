@@ -1,0 +1,22 @@
+{
+    "name": "Game.Unity.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Game.Unity",
+        "Game.Domain",
+        "Game.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,30 @@
+{
+  "Format": "gsave",
+  "SchemaVersion": 0,
+  "GameVersion": "0.1.0",
+  "SavedAtUtc": "2026-10-14T12:00:00Z",
+  "Payload": {
+    "SchemaVersion": 0,
+    "Profile": {
+      "CreatedAtUtc": "2026-10-14T12:00:00Z"
+    },
+    "Items": {
+      "gold": 50000
+    },
+    "Characters": {
+      "char01": {
+        "Level": 10,
+        "Exp": 1200,
+        "Awaken": 1,
+        "Affection": 50,
+        "PortraitStage": "S1",
+        "Costume": null,
+        "UnlockedPortraitStages": [
+          "S1"
+        ],
+        "ObtainedAtUtc": "2026-10-14T12:00:00Z"
+      }
+    }
+  },
+  "Hash": "25a6b6ea21d50316d568db69a93468a94dbce8b55d25cbdd79b1fada5746719e"
+}

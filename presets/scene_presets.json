@@ -1,0 +1,26 @@
+{
+  "bedroom": {
+    "desc": "臥室休閒場景",
+    "prompt": "full body, full body shot, sitting comfortably on edge of neat wooden bed, wearing soft pastel homewear, warm morning sunlight streaming through curtains, cozy bedroom atmosphere"
+  },
+  "bathroom": {
+    "desc": "浴室整理場景",
+    "prompt": "full body, full body shot, standing gracefully in front of modern vanity mirror, wearing clean comfortable loungewear, soft warm ambient lighting, clean tiled bathroom interior"
+  },
+  "cafe": {
+    "desc": "咖啡廳約會場景",
+    "prompt": "full body, full body shot, sitting at round wooden table, holding warm porcelain cup, soft daylight, cozy modern cafe background"
+  },
+  "beach": {
+    "desc": "海灘陽光場景",
+    "prompt": "full body, full body shot, standing along tropical coastline, gentle sea breeze, golden sunlight, turquoise ocean water, sandy shore"
+  },
+  "park": {
+    "desc": "公園漫步場景",
+    "prompt": "full body, full body shot, walking along stone paved park path, blooming flowers and lush greenery, dappled afternoon sunlight"
+  },
+  "library": {
+    "desc": "圖書館安靜場景",
+    "prompt": "full body, full body shot, standing beside tall wooden bookshelves, browsing a book, quiet peaceful library ambiance, warm indoor lighting"
+  }
+}

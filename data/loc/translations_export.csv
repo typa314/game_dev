@@ -1,0 +1,33 @@
+﻿Key,Context,en,zh-TW
+ach/ach_ch1_3star.desc,Achievement,Achieve 3-star rating in Chapter 1,在第一章關卡獲得 3 星評定
+ach/ach_ch1_3star.name,Achievement,Flawless Conquest,完美壓制
+ach/ach_claire_s2.desc,Achievement,Unlock Claire Stage 2 visual,克萊兒解鎖第二階段外觀
+ach/ach_claire_s2.name,Achievement,Soul Ascension,心靈昇華
+ach/ach_collect_3.desc,Achievement,Collect 3 distinct characters,收集獲得 3 位不同角色
+ach/ach_collect_3.name,Achievement,Forming Ranks,初具陣容
+ach/ach_encounter_10.desc,Achievement,Trigger 10 encounter events,累計進行 10 次巧遇事件
+ach/ach_encounter_10.name,Achievement,Ties of Fate,羈絆之緣
+ach/ach_ending_any.desc,Achievement,Reach any story ending,首次達成任何劇情結局
+ach/ach_ending_any.name,Achievement,New Narrative,故事新篇
+ach/ach_first_pull.desc,Achievement,Perform recruitment draw for the first time,完成第一次招募抽卡
+ach/ach_first_pull.name,Achievement,Gate of Destiny,初入命運之門
+ach/ach_first_win.desc,Achievement,Win a battle for the first time,首次推線戰鬥獲勝
+ach/ach_first_win.name,Achievement,First Triumph,首戰告捷
+ach/ach_gacha_100.desc,Achievement,Accumulate 100 recruitment draws,累計進行招募 100 次
+ach/ach_gacha_100.name,Achievement,Century Recruiter,百抽之證
+char/char01_claire.name,Character,Claire,克萊兒
+char/char02_luna.name,Character,Luna,露娜
+char/char03_scarlet.name,Character,Scarlet,史卡蕾特
+char/char04_elysia.name,Character,Elysia,愛麗西亞
+char/char05_rin.name,Character,Rin,凜
+gacha/banner_std.name,Gacha,Standard Recruitment,常駐招募卡池
+gacha/banner_ur.name,Gacha,All-Star Promotion Recruitment,全階進階特選卡池
+scene/scene_cafe.name,Scene,Cafe Terrace,咖啡廳露台
+scene/scene_lobby_default.name,Scene,Academy Lobby (Day),學院大廳（日間）
+spot/spot_cafe.name,General,Open-air Cafe,露天咖啡廳
+spot/spot_park.name,General,Central Park,中央公園
+stage/st_1_01.name,Stage,Stage 1: Academy Gate,第一關：學院正門
+stage/st_1_02.name,Stage,Stage 2: Central Garden,第二關：中央庭園
+stage/st_1_03.name,Stage,Stage 3: Abandoned School Building,第三關：廢棄舊校舍
+ui/level_up_congrats,UI Text,Congrats! {0} leveled up to Lv.{1}!,恭喜！{0} 成功升級至 Lv.{1}！
+ui/welcome_player,UI Text,Welcome back Commander {0}!,歡迎指揮官 {0} 回到基地！

@@ -1,0 +1,20 @@
+[
+  { "id": "st_1_01", "chapter": 1, "name": "loc:stage/st_1_01.name", "bg": "battle/bg/city_day", "bgm": "bgm/battle_01",
+    "length": 2400, "enemyBaseHp": 5000, "timeLimitSec": 0, "enemyStatPct": 100,
+    "waves": [ { "enemy": "en_slime", "atSec": 3, "count": 3, "intervalSec": 4, "repeatEverySec": 25 } ],
+    "rewards": { "firstClear": [ { "item": "gem", "n": 100 } ], "drop": [ { "item": "exp_s", "n": 3, "rate": 0.8 } ], "teamExp": 300 },
+    "starConditions": ["clear", "no_base_damage_pct_30", "within_sec_120"],
+    "unlocksOnClear": ["st_1_02"] },
+  { "id": "st_1_02", "chapter": 1, "name": "loc:stage/st_1_02.name", "bg": "battle/bg/city_day", "bgm": "bgm/battle_01",
+    "length": 2800, "enemyBaseHp": 9000, "timeLimitSec": 0, "enemyStatPct": 120,
+    "waves": [ { "enemy": "en_slime", "atSec": 2, "count": 4, "intervalSec": 3, "repeatEverySec": 20 }, { "enemy": "en_bat", "atSec": 15, "count": 2, "intervalSec": 5, "repeatEverySec": 30 } ],
+    "rewards": { "firstClear": [ { "item": "gem", "n": 150 } ], "drop": [ { "item": "exp_s", "n": 4, "rate": 0.8 } ], "teamExp": 500 },
+    "starConditions": ["clear", "no_base_damage_pct_30", "within_sec_150"],
+    "unlocksOnClear": ["st_1_03", "spot_cafe"] },
+  { "id": "st_1_03", "chapter": 1, "name": "loc:stage/st_1_03.name", "bg": "battle/bg/city_night", "bgm": "bgm/battle_02",
+    "length": 3200, "enemyBaseHp": 15000, "timeLimitSec": 300, "enemyStatPct": 150,
+    "waves": [ { "enemy": "en_slime", "atSec": 2, "count": 5, "intervalSec": 3, "repeatEverySec": 18 }, { "enemy": "en_golem", "trigger": { "type": "enemy_base_hp_below_pct", "value": 60 }, "count": 1 } ],
+    "rewards": { "firstClear": [ { "item": "gem", "n": 300 } ], "drop": [ { "item": "exp_m", "n": 1, "rate": 0.5 } ], "teamExp": 800 },
+    "starConditions": ["clear", "no_base_damage_pct_50", "within_sec_200"],
+    "unlocksOnClear": [] }
+]

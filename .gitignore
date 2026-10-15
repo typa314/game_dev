@@ -1,0 +1,43 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Aa]ssets/AssetStoreTools*
+
+# .NET / C#
+bin/
+obj/
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# Visual Studio / VS Code / Rider
+.vs/
+.vscode/
+.idea/
+*.sln.docstates
+*.suo
+
+# OS generated
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Crash reports
+sysinfo.txt
+*.stackdump
+
+# Saves / Local runtime temporary
+client/Assets/Game/Tests/Temp/
+saves/
+*.log

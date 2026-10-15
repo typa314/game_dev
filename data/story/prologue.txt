@@ -1,0 +1,21 @@
+[node Start]
+command bg scene_lobby_default
+command show char01_claire
+command expr char01_claire smile
+line l_pro_001 Claire welcome_to_command_center
+jump DecisionPoint
+
+[node DecisionPoint]
+line l_pro_002 Claire choose_your_priority
+option opt_patrol -> SafePatrolRoute
+option opt_deep -> SpicyExplorationRoute
+
+[node SafePatrolRoute]
+line l_pro_003 Claire starting_safe_patrol
+command ending ending_prologue_safe
+end
+
+[node SpicyExplorationRoute rating:R18 fallback:SafePatrolRoute]
+line l_pro_004 Claire dangerous_encounter_ahead
+command ending ending_prologue_spicy
+end

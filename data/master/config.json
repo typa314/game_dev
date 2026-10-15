@@ -1,0 +1,53 @@
+{
+  "masterDataVersion": 1,
+  "gachaHistoryLimit": 200,
+  "growth": {
+    "expCurveByRarity": {
+      "N": { "base": 20, "exponent": 1.4 },
+      "R": { "base": 25, "exponent": 1.45 },
+      "SR": { "base": 30, "exponent": 1.5 },
+      "SSR": { "base": 35, "exponent": 1.55 },
+      "UR": { "base": 40, "exponent": 1.6 }
+    },
+    "statCurvePerLevelPct": { "curve_standard": 8, "curve_tank": 10 },
+    "levelCapByAwaken": [20, 30, 40, 50, 60, 70],
+    "awakenShardCost": [10, 20, 30, 40, 50],
+    "awakenStatBonusPct": [0, 5, 10, 15, 20, 30],
+    "affectionThresholds": [0, 100, 300, 600, 1000],
+    "expItems": { "exp_s": 100, "exp_m": 500, "exp_l": 2500 },
+    "goldPerExp": 1,
+    "goldItem": "gold",
+    "shardItemPrefix": "awaken_shard_",
+    "shardsPerDuplicate": 10,
+    "maxedDuplicateItem": "heart_crystal",
+    "maxedDuplicateCount": 5,
+    "affectionPerWin": 5
+  },
+  "encounter": {
+    "staminaMax": 5,
+    "staminaRegenMinutes": 30,
+    "pityThreshold": 5,
+    "fallbackReward": [ { "item": "gold", "n": 300 } ]
+  },
+  "battle": {
+    "ticksPerSecond": 30,
+    "defaultAllyBaseHp": 20000,
+    "energyMaxByLevel": [1500, 2500, 3500, 4500, 5500, 6500, 7500, 8500],
+    "energyRegenPerSecByLevel": [60, 80, 100, 120, 140, 160, 180, 200],
+    "energyUpgradeCost": [400, 600, 800, 1000, 1200, 1400, 1600],
+    "startEnergy": 0,
+    "cannonChargeSec": 40,
+    "cannonDamage": 300,
+    "cannonRange": 1500,
+    "knockbackDistance": 60,
+    "maxUnitsPerSide": 50,
+    "maxBattleSec": 900
+  },
+  "initial": {
+    "items": [ { "item": "gold", "n": 5000 }, { "item": "gem", "n": 3000 }, { "item": "exp_s", "n": 10 } ],
+    "characters": ["char04_elysia", "char05_rin"],
+    "unlockedStages": ["st_1_01"],
+    "unlockedSpots": ["spot_park"],
+    "scenes": ["scene_lobby_default"]
+  }
+}

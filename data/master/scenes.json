@@ -1,0 +1,4 @@
+[
+  { "id": "scene_lobby_default", "name": "loc:scene/scene_lobby_default.name", "rating": "G", "variants": { "day": "scene/lobby_default/day", "night": "scene/lobby_default/night" }, "autoVariantByClock": true, "bgm": "bgm/lobby_01", "unlock": null },
+  { "id": "scene_cafe", "name": "loc:scene/scene_cafe.name", "rating": "G", "variants": { "day": "scene/cafe/day", "night": "scene/cafe/night" }, "autoVariantByClock": true, "bgm": "bgm/cafe", "unlock": { "type": "stage_cleared", "stage": "st_1_02" } }
+]
