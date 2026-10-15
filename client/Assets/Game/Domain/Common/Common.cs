@@ -125,7 +125,7 @@ namespace Game.Domain
         public bool Allows(Rating r) { return r <= Effective; }
     }
 
-    internal static class DictExt
+    public static class DictExt
     {
         public static TV GetOrNull<TK, TV>(this Dictionary<TK, TV> d, TK key) where TV : class
         {

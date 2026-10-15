@@ -1,0 +1,4 @@
+[
+  { "id": "spot_park", "name": "loc:spot/spot_park.name", "unlock": null },
+  { "id": "spot_cafe", "name": "loc:spot/spot_cafe.name", "unlock": null }
+]

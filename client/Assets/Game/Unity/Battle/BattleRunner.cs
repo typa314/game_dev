@@ -91,7 +91,7 @@ namespace Game.Unity
             if (!IsRunning && !_submitted) Submit();
         }
 
-        private void Submit()
+        public void Submit()
         {
             _submitted = true;
             GameCore core = GameServices.Core;

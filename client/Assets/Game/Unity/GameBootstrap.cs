@@ -49,7 +49,7 @@ namespace Game.Unity
             }
         }
 
-        private void Boot()
+        public void Boot()
         {
             // 1. 主資料
             // TODO: Android 的 streamingAssetsPath 在 apk 內，無法用 File IO 讀；目前目標平台是 PC，之後再處理。

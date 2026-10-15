@@ -1,0 +1,25 @@
+[
+  { "id": "banner_std", "type": "standard", "name": "loc:gacha/banner_std.name",
+    "cost": { "single": [ { "item": "gem", "n": 150 } ], "ten": [ { "item": "gem", "n": 1500 } ] },
+    "rates": { "SSR": 0.03, "SR": 0.12, "R": 0.85 },
+    "pool": { "SSR": ["char01_claire"], "SR": ["char02_luna", "char03_scarlet"], "R": ["char04_elysia", "char05_rin"] },
+    "pickup": null,
+    "pity": { "hardAt": 100, "rarity": "SSR" },
+    "tenPullGuarantee": "SR",
+    "periodStartUtc": null, "periodEndUtc": null,
+    "allowCrossRarity": false },
+  { "id": "banner_ur", "type": "upgrade", "name": "loc:gacha/banner_ur.name",
+    "cost": { "single": [ { "item": "gem", "n": 150 } ], "ten": [ { "item": "gem", "n": 1500 } ] },
+    "rates": { "UR": 0.01, "SSR": 0.03, "SR": 0.16, "R": 0.80 },
+    "pool": {
+      "UR": ["char01_claire", "char02_luna", "char03_scarlet", "char04_elysia", "char05_rin"],
+      "SSR": ["char01_claire", "char02_luna", "char03_scarlet", "char04_elysia", "char05_rin"],
+      "SR": ["char01_claire", "char02_luna", "char03_scarlet", "char04_elysia", "char05_rin"],
+      "R": ["char01_claire", "char02_luna", "char03_scarlet", "char04_elysia", "char05_rin"]
+    },
+    "pickup": null,
+    "pity": { "hardAt": 100, "rarity": "UR" },
+    "tenPullGuarantee": "SR",
+    "periodStartUtc": null, "periodEndUtc": null,
+    "allowCrossRarity": true }
+]

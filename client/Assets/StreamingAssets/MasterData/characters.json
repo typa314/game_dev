@@ -1,0 +1,17 @@
+[
+  { "id": "char01_claire", "name": "loc:char/char01_claire.name", "rarity": "SSR", "role": "ranged",
+    "battle": { "cost": 450, "cooldownSec": 8, "hp": 1200, "atk": 180, "range": 320, "attackIntervalSec": 1.6, "moveSpeed": 10, "knockbacks": 3, "target": "single", "traits": ["anti_flying"], "growthCurve": "curve_standard" },
+    "portraitStages": ["ps_char01_s1", "ps_char01_s2", "ps_char01_s3"], "defaultCostume": "cos_char01_default", "storyRoute": "route_char01", "obtainableBy": ["gacha"] },
+  { "id": "char02_luna", "name": "loc:char/char02_luna.name", "rarity": "SR", "role": "area",
+    "battle": { "cost": 300, "cooldownSec": 6, "hp": 900, "atk": 90, "range": 200, "attackIntervalSec": 2.0, "moveSpeed": 9, "knockbacks": 3, "target": "area", "traits": [], "growthCurve": "curve_standard" },
+    "portraitStages": ["ps_char02_s1", "ps_char02_s2"], "defaultCostume": "cos_char02_default", "storyRoute": "route_char02", "obtainableBy": ["gacha"] },
+  { "id": "char03_scarlet", "name": "loc:char/char03_scarlet.name", "rarity": "SR", "role": "tank",
+    "battle": { "cost": 150, "cooldownSec": 2, "hp": 2000, "atk": 20, "range": 110, "attackIntervalSec": 1.2, "moveSpeed": 8, "knockbacks": 2, "target": "single", "traits": [], "growthCurve": "curve_tank" },
+    "portraitStages": ["ps_char03_s1", "ps_char03_s2"], "defaultCostume": "cos_char03_default", "storyRoute": "route_char03", "obtainableBy": ["gacha"] },
+  { "id": "char04_elysia", "name": "loc:char/char04_elysia.name", "rarity": "R", "role": "melee",
+    "battle": { "cost": 100, "cooldownSec": 2.5, "hp": 600, "atk": 60, "range": 120, "attackIntervalSec": 1.0, "moveSpeed": 12, "knockbacks": 2, "target": "single", "traits": [], "growthCurve": "curve_standard" },
+    "portraitStages": ["ps_char04_s1"], "defaultCostume": null, "storyRoute": null, "obtainableBy": ["gacha", "initial"] },
+  { "id": "char05_rin", "name": "loc:char/char05_rin.name", "rarity": "R", "role": "tank",
+    "battle": { "cost": 75, "cooldownSec": 1.5, "hp": 800, "atk": 15, "range": 100, "attackIntervalSec": 1.2, "moveSpeed": 10, "knockbacks": 1, "target": "single", "traits": [], "growthCurve": "curve_tank" },
+    "portraitStages": ["ps_char05_s1"], "defaultCostume": null, "storyRoute": null, "obtainableBy": ["gacha", "initial"] }
+]

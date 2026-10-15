@@ -1,0 +1,6 @@
+[
+  { "id": "cos_char01_default", "character": "char01_claire", "rating": "G", "unlock": null, "art": { "stand": "char/char01_claire/portrait/cos_char01_default/stand" } },
+  { "id": "cos_char01_academy", "character": "char01_claire", "rating": "G", "unlock": { "type": "affection_gte", "char": "self", "value": 300 }, "art": { "stand": "char/char01_claire/portrait/cos_char01_academy/stand" } },
+  { "id": "cos_char02_default", "character": "char02_luna", "rating": "G", "unlock": null, "art": { "stand": "char/char02_luna/portrait/cos_char02_default/stand" } },
+  { "id": "cos_char03_default", "character": "char03_scarlet", "rating": "G", "unlock": null, "art": { "stand": "char/char03_scarlet/portrait/cos_char03_default/stand" } }
+]

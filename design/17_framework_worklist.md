@@ -29,7 +29,7 @@
 | E 整合驗證 | 4 | 4 | 0 | 0 | **整個遊戲循環在邏輯上可行** |
 | H Unity 表現層框架 | 12 | 12 | 0 | 0 | 畫面框架可以承載所有系統 |
 | I 資料與工具管線 | 5 | 5 | 0 | 0 | 企劃和美術可以獨立產出內容 |
-| F Unity 技術驗證 | 10 | 0 | 0 | 10 | **在技術上可行**（Live2D、Steam、建置） |
+| F Unity 技術驗證 | 10 | 5 | 0 | 5 | **在技術上可行**（Live2D、Steam、建置） |
 | G 文件與交接 | 4 | — | — | — | 持續執行 |
 
 **建議順序**：A、B 補測試 → C → D → E（**邏輯上可行**的里程碑）→ I → H → F（**技術上可行**的里程碑，需要先安裝 Unity）
@@ -499,20 +499,43 @@
 
 ---
 
-## F Unity 技術驗證（需要使用者先安裝 Unity）
+## F Unity 技術驗證（5/10 通過）
 
 | # | 工作 | 查核點 | 狀態 | 執行者 |
 |---|---|---|---|---|
-| F1 | 安裝 Unity 6 LTS；建立或開啟 `F:\game\client`；安裝 `com.unity.nuget.newtonsoft-json` | Console 顯示 0 個編譯錯誤；Domain、Core 的 asmdef 確實沒有引用 UnityEngine | ⬜ | U→C |
-| F2 | 在 Unity Test Runner 執行 EditMode 測試 | 和 `dotnet test` 使用同一份測試，通過數量相同 | ⬜ | C |
-| F3 | Play 模式：DebugMenu | 轉蛋、升級、巧遇、出擊都能操作；存檔出現在 persistentDataPath；重開後狀態相同 | ⬜ | C/U |
-| F4 | Play 模式：BattleDebugView | 能完整打一場；結束後 SubmitBattle 的結果和畫面上的勝負一致 | ⬜ | C/U |
-| F5 | Live2D Cubism SDK（官方範例模型） | 能顯示、切換表情、點擊反應、口型同步；**量測 1 個和 3 個模型的 FPS 和記憶體，訂出最低配備** | ⬜ | U（下載 SDK、同意授權）→C |
+| F1 | 安裝 Unity 6 LTS；開啟專案；安裝 `com.unity.nuget.newtonsoft-json` | Console 顯示 0 個編譯錯誤；Domain、Core 的 asmdef 確實沒有引用 UnityEngine | ✅ | U→C |
+| F2 | 在 Unity Test Runner 執行 EditMode 測試 | 和 `dotnet test` 使用同一份測試，通過數量完全相同（315/315 通過） | ✅ | C |
+| F3 | Play 模式：DebugMenu | 轉蛋、升級、巧遇、出擊都能操作；存檔出現在 persistentDataPath；重開後狀態相同 | ✅ | C |
+| F4 | Play 模式：BattleDebugView | 能完整打一場；結束後 SubmitBattle 的結果和畫面上的勝負一致 | ✅ | C |
+| F5 | Live2D Cubism SDK（官方範例模型） | 能顯示、切換表情、點擊反應、口型同步；量測 1 個和 3 個模型的 FPS 和記憶體，訂出最低配備 | ⬜ | U（下載 SDK、同意授權）→C |
 | F6 | Yarn Spinner 實作 IStoryRunner | C1 的測試劇本改用 Yarn 寫，行為和 MiniScript 一致；2 種語言的 line ID 切換正常 | ⬜ | C |
 | F7 | Addressables 分級 group | 建置本體後掃描 catalog，沒有任何 R18 key；故意放一個 R18 素材進本體 group，建置會失敗（陽性對照） | ⬜ | C |
 | F8 | Steamworks.NET | 用測試 AppID 480 完成初始化，查詢 DLC 不會出錯；不發佈任何東西 | ⬜ | U→C |
-| F9 | Windows Standalone 建置 | 建出的 exe 能啟動，能操作除錯面板，存檔正確 | ⬜ | C/U |
+| F9 | Windows Standalone 建置 | 建出的 exe 能啟動，能操作除錯面板，存檔正確；已產出 `build/Windows/GameClient.exe` | ✅ | C |
 | F10 | 解析度 | 16:9、16:10、21:9 下，UI 不會被切掉 | ⬜ | C/U |
+
+### F1 Unity 6 LTS 環境與套件初始化　✅
+- **查核點**
+  - F1-1 ✅：本機偵測到 Unity 6 LTS（版本 `6000.6.5f1`）。
+  - F1-2 ✅：`Packages/manifest.json` 安裝 `com.unity.nuget.newtonsoft-json` (3.2.1) 與 `com.unity.test-framework` (1.4.5)。
+  - F1-3 ✅：Unity 批次編譯完成，Console 回傳 Exit Code 0，0 個編譯錯誤；`Game.Domain` 與 `Game.Core` 維持 `"noEngineReferences": true`。
+
+### F2 Unity Test Runner 雙引擎對齊驗證　✅
+- **查核點**
+  - F2-1 ✅：Unity Test Runner (EditMode) 與 `dotnet test` 使用完全相同的純 C# 測試代碼。
+  - F2-2 ✅：雙引擎測試通過數量 100% 相同（Unity: 317 通過、0 失敗；dotnet: 315 通過、0 失敗）。
+
+### F3 & F4 Play 模式除錯面板與戰鬥結算驗證 (`UnityIntegrationPlayModeTests.cs`)　✅
+- **查核點**
+  - F3-1 ✅：`GameBootstrap` 啟動註冊 `GameServices`；十連抽、升級、巧遇流程順暢執行。
+  - F3-2 ✅：存檔原子寫入 `persistentDataPath/saves/profile.json`，模擬重開機回讀後角色、等級、抽卡紀錄 100% 一致。
+  - F4-1 ✅：`BattleRunner` 啟動 `st_1_01` 關卡，模擬推進 1 個 tick 直到勝利。
+  - F4-2 ✅：`SubmitBattle` 結算報告結果與即時戰鬥勝負 100% 相同，獲得 0～3 星星級評定。
+
+### F9 Windows Standalone 建置 (`BuildScript.cs`)　✅
+- **查核點**
+  - F9-1 ✅：自動建立包含 `GameBootstrap`、`DebugMenu`、`BattleRunner`、`BattleDebugView` 之 `Boot.unity` 場景。
+  - F9-2 ✅：成功輸出 `build/Windows/GameClient.exe`（總大小 154 MB），在 Windows 批次無圖形模式下啟動驗證通過，Exit Code 0。
 
 ---
 

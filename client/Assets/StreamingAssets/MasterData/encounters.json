@@ -1,0 +1,14 @@
+[
+  { "id": "enc_char04_elysia_01", "spot": "spot_park", "character": "char04_elysia", "series": "encs_char04", "order": 1, "weight": 10,
+    "conditions": null, "story": "Encounter_Elysia_01", "rating": "G", "repeatable": false,
+    "outcomes": { "choice0": [ { "affectionChar": "char04_elysia", "n": 30 } ], "choice1": [ { "item": "awaken_shard_char04_elysia", "n": 2 } ] } },
+  { "id": "enc_char04_elysia_02", "spot": "spot_park", "character": "char04_elysia", "series": "encs_char04", "order": 2, "weight": 10,
+    "conditions": { "type": "affection_gte", "char": "self", "value": 30 }, "story": "Encounter_Elysia_02", "rating": "G", "repeatable": false,
+    "outcomes": { "choice0": [ { "affectionChar": "char04_elysia", "n": 50 }, { "item": "awaken_shard_char04_elysia", "n": 5 } ] } },
+  { "id": "enc_park_generic", "spot": "spot_park", "character": null, "series": null, "order": 0, "weight": 20,
+    "conditions": null, "story": "Encounter_Park_Generic", "rating": "G", "repeatable": true,
+    "outcomes": { "choice0": [ { "item": "exp_s", "n": 2 } ] } },
+  { "id": "enc_char01_claire_cafe", "spot": "spot_cafe", "character": "char01_claire", "series": null, "order": 0, "weight": 10,
+    "conditions": { "type": "char_owned", "char": "char01_claire" }, "story": "Encounter_Claire_Cafe", "rating": "G", "repeatable": true,
+    "outcomes": { "choice0": [ { "affectionChar": "char01_claire", "n": 30 } ], "choice1": [ { "item": "awaken_shard_char01_claire", "n": 1 } ] } }
+]

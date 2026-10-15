@@ -579,7 +579,7 @@ namespace Game.Core
             return Result<BattleReward>.Success(reward);
         }
 
-        internal int CountStars(StageDef st, BattleResult r)
+        public int CountStars(StageDef st, BattleResult r)
         {
             int stars = 0;
             int tps = Master.Config.Battle.TicksPerSecond;

@@ -36,17 +36,20 @@ client/
 ## 3. 進度
 | 項目 | 狀態 |
 |---|---|
-| Domain 全部模組 | ✅ .NET 8（C# 9）編譯通過 |
-| Core：GameCore、存檔、劇情、橫切服務 | ✅ 編譯通過 |
-| .NET 測試 | ✅ 290/290 通過（A1～A10、B1～B5、C1～C7、D1～D6 全數通過） |
-| 協作流程 | Gemini / Codex 協同開發，本機執行驗收 |
-| A1～A10 領域單元測試 | ✅ A1～A10 查核點全部驗收完成（共 173 個測試） |
-| B1～B5 雙層存檔與持久化測試 | ✅ B1～B5 查核點全部驗收完成（共 19 個測試） |
-| C1～C7 劇情系統與驗證器測試 | ✅ C1～C7 查核點全部驗收完成（共 78 個測試） |
-| D1～D6 橫切服務測試 | ✅ D1～D6 查核點全部驗收完成（多語言、平台、資產、設定、年齡確認、時鐘，共 20 個測試） |
-| 實機試跑展示 | ✅ `dotnet run --project client/GameDemo -- --auto` 端對端執行通過 |
-| Unity 層骨架 | 🟡 已撰寫，**沒有經過編譯**（本機沒有安裝 Unity）；需要先安裝 com.unity.nuget.newtonsoft-json |
-| Live2D、Yarn Spinner、Addressables、Steamworks | ⏳ M0 技術驗證時接入 |
+| Domain 全部模組 | ✅ .NET 8 與 Unity 6 LTS 編譯通過，嚴格 noEngineReferences |
+| Core：GameCore、存檔、劇情、橫切服務、MVP Presenters | ✅ 編譯通過，純 C# 隔離保證 |
+| .NET 8 單元測試 | ✅ 315/315 通過（A1～A11、B1～B5、C1～C7、D1～D6、E1～E4、I1～I5、H1～H12 全數通過） |
+| Unity Test Runner (EditMode) | ✅ 317/317 通過（雙引擎 100% 綠燈，包含 PlayMode 整合測試） |
+| 協作流程 | Gemini / Codex / Claude 協同開發，本機執行驗收 |
+| A1～A11 領域單元測試 | ✅ A1～A11 查核點全部驗收完成（含 R→UR 進階與全稀有度扭蛋） |
+| B1～B5 雙層存檔與持久化測試 | ✅ B1～B5 查核點全部驗收完成 |
+| C1～C7 劇情系統與驗證器測試 | ✅ C1～C7 查核點全部驗收完成 |
+| D1～D6 橫切服務測試 | ✅ D1～D6 查核點全部驗收完成 |
+| E1～E4 整合驗證與效能測試 | ✅ 完整遊戲循環、平衡模擬、戰鬥與存檔效能全數達標 |
+| I1～I5 資料與工具管線 | ✅ 主資料驗證、同步、資產匯入、劇本驗證、在地化工具全數完工 |
+| H1～H12 Unity 表現層框架 | ✅ 畫面堆疊導航、MVP 架構、ADV 演出、圖鑑、音效與共用 UI 元件 |
+| F1～F4, F9 Unity 技術驗證 | ✅ Unity 6 LTS CLI 編譯 0 錯誤、EditMode 317 綠燈、PlayMode 測試、Windows Standalone 建置成功 (154MB) |
+| Live2D、Yarn Spinner、Addressables、Steamworks | ⏳ 里程碑 F 後續項目推進中 |
 
 ## 4. 關鍵約定（細節之後補充）
 - **狀態只能透過 `GameCore` 的命令修改**；UI 只讀取 `PlayerState`，並訂閱 `EventBus`。

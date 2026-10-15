@@ -351,12 +351,9 @@ namespace Game.Tests
             pity = 7;
             rngCalls = 0;
             Exception noRates = Assert.Catch(() => GachaEngine.Pull(banner, 1, ref pity, rng));
-            Assert.Multiple(() =>
-            {
-                Assert.IsInstanceOf<InvalidOperationException>(noRates);
-                Assert.AreEqual(7, pity, "沒有有效機率時不得變更 pity 狀態");
-                Assert.AreEqual(0, rngCalls, "沒有有效機率時不得消耗亂數");
-            });
+            Assert.IsInstanceOf<InvalidOperationException>(noRates);
+            Assert.AreEqual(7, pity, "沒有有效機率時不得變更 pity 狀態");
+            Assert.AreEqual(0, rngCalls, "沒有有效機率時不得消耗亂數");
         }
     }
 }

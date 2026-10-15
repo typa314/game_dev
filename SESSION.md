@@ -61,13 +61,15 @@
 - **B5-2 ✅（多結局累計保留）**：在分歧點存檔讀回後改走另一個分支，已達成的舊結局依然保留在 Profile 中，新結局也成功加入。
 - **B5-3 ✅（節點遺失降級保護）**：劇情存檔記錄的節點若在劇本改版中被刪除，自動退回該章節開頭節點（`ChapterStartNode`），恢復劇情變數，並觸發警告回呼，不崩潰。
 
-#### (7) 缺陷加固回歸測試全數通過
-- **Bug 2**：`ConditionEvaluator.cs` null 防禦與安全 `Enum.TryParse`。
-- **Bug 3**：`MiniScriptRunner.cs` 條件求值外層括號剝除、賦值運算函式呼叫支援。
-- **Bug 4**：`GameCore.NewPlayer` 初始角色預設服裝自動解鎖至 `Costumes`。
-- **Bug 5**：`GameCore.SetTeam` 全空隊伍防禦。
-- **Bug 6**：`GameCore.CountStars` 零受傷滿星通關邊界修復。
-- **Bug 7**：`MasterDataValidator.cs` 補齊條件合法性校驗。
+#### (7) 缺陷加固回歸測試全數通過（詳細請參見 `BUG_LOG.md`）
+- **Bug 1（BUG-001）**：`StoryCommandRegistryTests.cs` verbatim 引號轉義修復，傳入合法空字串 `""""`。
+- **Bug 2（BUG-002）**：`ConditionEvaluator.cs` null 防禦與安全 `Enum.TryParse`。
+- **Bug 3（BUG-003）**：`MiniScriptRunner.cs` 條件求值外層括號剝除、賦值運算函式呼叫支援。
+- **Bug 4（BUG-004）**：`GameCore.NewPlayer` 初始角色預設服裝自動解鎖至 `Costumes`。
+- **Bug 5（BUG-005）**：`GameCore.SetTeam` 全空隊伍防禦。
+- **Bug 6（BUG-006）**：`GameCore.CountStars` 零受傷滿星通關邊界修復。
+- **Bug 7（BUG-007）**：`MasterDataValidator.cs` 補齊條件合法性校驗。
+- **Bug 8（BUG-008）**：`GameCore.ReachEnding` 與 `UnlockCg` null 與空白防禦。
 
 ---
 
@@ -76,12 +78,15 @@
   ```bash
   dotnet test client/DotnetTests/Game.DotnetTests.csproj
   ```
-- **測試結果**：**通過 270 / 失敗 0 / 略過 0**（全部通過，無任何回歸）。
+- **測試結果**：**通過 315 / 失敗 0 / 略過 0**（全部通過，無任何回歸）。
 - **已驗證之工單進度**：
-  - A 核心架構（A1～A10）：**全部完成 ✅**
+  - A 核心架構（A1～A11）：**全部完成 ✅**
   - B 存檔系統（B1～B5）：**全部完成 ✅**
   - C 劇情系統框架（C1～C7）：**全部完成 ✅**
   - D 橫切服務模組（D1～D6）：**全部完成 ✅**
+  - E 整合驗證（E1～E4）：**全部完成 ✅**
+  - I 資料與工具管線（I1～I5）：**全部完成 ✅**
+  - H Unity 表現層框架（H1～H12）：**全部完成 ✅**
 
 ---
 
@@ -297,6 +302,50 @@
 
 ---
 
+### 10. 里程碑 F：Unity 技術驗證成果 (F1, F2, F3, F4, F9 通過)
+
+本機成功安裝並配置 Unity 6 LTS 官方環境，實現純 C# 核心與 Unity 6 LTS 雙引擎無縫接軌與全套自動化測試通過，並順利建置出 Windows Standalone 開發版：
+
+#### (1) 工單 F1: Unity 6 LTS 環境與套件初始化
+- **實作產物**：
+  - `client/ProjectSettings/ProjectVersion.txt`（設定版本為 `6000.6.5f1`）。
+  - `client/Packages/manifest.json`：配置 `com.unity.nuget.newtonsoft-json` (3.2.1) 與 `com.unity.test-framework` (1.4.5) 等必要依賴，排除廢棄的 VR 模組。
+- **驗證成果**：
+  - 透過 Unity CLI 執行批次模式編譯（`-batchmode -quit`），Console 回傳 **Exit Code = 0，0 個編譯錯誤**。
+  - 核心組件邊界隔離防護：`Game.Domain` 與 `Game.Core` 維持 `"noEngineReferences": true`，確認純 C# 領域層與業務邏輯完全未沾染 UnityEngine。
+  - 透過 `MasterDataSync.Sync` 自動同步驗證 11 份 MasterData JSON 至 `client/Assets/StreamingAssets/MasterData/`。
+
+#### (2) 工單 F2: Unity Test Runner 雙引擎對齊驗證
+- **實作產物**：
+  - `client/Assets/Game/Tests/Game.Tests.asmdef`（配置 `"Editor"` 平台與 NUnit 參照）。
+  - 修復跨 asmdef 擴充方法可見性（`DictExt` 宣告為 `public`）、解耦 `CountStars` 與拆解單獨斷言。
+- **驗證成果**：
+  - Unity CLI 批次執行 Test Runner EditMode：
+    ```bash
+    "C:\Program Files\Unity\Hub\Editor\6000.6.5f1\Editor\Unity.exe" -batchmode -projectPath "F:\game_dev\client" -runTests -testPlatform EditMode -testResults "C:\Users\typa3\agent_tmp\game_dev\editmode_test_results.xml" -logFile "C:\Users\typa3\agent_tmp\game_dev\unity_test.log"
+    ```
+  - **測試結果**：**317 項測試 100% 全數通過，0 項失敗、0 項略過**（耗時 32.45 秒）。
+  - 與 .NET 8 CLI (`dotnet test`) 之 315 項通用測試維持 100% 行為與數值一致。
+
+#### (3) 工單 F3 & F4: Play 模式除錯面板與戰鬥結算整合測試
+- **實作產物**：[`client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs`](file:///F:/game_dev/client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs)
+- **驗證成果**：
+  - **F3-1 ✅（啟動與主循環）**：`GameBootstrap.Boot()` 順利啟動並注入 `GameServices`；執行十連抽、角色等級強化、地點巧遇事件，所有狀態流轉正常。
+  - **F3-2 ✅（原子存檔與重讀驗證）**：觸發存檔原子寫入 `persistentDataPath/saves/profile.json`；模擬重新開機載入 Profile，驗證持有人員、卡片、等級、歷史紀錄前後 100% 吻合。
+  - **F4-1 ✅（戰鬥推進）**：`BattleRunner` 啟動 `st_1_01` 關卡，模擬推進 1 個 tick 直到勝利。
+  - **F4-2 ✅（結算一致性）**：`SubmitBattle` 結算報告結果與即時戰鬥勝負 100% 相同，獲得 0～3 星星級評定與關卡首通獎勵。
+
+#### (4) 工單 F9: Windows Standalone 遊戲建置
+- **實作產物**：[`client/Assets/Game/Unity/Editor/BuildScript.cs`](file:///F:/game_dev/client/Assets/Game/Unity/Editor/BuildScript.cs)
+- **驗證成果**：
+  - 自動生成包含 `GameBootstrap`、`DebugMenu`、`BattleRunner`、`BattleDebugView` 之 [`Assets/Scenes/Boot.unity`](file:///F:/game_dev/client/Assets/Scenes/Boot.unity) 開發場景。
+  - 成功輸出 Windows 64-bit Standalone 可執行檔：
+    - **輸出路徑**：`F:\game_dev\build\Windows\GameClient.exe`
+    - **檔案大小**：**154 MB**（161,788,253 bytes），建置耗時 37.93 秒。
+  - 啟動測試：在 Windows 批次無圖形模式下啟動 `GameClient.exe` 執行正常，**Exit Code = 0**。
+
+---
+
 ## 後續 AGENT 協同開發與待辦事項 (Backlog)
 
 ### 里程碑狀態總覽
@@ -306,20 +355,19 @@
 - **D 橫切服務（D1～D6）**：6/6 全項完成 ✅
 - **E 整合驗證（E1～E4）**：4/4 全項完成 ✅ —— **遊戲循環在邏輯上完全可行！**
 - **I 資料與工具管線（I1～I5）**：5/5 全項完成 ✅ —— **企劃與美術可獨立產出與驗證內容！**
-- **H Unity 表現層框架（H1～H12）**：12/12 全項完成 ✅ —— **表現層框架與 Presenter 完備，315/315 測試綠燈！**
-- **F Unity 技術驗證（F1～F10）**：待使用者安裝 Unity 6 LTS 後實地執行
+- **H Unity 表現層框架（H1～H12）**：12/12 全項完成 ✅ —— **表現層框架完備，315/315 測試綠燈！**
+- **F Unity 技術驗證（F1～F10）**：**5/10 已完成**（F1, F2, F3, F4, F9 通過 ✅）
 
-### 下階段推進建議：F Unity 技術驗證（`design/17_framework_worklist.md` F 系列）
-1. **F1: Unity 環境安裝與專案載入**
-   - 安裝 Unity 6 LTS，載入 `F:\game_dev\client`。
-   - 安裝 `com.unity.nuget.newtonsoft-json` 套件。
-   - 確認 Console 顯示 0 個編譯錯誤。
-2. **F2: Unity Test Runner 執行**
-   - 於 Unity 編輯器內執行 EditMode 測試，確認 315 項測試在 Unity 內全數通過。
-3. **F3～F4: Play 模式驗證**
-   - 透過 `DebugMenu` 與 `BattleDebugView` 在 Unity 內實際試跑戰鬥與主流程。
-4. **F5: Live2D Cubism SDK 整合**
-   - 匯入官方 SDK，掛載模型並量測 FPS 與記憶體消耗。
-5. **F7～F9: Addressables、Steamworks 與 Standalone 建置**
-   - 打包驗證 DLC 實體隔離、Steam 初始化與 Windows exe 建置。
+### 下階段推進待辦項目（里程碑 F 剩餘 5 項）
+1. **F10: 多螢幕比例與解析度自適應**
+   - 驗證 16:9 (1920x1080)、16:10 (1280x800 Steam Deck) 與 21:9 超寬螢幕之 CanvasScaler、安全框與背景延伸，確保 UI 不被裁切。
+2. **F7: Addressables 分級 Group 隔離打包**
+   - 安裝 `com.unity.addressables`，配置 `content_g`、`content_r15`、`content_r18` 分級群組。
+   - 實作建置 CI 閘門：本體 catalog 掃描陽性對照，禁止任何 R18 key 流入本體。
+3. **F6: Yarn Spinner 整合與 IStoryRunner 實作**
+   - 將標準劇本轉為 Yarn 腳本，串接 `IStoryRunner` 介面，驗證雙語言 Line ID 切換與選項跳轉行為與 MiniScript 一致。
+4. **F8: Steamworks.NET 平台初始化驗證**
+   - 引入 Steamworks.NET，以測試 AppID 480 進行離線/本機初始化測試，串接 `IPlatformService`。
+5. **F5: Live2D Cubism SDK 整合**
+   - 待使用者授權下載 Cubism 5 SDK package 後，掛載官方範例模型量測 1 個與 3 個模型之 FPS 與記憶體消耗。
 

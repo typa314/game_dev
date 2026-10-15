@@ -1,0 +1,8 @@
+[
+  { "id": "en_slime", "type": "normal", "defeatGold": 10,
+    "battle": { "hp": 300, "atk": 20, "range": 100, "attackIntervalSec": 1.5, "moveSpeed": 8, "knockbacks": 1, "target": "single" } },
+  { "id": "en_bat", "type": "flying", "defeatGold": 15,
+    "battle": { "hp": 200, "atk": 30, "range": 120, "attackIntervalSec": 1.2, "moveSpeed": 14, "knockbacks": 1, "target": "single" } },
+  { "id": "en_golem", "type": "armored", "defeatGold": 200,
+    "battle": { "hp": 6000, "atk": 250, "range": 150, "attackIntervalSec": 3.0, "moveSpeed": 5, "knockbacks": 3, "target": "area" } }
+]
