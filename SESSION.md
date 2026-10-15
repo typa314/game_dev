@@ -324,8 +324,8 @@
     ```bash
     "C:\Program Files\Unity\Hub\Editor\6000.6.5f1\Editor\Unity.exe" -batchmode -projectPath "F:\game_dev\client" -runTests -testPlatform EditMode -testResults "C:\Users\typa3\agent_tmp\game_dev\editmode_test_results.xml" -logFile "C:\Users\typa3\agent_tmp\game_dev\unity_test.log"
     ```
-  - **測試結果**：**328 項測試 100% 全數通過，0 項失敗、0 項略過**（包含 F3/F4 PlayMode 測試）。
-  - 與 .NET 8 CLI (`dotnet test`) 之 326 項通用測試維持 100% 行為與數值一致。
+  - **測試結果**：**332 項測試 100% 全數通過，0 項失敗、0 項略過**（包含 F3/F4 PlayMode 測試）。
+  - 與 .NET 8 CLI (`dotnet test`) 之 330 項通用測試維持 100% 行為與數值一致。
 
 #### (3) 工單 F3 & F4: Play 模式除錯面板與戰鬥結算整合測試
 - **實作產物**：[`client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs`](file:///F:/game_dev/client/Assets/Game/Tests/UnityIntegrationPlayModeTests.cs)
@@ -335,14 +335,22 @@
   - **F4-1 ✅（戰鬥推進）**：`BattleRunner` 啟動 `st_1_01` 關卡，模擬推進 1 個 tick 直到勝利。
   - **F4-2 ✅（結算一致性）**：`SubmitBattle` 結算報告結果與即時戰鬥勝負 100% 相同，獲得 0～3 星星級評定與關卡首通獎勵。
 
-#### (4) 工單 F7: Addressables 分級 Group 隔離審計與 CI 建置閘門
+#### (4) 工單 F6: Yarn Spinner 實作 IStoryRunner
+- **實作產物**：[`client/Assets/Game/Core/Story/Yarn/YarnStoryRunner.cs`](file:///F:/game_dev/client/Assets/Game/Core/Story/Yarn/YarnStoryRunner.cs)、[`client/Assets/Game/Tests/YarnStoryRunnerTests.cs`](file:///F:/game_dev/client/Assets/Game/Tests/YarnStoryRunnerTests.cs)
+- **驗證成果**：
+  - **F6-1 ✅（行為對齊）**：解析標準 Yarn 節點、選項跳轉（`-> Text #line:id <<jump Node>>`）、自訂演出指令（`<<bg>>`, `<<show>>`）與算術表達式（`<<set $var = $var + 1>>`），執行結果與 `MiniScriptRunner` 100% 一致。
+  - **F6-2 ✅（多語言切換）**：串接 `ILocalizationService`，切換 `zh-TW` 與 `en` 時 `#line:` ID 維持穩定，台詞文字即時切換。
+  - **F6-3 ✅（快照與回溯）**：完整支援 `Snapshot()` 與 `Restore()`，變數字典深拷貝隔離，不產生別名污染。
+  - **F6-4 ✅（分級退回）**：支援 `RatingPolicy`，G 政策下進入 R18 節點自動跳轉至 fallback 節點，R18 政策下正常進入。
+
+#### (5) 工單 F7: Addressables 分級 Group 隔離審計與 CI 建置閘門
 - **實作產物**：[`client/Assets/Game/Core/Assets/AddressablesCatalogAuditor.cs`](file:///F:/game_dev/client/Assets/Game/Core/Assets/AddressablesCatalogAuditor.cs)、[`client/Assets/Game/Tests/AddressablesCatalogAuditorTests.cs`](file:///F:/game_dev/client/Assets/Game/Tests/AddressablesCatalogAuditorTests.cs)
 - **驗證成果**：
   - **F7-1 ✅（分級規則）**：嚴格劃分 `content_g`、`content_r15`（主程式本體 Catalog）與 `content_r18`（成人 DLC Catalog）。
   - **F7-2 ✅（乾淨本體）**：主程式 Catalog 掃描結果 100% 無任何 R18 條目、無 R18 目錄素材，完全合法通過審計。
   - **F7-3 ✅（陽性對照）**：故意將 R18 評級素材注入 `content_g`、或將 `content_r18` 群組混入本體 Catalog、或素材帶有 `nsfw` 標籤時，CI 閘門立即觸發 `ERR_R18_KEY_IN_BASE_CATALOG` / `ERR_R18_FOLDER_IN_BASE_CATALOG`，強制拋出例外中斷建置！
 
-#### (5) 工單 F9: Windows Standalone 遊戲建置
+#### (6) 工單 F9: Windows Standalone 遊戲建置
 - **實作產物**：[`client/Assets/Game/Unity/Editor/BuildScript.cs`](file:///F:/game_dev/client/Assets/Game/Unity/Editor/BuildScript.cs)
 - **驗證成果**：
   - 自動生成包含 `GameBootstrap`、`DebugMenu`、`BattleRunner`、`BattleDebugView` 之 [`Assets/Scenes/Boot.unity`](file:///F:/game_dev/client/Assets/Scenes/Boot.unity) 開發場景。
@@ -351,7 +359,7 @@
     - **檔案大小**：**154 MB**（161,788,253 bytes），建置耗時 37.93 秒。
   - 啟動測試：在 Windows 批次無圖形模式下啟動 `GameClient.exe` 執行正常，**Exit Code = 0**。
 
-#### (6) 工單 F10: 多螢幕比例與解析度自適應
+#### (7) 工單 F10: 多螢幕比例與解析度自適應
 - **實作產物**：[`client/Assets/Game/Core/UI/ResolutionLayout.cs`](file:///F:/game_dev/client/Assets/Game/Core/UI/ResolutionLayout.cs)、[`client/Assets/Game/Unity/UI/ResolutionAdapter.cs`](file:///F:/game_dev/client/Assets/Game/Unity/UI/ResolutionAdapter.cs)、[`client/Assets/Game/Tests/ResolutionTests.cs`](file:///F:/game_dev/client/Assets/Game/Tests/ResolutionTests.cs)
 - **驗證成果**：
   - **F10-1 ✅（標準 16:9）**：1080p（1920x1080）與 4K（3840x2160）維持基準解析度，虛擬畫布完全貼合，所有 UI 元素零裁切。
@@ -371,13 +379,11 @@
 - **E 整合驗證（E1～E4）**：4/4 全項完成 ✅ —— **遊戲循環在邏輯上完全可行！**
 - **I 資料與工具管線（I1～I5）**：5/5 全項完成 ✅ —— **企劃與美術可獨立產出與驗證內容！**
 - **H Unity 表現層框架（H1～H12）**：12/12 全項完成 ✅ —— **表現層框架完備，純 C# 隔離！**
-- **F Unity 技術驗證（F1～F10）**：**7/10 已完成**（F1, F2, F3, F4, F7, F9, F10 通過 ✅）
+- **F Unity 技術驗證（F1～F10）**：**8/10 已完成**（F1, F2, F3, F4, F6, F7, F9, F10 通過 ✅）
 
-### 下階段推進待辦項目（里程碑 F 剩餘 3 項）
-1. **F6: Yarn Spinner 整合與 IStoryRunner 實作**
-   - 將標準劇本轉為 Yarn 腳本，串接 `IStoryRunner` 介面，驗證雙語言 Line ID 切換與選項跳轉行為與 MiniScript 一致。
-2. **F8: Steamworks.NET 平台初始化驗證**
-   - 引入 Steamworks.NET，以測試 AppID 480 進行離線/本機初始化測試，串接 `IPlatformService`。
-3. **F5: Live2D Cubism SDK 整合**
+### 下階段推進待辦項目（里程碑 F 剩餘 2 項，需外部 SDK 或 Steam 客戶端執行）
+1. **F8: Steamworks.NET 平台初始化驗證**
+   - 引入 Steamworks.NET 原生封裝，配置 AppID 480 進行離線/本機初始化測試，串接 `IPlatformService`。
+2. **F5: Live2D Cubism SDK 整合**
    - 待使用者授權下載 Cubism 5 SDK package 後，掛載官方範例模型量測 1 個與 3 個模型之 FPS 與記憶體消耗。
 
