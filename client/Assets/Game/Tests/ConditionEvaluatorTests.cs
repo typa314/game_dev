@@ -534,5 +534,27 @@ namespace Game.Tests
             Assert.IsFalse(ConditionEvaluator.Evaluate(cR18, ctx), "G 政策下評估 R18 應回傳 false");
             Assert.IsTrue(ConditionEvaluator.Evaluate(cG, ctx), "G 政策下評估 G 應回傳 true");
         }
+
+        // =============================================================
+        // A3-8：數值條件防禦測試（null 或非法字串安全回傳 false，不拋出例外）
+        // =============================================================
+
+        [Test]
+        public void A3_8_NumericConditions_WithInvalidOrNullValue_SafelyReturnsFalse()
+        {
+            ConditionContext ctx = CreateBaseContext();
+            ctx.EnemyBaseHpPct = 50;
+
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "char_level_gte", Char = "char01_claire", Value = null }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "char_level_gte", Char = "char01_claire", Value = "invalid" }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "char_awaken_gte", Char = "char01_claire", Value = null }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "char_awaken_gte", Char = "char01_claire", Value = "abc" }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "affection_gte", Char = "char01_claire", Value = null }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "affection_gte", Char = "char01_claire", Value = "xyz" }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "story_flag", Key = "flag1", Value = null }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "story_flag", Key = "flag1", Value = "invalid" }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "enemy_base_hp_below_pct", Value = null }, ctx));
+            Assert.IsFalse(ConditionEvaluator.Evaluate(new Condition { Type = "enemy_base_hp_below_pct", Value = "not_a_num" }, ctx));
+        }
     }
 }

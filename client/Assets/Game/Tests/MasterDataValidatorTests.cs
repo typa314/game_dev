@@ -530,6 +530,87 @@ namespace Game.Tests
             Assert.AreEqual(0, errors.Count, "N4 失敗: char 為 'self' 不需是存在的角色 ID，不應有錯誤。\n" + string.Join("\n", errors));
         }
 
+        [Test]
+        public void A2_5_32_Scene_ConditionStoryFlagNeedsKey_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "story_flag", Value = "1" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'story_flag' needs 'key'");
+        }
+
+        [Test]
+        public void A2_5_33_Scene_ConditionStoryFlagInvalidOp_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "story_flag", Key = "flag1", Op = "<>", Value = "1" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'story_flag' invalid op <>");
+        }
+
+        [Test]
+        public void A2_5_34_Scene_ConditionCharLevelGte_NeedsNumericValue_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "char_level_gte", Char = "char01_claire", Value = "invalid" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'char_level_gte' needs valid numeric 'value'");
+        }
+
+        [Test]
+        public void A2_5_35_Stage_WaveConditionEnemyBaseHpBelowPct_NeedsNumericValue_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Stages["st_1_01"].Waves[0].Trigger = new Condition { Type = "enemy_base_hp_below_pct", Value = "abc" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "stage st_1_01: ", "'enemy_base_hp_below_pct' needs valid numeric 'value'");
+        }
+
+        [Test]
+        public void A2_5_36_Scene_ConditionTimeOfDay_InvalidValue_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "time_of_day", Value = "midnight" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'time_of_day' invalid value midnight");
+        }
+
+        [Test]
+        public void A2_5_37_Scene_ConditionWeekday_InvalidValue_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "weekday", Value = "Funday" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'weekday' invalid value Funday");
+        }
+
+        [Test]
+        public void A2_5_38_Scene_ConditionRatingAllowed_InvalidRating_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "rating_allowed", Rating = "PG13" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'rating_allowed' invalid rating PG13");
+        }
+
+        [Test]
+        public void A2_5_39_Scene_ConditionEndingReached_NeedsEnding_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "ending_reached", Ending = "" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'ending_reached' needs 'ending'");
+        }
+
+        [Test]
+        public void A2_5_40_Scene_ConditionStoryNode_NeedsNode_IsRejected()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Scenes["scene_cafe"].Unlock = new Condition { Type = "story_node", Node = "" };
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "scene scene_cafe: ", "'story_node' needs 'node'");
+        }
+
         // =============================================================
         // A2-6 錯誤訊息格式（正規表示式檢查）
         // =============================================================

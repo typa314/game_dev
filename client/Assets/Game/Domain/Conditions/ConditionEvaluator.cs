@@ -50,17 +50,17 @@ namespace Game.Domain.Conditions
                 case "char_level_gte":
                 {
                     CharacterState s = CharState(c, ctx);
-                    return s != null && s.Level >= Num(c.Value);
+                    return s != null && TryNum(c.Value, out double v) && s.Level >= v;
                 }
                 case "char_awaken_gte":
                 {
                     CharacterState s = CharState(c, ctx);
-                    return s != null && s.Awaken >= Num(c.Value);
+                    return s != null && TryNum(c.Value, out double v) && s.Awaken >= v;
                 }
                 case "affection_gte":
                 {
                     CharacterState s = CharState(c, ctx);
-                    return s != null && s.Affection >= Num(c.Value);
+                    return s != null && TryNum(c.Value, out double v) && s.Affection >= v;
                 }
                 case "stage_cleared":
                 {
@@ -69,8 +69,8 @@ namespace Game.Domain.Conditions
                     return ctx.Player.Stages.TryGetValue(c.Stage, out p) && p.Cleared;
                 }
                 case "story_flag":
-                    if (string.IsNullOrEmpty(c.Key)) return false;
-                    return Compare(StoryValue(c.Key, ctx), c.Op, Num(c.Value));
+                    if (string.IsNullOrEmpty(c.Key) || !TryNum(c.Value, out double vFlag)) return false;
+                    return Compare(StoryValue(c.Key, ctx), c.Op, vFlag);
                 case "story_node":
                     if (string.IsNullOrEmpty(c.Node)) return false;
                     return ctx.Player.Story.ReadNodes.Contains(c.Node);
@@ -95,7 +95,7 @@ namespace Game.Domain.Conditions
                     return ctx.Rating.Allows(r);
                 }
                 case "enemy_base_hp_below_pct":
-                    return ctx.EnemyBaseHpPct.HasValue && ctx.EnemyBaseHpPct.Value < Num(c.Value);
+                    return ctx.EnemyBaseHpPct.HasValue && TryNum(c.Value, out double vHp) && ctx.EnemyBaseHpPct.Value < vHp;
                 default:
                     throw new InvalidOperationException("unknown condition type: " + c.Type);
             }
@@ -128,9 +128,14 @@ namespace Game.Domain.Conditions
             return ctx.Player.Story.Flags.TryGetValue(key, out g) ? g : 0;
         }
 
-        private static double Num(string s)
+        private static bool TryNum(string s, out double result)
         {
-            return double.Parse(s, NumberStyles.Float, CultureInfo.InvariantCulture);
+            if (string.IsNullOrEmpty(s))
+            {
+                result = 0;
+                return false;
+            }
+            return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result);
         }
 
         private static bool Compare(double a, string op, double b)

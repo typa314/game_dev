@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Game.Domain.Conditions;
 
@@ -87,8 +88,12 @@ namespace Game.Domain.MasterData
                 {
                     if (!m.Enemies.ContainsKey(w.Enemy)) err.Add(at + ": enemy " + w.Enemy + " not found");
                     if (w.Count <= 0) err.Add(at + ": wave count must be > 0");
-                    if (w.Trigger != null && w.Trigger.Type != "enemy_base_hp_below_pct")
-                        err.Add(at + ": unsupported wave trigger " + w.Trigger.Type);
+                    if (w.Trigger != null)
+                    {
+                        if (w.Trigger.Type != "enemy_base_hp_below_pct")
+                            err.Add(at + ": unsupported wave trigger " + w.Trigger.Type);
+                        CheckCondition(w.Trigger, at, m, err);
+                    }
                 }
                 foreach (string u in s.UnlocksOnClear)
                     if (!m.Stages.ContainsKey(u) && !m.Spots.ContainsKey(u)) err.Add(at + ": unlocksOnClear " + u + " is neither stage nor spot");
@@ -185,10 +190,14 @@ namespace Game.Domain.MasterData
                     else CheckCondition(c.Cond, at, m, err);
                     break;
                 case "char_owned":
+                    if (c.Char != "self" && !m.Characters.ContainsKey(c.Char ?? "")) err.Add(at + ": condition char " + c.Char + " not found");
+                    break;
                 case "char_level_gte":
                 case "char_awaken_gte":
                 case "affection_gte":
                     if (c.Char != "self" && !m.Characters.ContainsKey(c.Char ?? "")) err.Add(at + ": condition char " + c.Char + " not found");
+                    if (string.IsNullOrEmpty(c.Value) || !double.TryParse(c.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+                        err.Add(at + ": condition '" + c.Type + "' needs valid numeric 'value'");
                     break;
                 case "stage_cleared":
                     if (!m.Stages.ContainsKey(c.Stage ?? "")) err.Add(at + ": condition stage " + c.Stage + " not found");
@@ -198,6 +207,10 @@ namespace Game.Domain.MasterData
                     break;
                 case "story_flag":
                     if (string.IsNullOrEmpty(c.Key)) err.Add(at + ": condition 'story_flag' needs 'key'");
+                    if (!string.IsNullOrEmpty(c.Op) && c.Op != ">=" && c.Op != ">" && c.Op != "<=" && c.Op != "<" && c.Op != "==" && c.Op != "!=")
+                        err.Add(at + ": condition 'story_flag' invalid op " + c.Op);
+                    if (string.IsNullOrEmpty(c.Value) || !double.TryParse(c.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+                        err.Add(at + ": condition 'story_flag' needs valid numeric 'value'");
                     break;
                 case "story_node":
                     if (string.IsNullOrEmpty(c.Node)) err.Add(at + ": condition 'story_node' needs 'node'");
@@ -217,6 +230,10 @@ namespace Game.Domain.MasterData
                     string rStr = c.Rating ?? c.Value;
                     if (string.IsNullOrEmpty(rStr) || !Enum.TryParse<Rating>(rStr, true, out _))
                         err.Add(at + ": condition 'rating_allowed' invalid rating " + rStr);
+                    break;
+                case "enemy_base_hp_below_pct":
+                    if (string.IsNullOrEmpty(c.Value) || !double.TryParse(c.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+                        err.Add(at + ": condition 'enemy_base_hp_below_pct' needs valid numeric 'value'");
                     break;
             }
         }

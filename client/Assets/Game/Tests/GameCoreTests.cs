@@ -201,6 +201,8 @@ namespace Game.Tests
 
             // SetTeam: invalid_team, character_not_owned, duplicate_member
             AssertCommandFailsWithRollback(core, () => core.SetTeam(null), "invalid_team");
+            AssertCommandFailsWithRollback(core, () => core.SetTeam(new List<string>()), "invalid_team");
+            AssertCommandFailsWithRollback(core, () => core.SetTeam(new List<string> { null, null }), "invalid_team");
             AssertCommandFailsWithRollback(core, () => core.SetTeam(Enumerable.Range(0, 11).Select(i => "char04_elysia").ToList()), "invalid_team");
             AssertCommandFailsWithRollback(core, () => core.SetTeam(new List<string> { "char_unowned" }), "character_not_owned");
             AssertCommandFailsWithRollback(core, () => core.SetTeam(new List<string> { "char04_elysia", "char04_elysia" }), "duplicate_member");

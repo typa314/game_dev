@@ -48,8 +48,15 @@ namespace Game.Tests
             GameCore core = GameServices.Core;
             Assert.IsNotNull(core, "GameCore 實例應已建立");
 
-            // 給予足夠資源進行操作測試
-            core.Player.AddItem("gem", 3000);
+            // 給予足夠資源進行操作測試（配置驅動）
+            var stdBanner = core.Master.Banners.GetOrNull("banner_std");
+            if (stdBanner?.Cost?.Ten != null)
+            {
+                foreach (var costItem in stdBanner.Cost.Ten)
+                {
+                    core.Player.AddItem(costItem.Item, costItem.N * 2);
+                }
+            }
             core.Player.AddItem("item_dia_free", 3000);
             core.Player.AddItem("exp_s", 10);
             core.Player.Encounter.Stamina = 100;

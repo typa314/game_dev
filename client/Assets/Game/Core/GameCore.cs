@@ -89,10 +89,7 @@ namespace Game.Core
             p.Encounter.StaminaUpdatedAtUtc = now;
             foreach (string ch in init.Characters)
             {
-                p.Characters[ch] = NewCharacterState(master, ch, now);
-                CharacterDef cdef = master.Characters.GetOrNull(ch);
-                if (cdef != null && !string.IsNullOrEmpty(cdef.DefaultCostume))
-                    p.Costumes.Add(cdef.DefaultCostume);
+                IngestCharacter(p, master, ch, now);
                 if (p.Team.Count < 10) p.Team.Add(ch);
             }
             p.Lobby.Scene = init.Scenes.FirstOrDefault();
@@ -100,10 +97,35 @@ namespace Game.Core
             return p;
         }
 
+        /// <summary>統一角色納入與預設資產登錄工廠，確保無論開局贈送、轉蛋或掉落皆具備一致的領域不變量。</summary>
+        internal static CharacterState IngestCharacter(PlayerState player, MasterDatabase master, string charId, string nowIso, string initialRarity = null)
+        {
+            CharacterState s = NewCharacterState(master, charId, nowIso);
+            if (!string.IsNullOrEmpty(initialRarity))
+                s.CurrentRarity = initialRarity;
+            player.Characters[charId] = s;
+            CharacterDef def = master.Characters.GetOrNull(charId);
+            if (def != null && !string.IsNullOrEmpty(def.DefaultCostume))
+            {
+                player.Costumes.Add(def.DefaultCostume);
+            }
+            string baseCg = $"cg_{charId}_{s.CurrentRarity.ToLower()}";
+            player.Gallery.Add(baseCg);
+            return s;
+        }
+
         /// <summary>載入存檔後呼叫：補上新增的立繪解鎖、成就追溯（例如更新主資料或安裝 DLC 之後）。</summary>
         public void OnLoaded()
         {
-            foreach (KeyValuePair<string, CharacterState> kv in Player.Characters.ToList()) RefreshPortraits(kv.Key, kv.Value);
+            foreach (KeyValuePair<string, CharacterState> kv in Player.Characters.ToList())
+            {
+                RefreshPortraits(kv.Key, kv.Value);
+                CharacterDef def = Master.Characters.GetOrNull(kv.Key);
+                if (def != null && !string.IsNullOrEmpty(def.DefaultCostume))
+                    Player.Costumes.Add(def.DefaultCostume);
+                string baseCg = $"cg_{kv.Key}_{kv.Value.CurrentRarity.ToLower()}";
+                Player.Gallery.Add(baseCg);
+            }
             _achievements.Reevaluate();
         }
 
@@ -373,16 +395,12 @@ namespace Game.Core
         private void ObtainCharacter(string charId, string via, string initialRarity = null)
         {
             if (Player.Char(charId) != null) return;
-            CharacterState s = NewCharacterState(Master, charId, Iso(_clock.UtcNow));
             CharacterDef def = Master.Characters[charId];
-            if (initialRarity != null) s.CurrentRarity = initialRarity;
-            Player.Characters[charId] = s;
-            if (def.DefaultCostume != null && Player.Costumes.Add(def.DefaultCostume))
+            CharacterState s = IngestCharacter(Player, Master, charId, Iso(_clock.UtcNow), initialRarity);
+            if (def.DefaultCostume != null)
                 Bus.Publish(new DomainEvent(Ev.CostumeUnlocked).With("costume", def.DefaultCostume).With("char", charId));
 
-            // 解鎖當前等級基礎 CG 並收藏
-            UnlockGradeCg(charId, s.CurrentRarity, 0);
-
+            Bus.Publish(new DomainEvent(Ev.CgUnlocked).With("cg", $"cg_{charId}_{s.CurrentRarity.ToLower()}"));
             Bus.Publish(new DomainEvent(Ev.CharacterObtained).With("char", charId).With("rarity", s.CurrentRarity).With("via", via));
             RefreshPortraits(charId, s);
         }
@@ -680,6 +698,7 @@ namespace Game.Core
 
         public void SetGlobalFlag(string key, double value)
         {
+            if (string.IsNullOrWhiteSpace(key)) return;
             Player.Story.Flags[key] = value;
             Dirty = true;
         }

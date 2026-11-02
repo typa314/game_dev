@@ -142,6 +142,39 @@ end
             Assert.AreEqual(recordedTime, core.Player.Endings["ending_elysia_good"]);
         }
 
+        [Test]
+        public void C4_2_NullOrWhitespaceInputs_SafelyIgnored_WithoutException()
+        {
+            var core = CreateCore();
+            int endingCount = core.Player.Endings.Count;
+            int galleryCount = core.Player.Gallery.Count;
+            int flagCount = core.Player.Story.Flags.Count;
+
+            Assert.DoesNotThrow(() => core.ReachEnding(null));
+            Assert.DoesNotThrow(() => core.ReachEnding("   "));
+            Assert.DoesNotThrow(() => core.UnlockCg(null));
+            Assert.DoesNotThrow(() => core.UnlockCg("   "));
+            Assert.DoesNotThrow(() => core.SetGlobalFlag(null, 10));
+            Assert.DoesNotThrow(() => core.SetGlobalFlag("   ", 10));
+
+            Assert.AreEqual(endingCount, core.Player.Endings.Count);
+            Assert.AreEqual(galleryCount, core.Player.Gallery.Count);
+            Assert.AreEqual(flagCount, core.Player.Story.Flags.Count);
+        }
+
+        [Test]
+        public void C4_5_NewPlayer_UnlocksStarterCharacterCg()
+        {
+            var core = CreateCore();
+            foreach (var ch in core.Master.Config.Initial.Characters)
+            {
+                var cs = core.Player.Char(ch);
+                Assert.IsNotNull(cs, $"初始角色 {ch} 應存在");
+                string expectedCg = $"cg_{ch}_{cs.CurrentRarity.ToLower()}";
+                Assert.IsTrue(core.Player.Gallery.Contains(expectedCg), $"新玩家應已解鎖初始角色 {ch} 之基礎 CG {expectedCg}");
+            }
+        }
+
         // -----------------------------------------------------------------------------------------
         // C4-3: 回憶模式：重播章節時使用暫時的變數副本，結束後 Profile 和所有存檔都沒有改變
         // -----------------------------------------------------------------------------------------
@@ -198,6 +231,7 @@ end
 
             var gallery = new GalleryService(cgs);
             var player = GameCore.NewPlayer(_master, _clock);
+            player.Gallery.Clear();
             player.Gallery.Add("cg_claire_01"); // Claire G 已解鎖
 
             // 1. 在 G 政策下檢視圖鑑
