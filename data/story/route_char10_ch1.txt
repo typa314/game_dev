@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char10_mirai
+command expr char10_mirai smile
+line l_r10_001 Mirai route_char10_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r10_002 Mirai route_char10_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char10_ch1_choice = 1
+line l_r10_003 Mirai route_char10_ch1_stay
+command affection char10_mirai 25
+end
+
+[node WalkBranch]
+set route_char10_ch1_choice = 2
+line l_r10_004 Mirai route_char10_ch1_walk
+command affection char10_mirai 15
+end

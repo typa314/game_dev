@@ -123,5 +123,104 @@ namespace Game.Core.Localization
 
             return set;
         }
+
+        private static readonly Regex RichTextTagRegex = new Regex(@"<(/?[a-zA-Z]+)(?:=[^>]*)?>", RegexOptions.Compiled);
+
+        public static LocalizationValidationResult ValidateUiLengthAndTags(
+            ILocalizationService loc,
+            int maxUiButtonChars = 40,
+            int maxGeneralChars = 200)
+        {
+            var result = new LocalizationValidationResult();
+            if (loc == null)
+            {
+                result.Errors.Add("LocalizationService is null.");
+                return result;
+            }
+
+            foreach (string locale in loc.AvailableLocales)
+            {
+                var table = loc.GetTable(locale);
+                if (table == null) continue;
+
+                foreach (var kvp in table)
+                {
+                    string key = kvp.Key;
+                    string text = kvp.Value ?? string.Empty;
+
+                    // 1. UI 與一般文字長度上限檢查
+                    if (key.StartsWith("ui.", StringComparison.OrdinalIgnoreCase) || key.StartsWith("ui/", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (text.Length > maxUiButtonChars)
+                        {
+                            result.Errors.Add($"ERR_UI_LENGTH_EXCEEDED: Key '{key}' in locale '{locale}' length {text.Length} exceeds limit of {maxUiButtonChars}. Text: '{text}'");
+                        }
+                    }
+                    else
+                    {
+                        if (text.Length > maxGeneralChars)
+                        {
+                            result.Errors.Add($"ERR_GENERAL_LENGTH_EXCEEDED: Key '{key}' in locale '{locale}' length {text.Length} exceeds limit of {maxGeneralChars}. Text: '{text}'");
+                        }
+                    }
+
+                    // 2. 富文字標籤成對閉合檢查 (<b>...</b>, <i>...</i>, <color=...>...</color>, <size=...>...</size>)
+                    string tagError = ValidateRichTextTags(text);
+                    if (!string.IsNullOrEmpty(tagError))
+                    {
+                        result.Errors.Add($"ERR_UNCLOSED_TAG: Key '{key}' in locale '{locale}' has malformed rich text tags: {tagError}. Text: '{text}'");
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public static string ValidateRichTextTags(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return null;
+
+            var matches = RichTextTagRegex.Matches(text);
+            if (matches.Count == 0) return null;
+
+            var stack = new Stack<string>();
+            var knownTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "b", "i", "color", "size" };
+
+            foreach (Match m in matches)
+            {
+                string rawTag = m.Groups[1].Value;
+                if (rawTag.StartsWith("/"))
+                {
+                    string closeTag = rawTag.Substring(1).ToLowerInvariant();
+                    if (!knownTags.Contains(closeTag)) continue;
+
+                    if (stack.Count == 0)
+                    {
+                        return $"Unexpected closing tag '</{closeTag}>' with no matching open tag";
+                    }
+
+                    string expected = stack.Pop();
+                    if (!string.Equals(expected, closeTag, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return $"Mismatched closing tag '</{closeTag}>', expected '</{expected}>'";
+                    }
+                }
+                else
+                {
+                    string openTag = rawTag.ToLowerInvariant();
+                    if (knownTags.Contains(openTag))
+                    {
+                        stack.Push(openTag);
+                    }
+                }
+            }
+
+            if (stack.Count > 0)
+            {
+                return $"Unclosed tag '<{stack.Peek()}>'";
+            }
+
+            return null;
+        }
     }
 }

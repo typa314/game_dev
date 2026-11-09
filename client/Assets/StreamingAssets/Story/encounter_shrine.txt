@@ -1,0 +1,20 @@
+[node Start]
+command bg scene_lobby_default
+command show char18_sakura_miko
+line l_shrine_001 Sakura welcome_to_shrine
+jump ShrineChoice
+
+[node ShrineChoice]
+line l_shrine_002 Sakura draw_fortune_together
+option opt_pray -> PrayOutcome
+option opt_tea -> TeaOutcome
+
+[node PrayOutcome]
+line l_shrine_003 Sakura blessing_granted
+command affection char18_sakura_miko 40
+end
+
+[node TeaOutcome]
+line l_shrine_004 Sakura warm_matcha
+command give exp_m 1
+end

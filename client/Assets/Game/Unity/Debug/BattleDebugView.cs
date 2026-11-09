@@ -59,24 +59,46 @@ namespace Game.Unity
             GUI.color = prev;
             top += 68f;
 
-            // 出擊按鈕列
+            // 出擊與特殊技能按鈕列 (移除主堡砲，點擊出兵或滿氣放技)
+            Color prevBg = GUI.backgroundColor;
             for (int slot = 0; slot < 10; slot++)
             {
-                bool can = sim.CanDeploy(slot);
-                GUI.enabled = can && battleRunner.IsRunning;
+                bool canDeploy = sim.CanDeploy(slot);
+                bool skillReady = sim.IsSkillReady(slot);
+                int charge = sim.SkillChargeOf(slot);
+                int full = sim.SkillFullTicksOf(slot);
+                int pct = full > 0 ? Mathf.Clamp(charge * 100 / full, 0, 100) : 0;
+
                 string key = slot == 9 ? "0" : (slot + 1).ToString();
-                if (GUI.Button(new Rect(left + slot * 52f, top, 50f, 30f), "[" + key + "]")) battleRunner.Deploy(slot);
+                string label;
+
+                if (skillReady)
+                {
+                    GUI.backgroundColor = new Color(1f, 0.85f, 0.2f); // 金黃大招高亮
+                    label = "[" + key + "] 💥大招";
+                    GUI.enabled = battleRunner.IsRunning;
+                }
+                else
+                {
+                    GUI.backgroundColor = prevBg;
+                    int cd = sim.CooldownOf(slot) / sim.TicksPerSecond;
+                    label = cd > 0 ? "[" + key + "] " + cd + "s" : "[" + key + "] " + pct + "%";
+                    GUI.enabled = canDeploy && battleRunner.IsRunning;
+                }
+
+                if (GUI.Button(new Rect(left + slot * 68f, top, 65f, 32f), label))
+                {
+                    battleRunner.TapSlot(slot);
+                }
             }
+            GUI.backgroundColor = prevBg;
             GUI.enabled = true;
-            top += 36f;
+            top += 38f;
 
             int? upCost = sim.EnergyUpgradeCost;
             GUI.enabled = battleRunner.IsRunning && upCost != null;
             if (GUI.Button(new Rect(left, top, 140f, 26f), upCost != null ? "能量升級 (" + upCost.Value + ")" : "能量已滿級"))
                 battleRunner.UpgradeEnergy();
-            GUI.enabled = battleRunner.IsRunning && sim.CannonFullTicks > 0 && sim.CannonChargeTicks >= sim.CannonFullTicks;
-            int pct = sim.CannonFullTicks > 0 ? sim.CannonChargeTicks * 100 / sim.CannonFullTicks : 0;
-            if (GUI.Button(new Rect(left + 150f, top, 140f, 26f), "據點砲 " + pct + "%")) battleRunner.FireCannon();
             GUI.enabled = true;
 
             if (GUI.Button(new Rect(left + 300f, top, 70f, 26f), battleRunner.Paused ? "繼續" : "暫停"))
@@ -95,7 +117,7 @@ namespace Game.Unity
             if (e.keyCode >= KeyCode.Alpha1 && e.keyCode <= KeyCode.Alpha9) slot = e.keyCode - KeyCode.Alpha1;
             else if (e.keyCode == KeyCode.Alpha0) slot = 9;
             if (slot < 0) return;
-            battleRunner.Deploy(slot);
+            battleRunner.TapSlot(slot);
             e.Use();
         }
     }

@@ -5,6 +5,7 @@
         "Game.Domain",
         "Game.Core",
         "Game.Unity",
+        "Live2D.Cubism",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

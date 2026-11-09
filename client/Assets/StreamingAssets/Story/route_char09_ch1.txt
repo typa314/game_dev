@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char09_chloe
+command expr char09_chloe smile
+line l_r09_001 Chloe route_char09_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r09_002 Chloe route_char09_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char09_ch1_choice = 1
+line l_r09_003 Chloe route_char09_ch1_stay
+command affection char09_chloe 25
+end
+
+[node WalkBranch]
+set route_char09_ch1_choice = 2
+line l_r09_004 Chloe route_char09_ch1_walk
+command affection char09_chloe 15
+end

@@ -14,5 +14,17 @@
   { "id": "ach_encounter_10", "category": "encounter", "name": "loc:ach/ach_encounter_10.name", "desc": "loc:ach/ach_encounter_10.desc", "rating": "G", "hidden": false,
     "trigger": { "event": "EncounterResolved", "counter": "count", "target": 10 }, "reward": [ { "item": "gem", "n": 100 } ], "steamApiName": "ACH_ENCOUNTER_10" },
   { "id": "ach_ending_any", "category": "story", "name": "loc:ach/ach_ending_any.name", "desc": "loc:ach/ach_ending_any.desc", "rating": "G", "hidden": false,
-    "trigger": { "event": "EndingReached", "counter": "count", "target": 1 }, "reward": [ { "item": "gem", "n": 100 } ], "steamApiName": "ACH_ENDING_ANY" }
+    "trigger": { "event": "EndingReached", "counter": "count", "target": 1 }, "reward": [ { "item": "gem", "n": 100 } ], "steamApiName": "ACH_ENDING_ANY" },
+  { "id": "ach_ch2_clear", "category": "battle", "name": "loc:ach/ach_ch2_clear.name", "desc": "loc:ach/ach_ch2_clear.desc", "rating": "G", "hidden": false,
+    "trigger": { "event": "BattleFinished", "counter": "distinct", "field": "stage", "filter": { "stage": "st_2_*", "outcome": "Win" }, "target": 3 }, "reward": [ { "item": "gem", "n": 250 } ], "steamApiName": "ACH_CH2_CLEAR" },
+  { "id": "ach_advance_any", "category": "growth", "name": "loc:ach/ach_advance_any.name", "desc": "loc:ach/ach_advance_any.desc", "rating": "G", "hidden": false,
+    "trigger": { "event": "CharacterTierAdvanced", "counter": "count", "target": 1 }, "reward": [ { "item": "gem", "n": 150 } ], "steamApiName": "ACH_ADVANCE_ANY" },
+  { "id": "ach_affection_claire", "category": "encounter", "name": "loc:ach/ach_affection_claire.name", "desc": "loc:ach/ach_affection_claire.desc", "rating": "G", "hidden": false,
+    "trigger": { "event": "AffectionChanged", "counter": "state", "condition": { "type": "affection_gte", "char": "char01_claire", "value": "50" }, "target": 1 }, "reward": [ { "item": "gem", "n": 100 } ], "steamApiName": "ACH_AFFECTION_CLAIRE" },
+  { "id": "ach_endings_2", "category": "story", "name": "loc:ach/ach_endings_2.name", "desc": "loc:ach/ach_endings_2.desc", "rating": "G", "hidden": false,
+    "trigger": { "event": "EndingReached", "counter": "distinct", "field": "ending", "target": 2 }, "reward": [ { "item": "gem", "n": 150 } ], "steamApiName": "ACH_ENDINGS_2" },
+  { "id": "ach_ch3_clear", "category": "battle", "name": "loc:ach/ach_ch3_clear.name", "desc": "loc:ach/ach_ch3_clear.desc", "rating": "G", "hidden": false,
+    "trigger": { "event": "BattleFinished", "counter": "distinct", "field": "stage", "filter": { "stage": "st_3_*", "outcome": "Win" }, "target": 3 }, "reward": [ { "item": "gem", "n": 300 } ], "steamApiName": "ACH_CH3_CLEAR" },
+  { "id": "ach_claire_s3", "category": "growth", "name": "loc:ach/ach_claire_s3.name", "desc": "loc:ach/ach_claire_s3.desc", "rating": "G", "hidden": false,
+    "trigger": { "event": "PortraitStageUnlocked", "counter": "count", "filter": { "stage": "ps_char01_s3" }, "target": 1 }, "reward": [ { "item": "gem", "n": 150 } ], "steamApiName": "ACH_CLAIRE_S3" }
 ]

@@ -1,24 +1,853 @@
 [
-  { "id": "ps_char01_s1", "character": "char01_claire", "order": 1, "unlock": null, "rating": "G",
-    "art": { "stand": "char/char01_claire/portrait/ps_char01_s1/stand", "bust": "char/char01_claire/portrait/ps_char01_s1/bust", "live2d": null } },
-  { "id": "ps_char01_s2", "character": "char01_claire", "order": 2, "rating": "G", "statBonus": { "atkPct": 5 },
-    "unlock": { "type": "all", "of": [ { "type": "char_level_gte", "char": "self", "value": 30 }, { "type": "char_awaken_gte", "char": "self", "value": 2 } ] },
-    "art": { "stand": "char/char01_claire/portrait/ps_char01_s2/stand", "bust": "char/char01_claire/portrait/ps_char01_s2/bust", "live2d": null } },
-  { "id": "ps_char01_s3", "character": "char01_claire", "order": 3, "rating": "G", "statBonus": { "atkPct": 10, "hpPct": 10 },
-    "unlock": { "type": "all", "of": [ { "type": "char_level_gte", "char": "self", "value": 60 }, { "type": "char_awaken_gte", "char": "self", "value": 4 } ] },
-    "art": { "stand": "char/char01_claire/portrait/ps_char01_s3/stand", "bust": "char/char01_claire/portrait/ps_char01_s3/bust", "live2d": null } },
-  { "id": "ps_char02_s1", "character": "char02_luna", "order": 1, "unlock": null, "rating": "G",
-    "art": { "stand": "char/char02_luna/portrait/ps_char02_s1/stand", "bust": "char/char02_luna/portrait/ps_char02_s1/bust", "live2d": null } },
-  { "id": "ps_char02_s2", "character": "char02_luna", "order": 2, "rating": "G",
-    "unlock": { "type": "all", "of": [ { "type": "char_level_gte", "char": "self", "value": 30 }, { "type": "char_awaken_gte", "char": "self", "value": 2 } ] },
-    "art": { "stand": "char/char02_luna/portrait/ps_char02_s2/stand", "bust": "char/char02_luna/portrait/ps_char02_s2/bust", "live2d": null } },
-  { "id": "ps_char03_s1", "character": "char03_scarlet", "order": 1, "unlock": null, "rating": "G",
-    "art": { "stand": "char/char03_scarlet/portrait/ps_char03_s1/stand", "bust": "char/char03_scarlet/portrait/ps_char03_s1/bust", "live2d": null } },
-  { "id": "ps_char03_s2", "character": "char03_scarlet", "order": 2, "rating": "G",
-    "unlock": { "type": "all", "of": [ { "type": "char_level_gte", "char": "self", "value": 30 }, { "type": "char_awaken_gte", "char": "self", "value": 2 } ] },
-    "art": { "stand": "char/char03_scarlet/portrait/ps_char03_s2/stand", "bust": "char/char03_scarlet/portrait/ps_char03_s2/bust", "live2d": null } },
-  { "id": "ps_char04_s1", "character": "char04_elysia", "order": 1, "unlock": null, "rating": "G",
-    "art": { "stand": "char/char04_elysia/portrait/ps_char04_s1/stand", "bust": null, "live2d": null } },
-  { "id": "ps_char05_s1", "character": "char05_rin", "order": 1, "unlock": null, "rating": "G",
-    "art": { "stand": "char/char05_rin/portrait/ps_char05_s1/stand", "bust": null, "live2d": null } }
+  {
+    "id": "ps_char01_s1",
+    "character": "char01_claire",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char01_claire/portrait/ps_char01_s1/stand",
+      "bust": "char/char01_claire/portrait/ps_char01_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char01_s2",
+    "character": "char01_claire",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 5
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": 30
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": 2
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char01_claire/portrait/ps_char01_s2/stand",
+      "bust": "char/char01_claire/portrait/ps_char01_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char01_s3",
+    "character": "char01_claire",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": 4
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char01_claire/portrait/ps_char01_s3/stand",
+      "bust": "char/char01_claire/portrait/ps_char01_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char02_s1",
+    "character": "char02_luna",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char02_luna/portrait/ps_char02_s1/stand",
+      "bust": "char/char02_luna/portrait/ps_char02_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char02_s2",
+    "character": "char02_luna",
+    "order": 2,
+    "rating": "G",
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": 30
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": 2
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char02_luna/portrait/ps_char02_s2/stand",
+      "bust": "char/char02_luna/portrait/ps_char02_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char03_s1",
+    "character": "char03_scarlet",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char03_scarlet/portrait/ps_char03_s1/stand",
+      "bust": "char/char03_scarlet/portrait/ps_char03_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char03_s2",
+    "character": "char03_scarlet",
+    "order": 2,
+    "rating": "G",
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": 30
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": 2
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char03_scarlet/portrait/ps_char03_s2/stand",
+      "bust": "char/char03_scarlet/portrait/ps_char03_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char04_s1",
+    "character": "char04_elysia",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char04_elysia/portrait/ps_char04_s1/stand",
+      "bust": null,
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char05_s1",
+    "character": "char05_rin",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char05_rin/portrait/ps_char05_s1/stand",
+      "bust": null,
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char05_s2",
+    "character": "char05_rin",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char05_rin/portrait/ps_char05_s2/stand",
+      "bust": null,
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char04_s2",
+    "character": "char04_elysia",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char04_elysia/portrait/ps_char04_s2/stand",
+      "bust": "char/char04_elysia/portrait/ps_char04_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char06_s1",
+    "character": "char06_seraphina",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char06_seraphina/portrait/ps_char06_s1/stand",
+      "bust": "char/char06_seraphina/portrait/ps_char06_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char06_s2",
+    "character": "char06_seraphina",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char06_seraphina/portrait/ps_char06_s2/stand",
+      "bust": "char/char06_seraphina/portrait/ps_char06_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char08_s1",
+    "character": "char08_yuki",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char08_yuki/portrait/ps_char08_s1/stand",
+      "bust": "char/char08_yuki/portrait/ps_char08_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char08_s2",
+    "character": "char08_yuki",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 5,
+      "hpPct": 5
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char08_yuki/portrait/ps_char08_s2/stand",
+      "bust": "char/char08_yuki/portrait/ps_char08_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char18_s1",
+    "character": "char18_sakura_miko",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char18_sakura_miko/portrait/ps_char18_s1/stand",
+      "bust": "char/char18_sakura_miko/portrait/ps_char18_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char18_s2",
+    "character": "char18_sakura_miko",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 5,
+      "hpPct": 5
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char18_sakura_miko/portrait/ps_char18_s2/stand",
+      "bust": "char/char18_sakura_miko/portrait/ps_char18_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char26_s1",
+    "character": "char26_ayame_ninja",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char26_ayame_ninja/portrait/ps_char26_s1/stand",
+      "bust": "char/char26_ayame_ninja/portrait/ps_char26_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char26_s2",
+    "character": "char26_ayame_ninja",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char26_ayame_ninja/portrait/ps_char26_s2/stand",
+      "bust": "char/char26_ayame_ninja/portrait/ps_char26_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char07_s1",
+    "character": "char07_kagura",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char07_kagura/portrait/ps_char07_s1/stand",
+      "bust": "char/char07_kagura/portrait/ps_char07_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char07_s2",
+    "character": "char07_kagura",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 5,
+      "hpPct": 5
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char07_kagura/portrait/ps_char07_s2/stand",
+      "bust": "char/char07_kagura/portrait/ps_char07_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char09_s1",
+    "character": "char09_chloe",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char09_chloe/portrait/ps_char09_s1/stand",
+      "bust": "char/char09_chloe/portrait/ps_char09_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char09_s2",
+    "character": "char09_chloe",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 5,
+      "hpPct": 5
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char09_chloe/portrait/ps_char09_s2/stand",
+      "bust": "char/char09_chloe/portrait/ps_char09_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char10_s1",
+    "character": "char10_mirai",
+    "order": 1,
+    "unlock": null,
+    "rating": "G",
+    "art": {
+      "stand": "char/char10_mirai/portrait/ps_char10_s1/stand",
+      "bust": "char/char10_mirai/portrait/ps_char10_s1/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char10_s2",
+    "character": "char10_mirai",
+    "order": 2,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 5,
+      "hpPct": 5
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "30"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "2"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char10_mirai/portrait/ps_char10_s2/stand",
+      "bust": "char/char10_mirai/portrait/ps_char10_s2/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char02_s3",
+    "character": "char02_luna",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char02_luna/portrait/ps_char02_s3/stand",
+      "bust": "char/char02_luna/portrait/ps_char02_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char03_s3",
+    "character": "char03_scarlet",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char03_scarlet/portrait/ps_char03_s3/stand",
+      "bust": "char/char03_scarlet/portrait/ps_char03_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char04_s3",
+    "character": "char04_elysia",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char04_elysia/portrait/ps_char04_s3/stand",
+      "bust": "char/char04_elysia/portrait/ps_char04_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char05_s3",
+    "character": "char05_rin",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char05_rin/portrait/ps_char05_s3/stand",
+      "bust": "char/char05_rin/portrait/ps_char05_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char06_s3",
+    "character": "char06_seraphina",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char06_seraphina/portrait/ps_char06_s3/stand",
+      "bust": "char/char06_seraphina/portrait/ps_char06_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char07_s3",
+    "character": "char07_kagura",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char07_kagura/portrait/ps_char07_s3/stand",
+      "bust": "char/char07_kagura/portrait/ps_char07_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char08_s3",
+    "character": "char08_yuki",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char08_yuki/portrait/ps_char08_s3/stand",
+      "bust": "char/char08_yuki/portrait/ps_char08_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char09_s3",
+    "character": "char09_chloe",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char09_chloe/portrait/ps_char09_s3/stand",
+      "bust": "char/char09_chloe/portrait/ps_char09_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char10_s3",
+    "character": "char10_mirai",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char10_mirai/portrait/ps_char10_s3/stand",
+      "bust": "char/char10_mirai/portrait/ps_char10_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char18_s3",
+    "character": "char18_sakura_miko",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char18_sakura_miko/portrait/ps_char18_s3/stand",
+      "bust": "char/char18_sakura_miko/portrait/ps_char18_s3/bust",
+      "live2d": null
+    }
+  },
+  {
+    "id": "ps_char26_s3",
+    "character": "char26_ayame_ninja",
+    "order": 3,
+    "rating": "G",
+    "statBonus": {
+      "atkPct": 10,
+      "hpPct": 10
+    },
+    "unlock": {
+      "type": "all",
+      "of": [
+        {
+          "type": "char_level_gte",
+          "char": "self",
+          "value": "50"
+        },
+        {
+          "type": "char_awaken_gte",
+          "char": "self",
+          "value": "4"
+        }
+      ]
+    },
+    "art": {
+      "stand": "char/char26_ayame_ninja/portrait/ps_char26_s3/stand",
+      "bust": "char/char26_ayame_ninja/portrait/ps_char26_s3/bust",
+      "live2d": null
+    }
+  }
 ]

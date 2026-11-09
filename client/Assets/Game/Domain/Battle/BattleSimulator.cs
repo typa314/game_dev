@@ -24,6 +24,9 @@ namespace Game.Domain.Battle
         private int _replayIndex;
         private readonly List<WaveState> _waves = new List<WaveState>();
         private readonly int[] _cooldowns;
+        private readonly int[] _skillCharges;
+        private int _lastAllyBaseHpCrossed;
+        private int _lastEnemyBaseHpCrossed;
         private int _nextUid = 1;
 
         public int Tick { get; private set; }
@@ -54,6 +57,7 @@ namespace Game.Domain.Battle
             _tps = _rules.TicksPerSecond;
             _lengthMilli = (long)setup.Stage.Length * 1000;
             _cooldowns = new int[setup.Team.Count];
+            _skillCharges = new int[setup.Team.Count];
             TickEvents = new List<BattleEvent>();
             Recorded = new List<BattleCommand>();
 
@@ -81,6 +85,24 @@ namespace Game.Domain.Battle
         }
 
         public int CooldownOf(int slot) { return _cooldowns[slot]; }
+
+        public int SkillChargeOf(int slot) { return (slot >= 0 && slot < _skillCharges.Length) ? _skillCharges[slot] : 0; }
+        public int SkillFullTicksOf(int slot) { return (slot >= 0 && slot < _setup.Team.Count && _setup.Team[slot] != null) ? _setup.Team[slot].SkillChargeTicks : 0; }
+        public bool IsSkillReady(int slot)
+        {
+            if (slot < 0 || slot >= _setup.Team.Count) return false;
+            UnitTemplate t = _setup.Team[slot];
+            return t != null && t.Skill != null && _skillCharges[slot] >= t.SkillChargeTicks;
+        }
+
+        /// <summary>
+        /// 單次點擊格子：若技能條已滿則釋放特殊技能，否則出兵。
+        /// </summary>
+        public void TapSlot(int slot)
+        {
+            if (IsSkillReady(slot)) Enqueue(CommandType.CastSkill, slot);
+            else Enqueue(CommandType.Deploy, slot);
+        }
 
         public int? EnergyUpgradeCost
         {
@@ -191,6 +213,14 @@ namespace Game.Domain.Battle
                     }
                     return true;
                 }
+                case CommandType.CastSkill:
+                {
+                    if (!IsSkillReady(c.Slot)) return false;
+                    UnitTemplate t = _setup.Team[c.Slot];
+                    _skillCharges[c.Slot] = 0;
+                    ExecuteSkill(t, c.Slot);
+                    return true;
+                }
             }
             return false;
         }
@@ -202,6 +232,11 @@ namespace Game.Domain.Battle
             EnergyMilli = Math.Min(max, EnergyMilli + regen);
             for (int i = 0; i < _cooldowns.Length; i++) if (_cooldowns[i] > 0) _cooldowns[i]--;
             if (CannonChargeTicks < CannonFullTicks) CannonChargeTicks++;
+            for (int i = 0; i < _skillCharges.Length; i++)
+            {
+                if (_setup.Team[i] != null && _skillCharges[i] < _setup.Team[i].SkillChargeTicks)
+                    _skillCharges[i]++;
+            }
         }
 
         private void SpawnWaves()
@@ -255,6 +290,20 @@ namespace Game.Domain.Battle
             {
                 BattleUnit u = _units[i];
                 if (!u.Alive) continue;
+
+                // 狀態效果遞減與持續傷害
+                if (u.AtkBuffTicks > 0) u.AtkBuffTicks--;
+                if (u.SlowTicks > 0) u.SlowTicks--;
+                if (Tick % 15 == 0)
+                {
+                    int dot = 0;
+                    if (u.PoisonTicks > 0) dot += Math.Max(1, u.PoisonDmgPerSec / 2);
+                    if (u.BurnTicks > 0) dot += Math.Max(1, u.BurnDmgPerSec / 2);
+                    if (dot > 0) Damage(u, dot, false);
+                }
+                if (u.PoisonTicks > 0) u.PoisonTicks--;
+                if (u.BurnTicks > 0) u.BurnTicks--;
+
                 if (u.AttackTimer > 0) u.AttackTimer--;
                 if (u.StunTicks > 0) { u.StunTicks--; continue; }
 
@@ -306,13 +355,22 @@ namespace Game.Domain.Battle
 
         private void Move(BattleUnit u)
         {
-            if (u.Side == Side.Ally) u.X = Math.Min(_lengthMilli, u.X + u.T.SpeedMilliPerTick);
-            else u.X = Math.Max(0, u.X - u.T.SpeedMilliPerTick);
+            long speed = u.T.SpeedMilliPerTick;
+            if (u.SlowTicks > 0 && u.SlowPct > 0)
+            {
+                speed = speed * Math.Max(10, 100 - u.SlowPct) / 100;
+            }
+            if (u.Side == Side.Ally) u.X = Math.Min(_lengthMilli, u.X + speed);
+            else u.X = Math.Max(0, u.X - speed);
         }
 
         private static int DamageAgainst(BattleUnit attacker, BattleUnit target)
         {
             int dmg = attacker.T.Atk;
+            if (attacker.AtkBuffTicks > 0 && attacker.AtkBuffPct > 0)
+            {
+                dmg = dmg * (100 + attacker.AtkBuffPct) / 100;
+            }
             if (attacker.T.Traits.Contains("anti_" + target.T.Type)) dmg = dmg * 3 / 2;
             return dmg;
         }
@@ -350,9 +408,190 @@ namespace Game.Domain.Battle
 
         private void HitBase(BattleUnit u)
         {
+            Side targetSide = u.Side == Side.Ally ? Side.Enemy : Side.Ally;
+            List<string> traits = targetSide == Side.Enemy ? _setup.Stage.EnemyBaseTraits : _setup.Stage.AllyBaseTraits;
+
+            if (traits != null && traits.Count > 0)
+            {
+                // 傷害類型免疫檢查
+                if (traits.Contains("immune_ranged") && u.T.RangeMilli > 150 * 1000)
+                {
+                    TickEvents.Add(new BattleEvent { Type = BattleEventType.BaseImmune, Uid = u.Uid, Side = targetSide, X = u.X });
+                    return;
+                }
+                if (traits.Contains("immune_area") && u.T.Area)
+                {
+                    TickEvents.Add(new BattleEvent { Type = BattleEventType.BaseImmune, Uid = u.Uid, Side = targetSide, X = u.X });
+                    return;
+                }
+                if (traits.Contains("immune_single") && !u.T.Area)
+                {
+                    TickEvents.Add(new BattleEvent { Type = BattleEventType.BaseImmune, Uid = u.Uid, Side = targetSide, X = u.X });
+                    return;
+                }
+            }
+
+            int prevHp = targetSide == Side.Enemy ? EnemyBaseHp : AllyBaseHp;
+            int maxHp = targetSide == Side.Enemy ? EnemyBaseMaxHp : AllyBaseMaxHp;
+
             if (u.Side == Side.Ally) EnemyBaseHp = Math.Max(0, EnemyBaseHp - u.T.Atk);
             else AllyBaseHp = Math.Max(0, AllyBaseHp - u.T.Atk);
+
             TickEvents.Add(new BattleEvent { Type = BattleEventType.BaseHit, Uid = u.Uid, Side = u.Side, X = u.X, Value = u.T.Atk });
+
+            // 主堡控場反擊 (Base CC: 每損失 20% 血量爆發一次衝擊波震退敵軍)
+            if (traits != null && traits.Count > 0 && maxHp > 0)
+            {
+                int curHp = targetSide == Side.Enemy ? EnemyBaseHp : AllyBaseHp;
+                if (traits.Contains("shockwave_on_hp_loss"))
+                {
+                    int crossed = (maxHp - curHp) * 5 / maxHp;
+                    if (targetSide == Side.Enemy)
+                    {
+                        if (crossed > _lastEnemyBaseHpCrossed)
+                        {
+                            _lastEnemyBaseHpCrossed = crossed;
+                            TriggerBaseShockwave(Side.Enemy);
+                        }
+                    }
+                    else
+                    {
+                        if (crossed > _lastAllyBaseHpCrossed)
+                        {
+                            _lastAllyBaseHpCrossed = crossed;
+                            TriggerBaseShockwave(Side.Ally);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void TriggerBaseShockwave(Side baseSide)
+        {
+            long baseX = baseSide == Side.Enemy ? _lengthMilli : 0;
+            long waveReach = 600 * 1000;
+            TickEvents.Add(new BattleEvent { Type = BattleEventType.BaseShockwave, Side = baseSide, X = baseX });
+
+            foreach (BattleUnit u in _units)
+            {
+                if (!u.Alive || u.Side == baseSide) continue;
+                long dist = baseSide == Side.Enemy ? _lengthMilli - u.X : u.X;
+                if (dist <= waveReach)
+                {
+                    Knockback(u);
+                    u.StunTicks = Math.Max(u.StunTicks, _tps * 1);
+                }
+            }
+        }
+
+        private void ExecuteSkill(UnitTemplate t, int slot)
+        {
+            CharacterSkillDef sk = t.Skill;
+            if (sk == null) return;
+
+            TickEvents.Add(new BattleEvent { Type = BattleEventType.SkillCast, Side = Side.Ally, Value = slot });
+
+            switch (sk.EffectType)
+            {
+                case "cannon":
+                {
+                    long reach = sk.Range > 0 ? (long)sk.Range * 1000 : _lengthMilli;
+                    TickEvents.Add(new BattleEvent { Type = BattleEventType.Cannon, X = reach, Value = sk.Value });
+                    foreach (BattleUnit e in _units)
+                    {
+                        if (!e.Alive || e.Side != Side.Enemy || e.X > reach) continue;
+                        Damage(e, sk.Value, true);
+                    }
+                    break;
+                }
+                case "heal":
+                {
+                    foreach (BattleUnit a in _units)
+                    {
+                        if (!a.Alive || a.Side != Side.Ally) continue;
+                        a.Hp = Math.Min(a.T.Hp, a.Hp + sk.Value);
+                        a.SlowTicks = 0;
+                        a.PoisonTicks = 0;
+                        a.BurnTicks = 0;
+                        TickEvents.Add(new BattleEvent { Type = BattleEventType.Heal, Uid = a.Uid, Side = Side.Ally, Value = sk.Value });
+                    }
+                    break;
+                }
+                case "buff_atk":
+                {
+                    int durTicks = UnitTemplate.SecToTicks(sk.DurationSec > 0 ? sk.DurationSec : 6.0, _tps);
+                    foreach (BattleUnit a in _units)
+                    {
+                        if (!a.Alive || a.Side != Side.Ally) continue;
+                        a.AtkBuffTicks = durTicks;
+                        a.AtkBuffPct = sk.Value;
+                        TickEvents.Add(new BattleEvent { Type = BattleEventType.StatusApply, Uid = a.Uid, Side = Side.Ally, Value = sk.Value });
+                    }
+                    break;
+                }
+                case "slow":
+                {
+                    int durTicks = UnitTemplate.SecToTicks(sk.DurationSec > 0 ? sk.DurationSec : 6.0, _tps);
+                    long reach = sk.Range > 0 ? (long)sk.Range * 1000 : _lengthMilli;
+                    foreach (BattleUnit e in _units)
+                    {
+                        if (!e.Alive || e.Side != Side.Enemy || e.X > reach) continue;
+                        e.SlowTicks = durTicks;
+                        e.SlowPct = sk.Value > 0 ? sk.Value : 50;
+                        TickEvents.Add(new BattleEvent { Type = BattleEventType.StatusApply, Uid = e.Uid, Side = Side.Enemy, Value = e.SlowPct });
+                    }
+                    break;
+                }
+                case "poison":
+                {
+                    int durTicks = UnitTemplate.SecToTicks(sk.DurationSec > 0 ? sk.DurationSec : 6.0, _tps);
+                    long reach = sk.Range > 0 ? (long)sk.Range * 1000 : _lengthMilli;
+                    foreach (BattleUnit e in _units)
+                    {
+                        if (!e.Alive || e.Side != Side.Enemy || e.X > reach) continue;
+                        e.PoisonTicks = durTicks;
+                        e.PoisonDmgPerSec = sk.Value > 0 ? sk.Value : 40;
+                        TickEvents.Add(new BattleEvent { Type = BattleEventType.StatusApply, Uid = e.Uid, Side = Side.Enemy, Value = e.PoisonDmgPerSec });
+                    }
+                    break;
+                }
+                case "burn":
+                {
+                    int durTicks = UnitTemplate.SecToTicks(sk.DurationSec > 0 ? sk.DurationSec : 5.0, _tps);
+                    long reach = sk.Range > 0 ? (long)sk.Range * 1000 : _lengthMilli;
+                    foreach (BattleUnit e in _units)
+                    {
+                        if (!e.Alive || e.Side != Side.Enemy || e.X > reach) continue;
+                        Damage(e, sk.Value, false);
+                        e.BurnTicks = durTicks;
+                        e.BurnDmgPerSec = Math.Max(10, sk.Value / 3);
+                        TickEvents.Add(new BattleEvent { Type = BattleEventType.StatusApply, Uid = e.Uid, Side = Side.Enemy, Value = e.BurnDmgPerSec });
+                    }
+                    break;
+                }
+                case "stun":
+                {
+                    int durTicks = UnitTemplate.SecToTicks(sk.DurationSec > 0 ? sk.DurationSec : 3.0, _tps);
+                    long reach = sk.Range > 0 ? (long)sk.Range * 1000 : _lengthMilli;
+                    foreach (BattleUnit e in _units)
+                    {
+                        if (!e.Alive || e.Side != Side.Enemy || e.X > reach) continue;
+                        e.StunTicks = Math.Max(e.StunTicks, durTicks);
+                        TickEvents.Add(new BattleEvent { Type = BattleEventType.StatusApply, Uid = e.Uid, Side = Side.Enemy, Value = durTicks });
+                    }
+                    break;
+                }
+                default:
+                {
+                    long reach = sk.Range > 0 ? (long)sk.Range * 1000 : _lengthMilli;
+                    foreach (BattleUnit e in _units)
+                    {
+                        if (!e.Alive || e.Side != Side.Enemy || e.X > reach) continue;
+                        Damage(e, sk.Value, false);
+                    }
+                    break;
+                }
+            }
         }
 
         private void CheckOutcome()

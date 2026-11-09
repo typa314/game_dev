@@ -85,6 +85,17 @@ namespace Game.Unity
             if (GUILayout.Button("單抽")) Pull(core, 1);
             if (GUILayout.Button("十連")) Pull(core, 10);
             GUILayout.EndHorizontal();
+
+            if (GUILayout.Button("打開契約招募介面 (GachaUI)"))
+            {
+                var gacha = FindAnyObjectByType<Game.Unity.UI.GachaView>(FindObjectsInactive.Include);
+                var lobby = FindAnyObjectByType<Game.Unity.UI.LobbyView>(FindObjectsInactive.Include);
+                if (gacha != null)
+                {
+                    gacha.Open(lobby);
+                    if (lobby != null) lobby.gameObject.SetActive(false);
+                }
+            }
         }
 
         private void Pull(GameCore core, int count)

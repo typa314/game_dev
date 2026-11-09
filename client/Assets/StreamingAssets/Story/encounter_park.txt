@@ -1,0 +1,20 @@
+[node Start]
+command bg scene_lobby_default
+command show char04_elysia
+line l_enc_001 Elysia commander_over_here
+jump EncounterChoice
+
+[node EncounterChoice]
+line l_enc_002 Elysia what_should_we_do
+option opt_talk -> TalkOutcome
+option opt_train -> TrainOutcome
+
+[node TalkOutcome]
+line l_enc_003 Elysia having_fun_talking
+command affection char04_elysia 20
+end
+
+[node TrainOutcome]
+line l_enc_004 Elysia training_hard_together
+command give exp_s 2
+end

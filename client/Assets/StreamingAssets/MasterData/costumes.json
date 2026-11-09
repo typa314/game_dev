@@ -1,6 +1,123 @@
 [
-  { "id": "cos_char01_default", "character": "char01_claire", "rating": "G", "unlock": null, "art": { "stand": "char/char01_claire/portrait/cos_char01_default/stand" } },
-  { "id": "cos_char01_academy", "character": "char01_claire", "rating": "G", "unlock": { "type": "affection_gte", "char": "self", "value": 300 }, "art": { "stand": "char/char01_claire/portrait/cos_char01_academy/stand" } },
-  { "id": "cos_char02_default", "character": "char02_luna", "rating": "G", "unlock": null, "art": { "stand": "char/char02_luna/portrait/cos_char02_default/stand" } },
-  { "id": "cos_char03_default", "character": "char03_scarlet", "rating": "G", "unlock": null, "art": { "stand": "char/char03_scarlet/portrait/cos_char03_default/stand" } }
+  {
+    "id": "cos_char01_default",
+    "character": "char01_claire",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char01_claire/portrait/cos_char01_default/stand"
+    }
+  },
+  {
+    "id": "cos_char01_academy",
+    "character": "char01_claire",
+    "rating": "G",
+    "unlock": {
+      "type": "affection_gte",
+      "char": "self",
+      "value": 300
+    },
+    "art": {
+      "stand": "char/char01_claire/portrait/cos_char01_academy/stand"
+    }
+  },
+  {
+    "id": "cos_char02_default",
+    "character": "char02_luna",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char02_luna/portrait/cos_char02_default/stand"
+    }
+  },
+  {
+    "id": "cos_char03_default",
+    "character": "char03_scarlet",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char03_scarlet/portrait/cos_char03_default/stand"
+    }
+  },
+  {
+    "id": "cos_char04_default",
+    "character": "char04_elysia",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char04_elysia/portrait/cos_char04_default/stand"
+    }
+  },
+  {
+    "id": "cos_char05_default",
+    "character": "char05_rin",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char05_rin/portrait/cos_char05_default/stand"
+    }
+  },
+  {
+    "id": "cos_char06_default",
+    "character": "char06_seraphina",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char06_seraphina/portrait/cos_char06_default/stand"
+    }
+  },
+  {
+    "id": "cos_char07_default",
+    "character": "char07_kagura",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char07_kagura/portrait/cos_char07_default/stand"
+    }
+  },
+  {
+    "id": "cos_char08_default",
+    "character": "char08_yuki",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char08_yuki/portrait/cos_char08_default/stand"
+    }
+  },
+  {
+    "id": "cos_char09_default",
+    "character": "char09_chloe",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char09_chloe/portrait/cos_char09_default/stand"
+    }
+  },
+  {
+    "id": "cos_char10_beret_dress",
+    "character": "char10_mirai",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char10_mirai/portrait/cos_char10_beret_dress/stand"
+    }
+  },
+  {
+    "id": "cos_char18_default",
+    "character": "char18_sakura_miko",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char18_sakura_miko/portrait/cos_char18_default/stand"
+    }
+  },
+  {
+    "id": "cos_char26_default",
+    "character": "char26_ayame_ninja",
+    "rating": "G",
+    "unlock": null,
+    "art": {
+      "stand": "char/char26_ayame_ninja/portrait/cos_char26_default/stand"
+    }
+  }
 ]

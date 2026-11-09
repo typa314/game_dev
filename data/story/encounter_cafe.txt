@@ -1,0 +1,20 @@
+[node Start]
+command bg scene_cafe
+command show char01_claire
+line l_cafe_001 Claire commander_coffee_break
+jump CafeChoice
+
+[node CafeChoice]
+line l_cafe_002 Claire order_together
+option opt_coffee -> CoffeeOutcome
+option opt_cake -> CakeOutcome
+
+[node CoffeeOutcome]
+line l_cafe_003 Claire enjoy_coffee
+command affection char01_claire 30
+end
+
+[node CakeOutcome]
+line l_cafe_004 Claire sweet_cake
+command give exp_s 2
+end

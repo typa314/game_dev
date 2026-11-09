@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char07_kagura
+command expr char07_kagura smile
+line l_r07_001 Kagura route_char07_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r07_002 Kagura route_char07_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char07_ch1_choice = 1
+line l_r07_003 Kagura route_char07_ch1_stay
+command affection char07_kagura 25
+end
+
+[node WalkBranch]
+set route_char07_ch1_choice = 2
+line l_r07_004 Kagura route_char07_ch1_walk
+command affection char07_kagura 15
+end

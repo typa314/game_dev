@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char01_claire
+command expr char01_claire smile
+line l_r01_201 Claire commander_claire_ch2_start
+jump TrainingPlan
+
+[node TrainingPlan]
+line l_r01_202 Claire commander_claire_ch2_question
+option opt_tactics -> TacticsBranch
+option opt_rest -> RestBranch
+
+[node TacticsBranch]
+set route_char01_ch2_choice = 1
+line l_r01_203 Claire commander_claire_ch2_tactics
+command affection char01_claire 30
+end
+
+[node RestBranch]
+set route_char01_ch2_choice = 2
+line l_r01_204 Claire commander_claire_ch2_rest
+command affection char01_claire 20
+end

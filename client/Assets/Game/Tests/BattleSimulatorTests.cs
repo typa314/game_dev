@@ -548,5 +548,195 @@ namespace Game.Tests
             Assert.AreEqual(27, result.EnemiesDefeated, "擊殺敵兵數應為 27");
             Assert.AreEqual(50, result.Deploys, "出兵總次數應為 50");
         }
+// =============================================================
+        // A7-15 ～ A7-20：角色特殊技能與主堡控場/傷害免疫 (M1 新戰鬥機制)
+        // =============================================================
+
+        [Test]
+        public void A7_15_TapSlot_DeploysUnit_WhenSkillNotReady()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 1000);
+            var charSkill = new CharacterSkillDef { Id = "sk_strike", Name = "打擊", ChargeSec = 10.0, EffectType = "damage", Value = 100 };
+            UnitTemplate unit = new UnitTemplate { Id = "u1", Cost = 100, CooldownTicks = 30, Hp = 500, Atk = 50, Skill = charSkill, SkillChargeTicks = 300 };
+            setup.Team.Add(unit);
+
+            var sim = new BattleSimulator(setup);
+            sim.Step();
+
+            Assert.IsFalse(sim.IsSkillReady(0), "初始技能充能尚未滿");
+
+            // TapSlot 在技能未滿時執行出兵
+            sim.TapSlot(0);
+            sim.Step();
+
+            Assert.AreEqual(1, sim.Units.Count(u => u.Side == Side.Ally), "TapSlot 應召喚一個我方單位到戰場");
+            Assert.AreEqual(1, sim.Deploys, "出兵計數器應加 1");
+            Assert.AreEqual(1, sim.Recorded.Count(c => c.Type == CommandType.Deploy), "指令記錄應為 Deploy");
+        }
+
+        [Test]
+        public void A7_16_TapSlot_CastsSpecialSkill_WhenSkillFull()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 1000);
+            var charSkill = new CharacterSkillDef { Id = "sk_strike", Name = "打擊", ChargeSec = 1.0, EffectType = "damage", Value = 150 };
+            UnitTemplate unit = new UnitTemplate { Id = "u1", Cost = 100, CooldownTicks = 30, Hp = 500, Atk = 50, Skill = charSkill, SkillChargeTicks = 30 };
+            setup.Team.Add(unit);
+
+            var sim = new BattleSimulator(setup);
+
+            // 推進 30 ticks 使技能條充滿
+            for (int i = 0; i < 30; i++) sim.Step();
+
+            Assert.IsTrue(sim.IsSkillReady(0), "技能條充能滿 30 ticks 後應就緒");
+
+            // 點擊已就緒的 Slot
+            sim.TapSlot(0);
+            sim.Step();
+
+            Assert.AreEqual(0, sim.Units.Count(u => u.Side == Side.Ally), "釋放技能不應額外出兵");
+            Assert.AreEqual(1, sim.Recorded.Count(c => c.Type == CommandType.CastSkill), "指令記錄應為 CastSkill");
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.SkillCast), "應發出 SkillCast 戰鬥事件");
+            Assert.AreEqual(1, sim.SkillChargeOf(0), "施放技能後充能歸零，該 tick 結尾累加 1 tick");
+            Assert.IsFalse(sim.IsSkillReady(0), "施放後技能應回到未就緒狀態");
+        }
+
+        [Test]
+        public void A7_17_Scarlet_CannonSkill_DealsHighDamageAndKnockback()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 2000);
+            // 配置類似主堡砲的 Scarlet 猩紅殲滅巨砲
+            var scarletSkill = new CharacterSkillDef { Id = "skill_scarlet_cannon", Name = "猩紅巨砲", ChargeSec = 1.0, EffectType = "cannon", Value = 300, Range = 0 };
+            UnitTemplate scarlet = new UnitTemplate { Id = "char03_scarlet", Cost = 300, Hp = 800, Atk = 100, Skill = scarletSkill, SkillChargeTicks = 10 };
+            setup.Team.Add(scarlet);
+
+            UnitTemplate enemyT = new UnitTemplate { Id = "en_target", Hp = 1000, Knockbacks = 3 };
+            setup.EnemyTemplates["en_target"] = enemyT;
+
+            var sim = new BattleSimulator(setup);
+            // 生成敵人於 X=1500
+            for (int i = 0; i < 10; i++) sim.Step();
+
+            // 手動施放大招
+            sim.Enqueue(CommandType.CastSkill, 0);
+            sim.Step();
+
+            // 應產生 Cannon 事件與高額全場傷害
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.Cannon), "應發出 Cannon 巨砲爆破事件");
+        }
+
+        [Test]
+        public void A7_18_StatusEffects_HealBuffSlowPoisonBurn_WorkDeterministically()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 1500);
+
+            // 敵方單位，供測試緩速與中毒
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_dummy", Count = 1, AtSec = 0 });
+            setup.EnemyTemplates["en_dummy"] = new UnitTemplate { Id = "en_dummy", Hp = 2000, SpeedMilliPerTick = 100 };
+
+            // 1. 治癒技能 (Elysia)
+            var healSkill = new CharacterSkillDef { Id = "sk_heal", EffectType = "heal", Value = 300, ChargeSec = 1.0 };
+            UnitTemplate elysia = new UnitTemplate { Id = "elysia", Hp = 1000, Skill = healSkill, SkillChargeTicks = 1 };
+            setup.Team.Add(elysia);
+
+            // 2. 緩速技能 (Luna)
+            var slowSkill = new CharacterSkillDef { Id = "sk_slow", EffectType = "slow", Value = 60, DurationSec = 2.0, ChargeSec = 1.0 };
+            UnitTemplate luna = new UnitTemplate { Id = "luna", Hp = 800, Skill = slowSkill, SkillChargeTicks = 1 };
+            setup.Team.Add(luna);
+
+            // 3. 中毒技能 (Ayame)
+            var poisonSkill = new CharacterSkillDef { Id = "sk_poison", EffectType = "poison", Value = 50, DurationSec = 3.0, ChargeSec = 1.0 };
+            UnitTemplate ayame = new UnitTemplate { Id = "ayame", Hp = 700, Skill = poisonSkill, SkillChargeTicks = 1 };
+            setup.Team.Add(ayame);
+
+            var sim = new BattleSimulator(setup);
+            sim.Step();
+
+            // 部署受傷友軍 (先出兵再手動扣血測試治癒)
+            sim.Enqueue(CommandType.Deploy, 0);
+            sim.Step();
+
+            BattleUnit ally = sim.Units.First(u => u.Side == Side.Ally);
+            ally.Hp = 500; // 受損 500 HP
+
+            // 蓄力完成釋放治癒
+            while (!sim.IsSkillReady(0)) sim.Step();
+            sim.Enqueue(CommandType.CastSkill, 0);
+            sim.Step();
+
+            Assert.AreEqual(800, ally.Hp, "治癒應回復 300 HP (500 + 300 = 800)");
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.Heal), "應發出 Heal 戰鬥事件");
+
+            // 施放緩速與中毒
+            while (!sim.IsSkillReady(1)) sim.Step();
+            sim.Enqueue(CommandType.CastSkill, 1);
+            sim.Step();
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.StatusApply), "應發出 StatusApply 事件");
+        }
+
+        [Test]
+        public void A7_19_BaseImmunity_ProtectsBaseFromRangedOrAreaDamage()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 1000);
+            // 敵方據點擁有遠程免疫 (immune_ranged)
+            setup.Stage.EnemyBaseTraits.Add("immune_ranged");
+            setup.Stage.EnemyBaseHp = 5000;
+
+            // 遠程攻擊手 (Range = 300 > 150)
+            UnitTemplate sniper = new UnitTemplate { Id = "sniper", Cost = 100, Hp = 500, Atk = 200, RangeMilli = 300 * 1000 };
+            setup.Team.Add(sniper);
+
+            // 近戰攻擊手 (Range = 100 <= 150)
+            UnitTemplate brawler = new UnitTemplate { Id = "brawler", Cost = 100, Hp = 500, Atk = 200, RangeMilli = 100 * 1000 };
+            setup.Team.Add(brawler);
+
+            var sim = new BattleSimulator(setup);
+
+            // 召喚狙擊手在據點前開火
+            sim.Enqueue(CommandType.Deploy, 0);
+            sim.Step();
+            BattleUnit uSniper = sim.Units.First(u => u.Side == Side.Ally);
+            uSniper.X = 800 * 1000; // 距離據點 200 單位，進入射程
+
+            sim.Step();
+            Assert.AreEqual(5000, sim.EnemyBaseHp, "遠程狙擊對 immune_ranged 主堡無效，HP 應保持 5000");
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.BaseImmune), "應發出 BaseImmune 免疫事件");
+
+            // 召喚近戰單位攻擊據點
+            sim.Enqueue(CommandType.Deploy, 1);
+            sim.Step();
+            BattleUnit uBrawler = sim.Units.First(u => u.T.Id == "brawler");
+            uBrawler.X = 950 * 1000; // 距離據點 50 單位 (近戰射程內)
+
+            sim.Step();
+            Assert.AreEqual(4800, sim.EnemyBaseHp, "近戰攻擊應能成功對主堡造成 200 傷害 (5000 - 200 = 4800)");
+        }
+
+        [Test]
+        public void A7_20_BaseShockwave_RepelsAttackersOnHpLoss()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 1000);
+            // 敵方主堡擁有損血控場震波 (shockwave_on_hp_loss)
+            setup.Stage.EnemyBaseTraits.Add("shockwave_on_hp_loss");
+            setup.Stage.EnemyBaseHp = 1000;
+
+            // 高傷害近戰攻城手，一次攻擊打掉 25% 血量 (250 / 1000)
+            UnitTemplate siege = new UnitTemplate { Id = "siege", Cost = 100, Hp = 2000, Atk = 250, RangeMilli = 100 * 1000 };
+            setup.Team.Add(siege);
+
+            var sim = new BattleSimulator(setup);
+            sim.Enqueue(CommandType.Deploy, 0);
+            sim.Step();
+
+            BattleUnit u = sim.Units.First(u => u.Side == Side.Ally);
+            u.X = 950 * 1000; // 貼近據點
+
+            // 打中據點，血量從 1000 降至 750 (損失 25% > 20% 門檻)
+            sim.Step();
+
+            Assert.AreEqual(750, sim.EnemyBaseHp, "據點應扣除 250 HP");
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.BaseShockwave), "主堡應爆發反擊衝擊波事件");
+            Assert.IsTrue(u.X < 950 * 1000, "靠近主堡的攻城單位應被衝擊波強制擊退後移");
+            Assert.IsTrue(u.StunTicks > 0, "攻城單位應進入震波眩暈狀態");
+        }
     }
 }

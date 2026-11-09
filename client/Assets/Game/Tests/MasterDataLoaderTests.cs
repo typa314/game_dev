@@ -95,7 +95,7 @@ namespace Game.Tests
             {
                 MasterDatabase db = MasterDataLoader.LoadFromDirectory(tempDir);
                 Assert.IsNotNull(db);
-                Assert.AreEqual(5, db.Characters.Count);
+                Assert.AreEqual(12, db.Characters.Count);
             }
             finally
             {

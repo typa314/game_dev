@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char04_elysia
+command expr char04_elysia smile
+line l_r04_001 Elysia route_char04_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r04_002 Elysia route_char04_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char04_ch1_choice = 1
+line l_r04_003 Elysia route_char04_ch1_stay
+command affection char04_elysia 25
+end
+
+[node WalkBranch]
+set route_char04_ch1_choice = 2
+line l_r04_004 Elysia route_char04_ch1_walk
+command affection char04_elysia 15
+end

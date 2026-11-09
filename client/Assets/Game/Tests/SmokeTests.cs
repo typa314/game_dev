@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Game.Core;
 using Game.Domain;
+
 using Game.Domain.Battle;
 using Game.Domain.MasterData;
 using Game.Domain.Player;
@@ -35,9 +37,42 @@ namespace Game.Tests
             MasterDatabase m = MasterDataLoader.LoadFromDirectory(TestPaths.MasterDataDir());
             List<string> errors = MasterDataValidator.Validate(m);
             Assert.That(errors, Is.Empty, string.Join("\n", errors));
-            Assert.AreEqual(5, m.Characters.Count);
+            Assert.AreEqual(12, m.Characters.Count);
+            Assert.AreEqual("route_char04_ch1.txt", Game.Core.Story.RouteScriptNames.FileName("char04_elysia", 1, "route_char04"));
+            Assert.AreEqual("route_char18_ch1.txt", Game.Core.Story.RouteScriptNames.FileName("char18_sakura_miko", 1, null));
+            Assert.AreNotEqual("route_char01_ch1.txt", Game.Core.Story.RouteScriptNames.FileName("char07_kagura", 1, "route_char07"));
             // 數字型的 value 要能讀進字串欄位（條件 DSL 依賴這一點）
             Assert.AreEqual("30", m.PortraitStages["ps_char01_s2"].Unlock.Of[0].Value);
+            Assert.IsTrue(m.Characters.ContainsKey("char07_kagura"));
+            Assert.IsTrue(m.Characters.ContainsKey("char09_chloe"));
+            Assert.IsTrue(m.Characters.ContainsKey("char10_mirai"));
+            Assert.AreEqual("cos_char05_default", m.Characters["char05_rin"].DefaultCostume);
+            Assert.AreEqual("route_char10", m.Characters["char10_mirai"].StoryRoute);
+            CollectionAssert.IsSubsetOf(
+                new[] { "char07_kagura", "char09_chloe", "char10_mirai" },
+                m.Banners["banner_std"].Pool["R"]);
+            Assert.IsFalse(m.Banners.ContainsKey("banner_newcomer"));
+        }
+
+        [Test]
+        public void M3_1_FirstTierChapter1Scripts_AffectionTargetsThatCharacter()
+        {
+            string storyDir = Path.Combine(TestPaths.DataDir(), "story");
+            string[] ids =
+            {
+                "char02_luna", "char03_scarlet", "char04_elysia", "char05_rin", "char06_seraphina",
+                "char07_kagura", "char08_yuki", "char09_chloe", "char10_mirai"
+            };
+            foreach (string id in ids)
+            {
+                string prefix = id.Substring(0, id.IndexOf('_'));
+                string path = Path.Combine(storyDir, "route_" + prefix + "_ch1.txt");
+                Assert.IsTrue(File.Exists(path), path);
+                string text = File.ReadAllText(path);
+                StringAssert.Contains("command affection " + id + " ", text);
+                StringAssert.DoesNotContain("char01_claire", text);
+                StringAssert.DoesNotContain("sailor", text);
+            }
         }
 
         [Test]

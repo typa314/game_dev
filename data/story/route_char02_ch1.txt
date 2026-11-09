@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char02_luna
+command expr char02_luna smile
+line l_r02_001 Luna route_char02_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r02_002 Luna route_char02_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char02_ch1_choice = 1
+line l_r02_003 Luna route_char02_ch1_stay
+command affection char02_luna 25
+end
+
+[node WalkBranch]
+set route_char02_ch1_choice = 2
+line l_r02_004 Luna route_char02_ch1_walk
+command affection char02_luna 15
+end

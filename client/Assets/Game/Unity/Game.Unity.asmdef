@@ -3,7 +3,9 @@
     "rootNamespace": "",
     "references": [
         "Game.Domain",
-        "Game.Core"
+        "Game.Core",
+        "com.rlabrecque.steamworks.net",
+        "Live2D.Cubism"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

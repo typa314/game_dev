@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char01_claire
+command expr char01_claire smile
+line l_r01_001 Claire commander_claire_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r01_002 Claire commander_claire_ch1_question
+option opt_praise -> PraiseBranch
+option opt_tease -> TeaseBranch
+
+[node PraiseBranch]
+set route_char01_ch1_choice = 1
+line l_r01_003 Claire commander_claire_ch1_praise
+command affection char01_claire 25
+end
+
+[node TeaseBranch]
+set route_char01_ch1_choice = 2
+line l_r01_004 Claire commander_claire_ch1_tease
+command affection char01_claire 15
+end

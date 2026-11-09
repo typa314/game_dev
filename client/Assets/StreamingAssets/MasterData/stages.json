@@ -1,20 +1,511 @@
 [
-  { "id": "st_1_01", "chapter": 1, "name": "loc:stage/st_1_01.name", "bg": "battle/bg/city_day", "bgm": "bgm/battle_01",
-    "length": 2400, "enemyBaseHp": 5000, "timeLimitSec": 0, "enemyStatPct": 100,
-    "waves": [ { "enemy": "en_slime", "atSec": 3, "count": 3, "intervalSec": 4, "repeatEverySec": 25 } ],
-    "rewards": { "firstClear": [ { "item": "gem", "n": 100 } ], "drop": [ { "item": "exp_s", "n": 3, "rate": 0.8 } ], "teamExp": 300 },
-    "starConditions": ["clear", "no_base_damage_pct_30", "within_sec_120"],
-    "unlocksOnClear": ["st_1_02"] },
-  { "id": "st_1_02", "chapter": 1, "name": "loc:stage/st_1_02.name", "bg": "battle/bg/city_day", "bgm": "bgm/battle_01",
-    "length": 2800, "enemyBaseHp": 9000, "timeLimitSec": 0, "enemyStatPct": 120,
-    "waves": [ { "enemy": "en_slime", "atSec": 2, "count": 4, "intervalSec": 3, "repeatEverySec": 20 }, { "enemy": "en_bat", "atSec": 15, "count": 2, "intervalSec": 5, "repeatEverySec": 30 } ],
-    "rewards": { "firstClear": [ { "item": "gem", "n": 150 } ], "drop": [ { "item": "exp_s", "n": 4, "rate": 0.8 } ], "teamExp": 500 },
-    "starConditions": ["clear", "no_base_damage_pct_30", "within_sec_150"],
-    "unlocksOnClear": ["st_1_03", "spot_cafe"] },
-  { "id": "st_1_03", "chapter": 1, "name": "loc:stage/st_1_03.name", "bg": "battle/bg/city_night", "bgm": "bgm/battle_02",
-    "length": 3200, "enemyBaseHp": 15000, "timeLimitSec": 300, "enemyStatPct": 150,
-    "waves": [ { "enemy": "en_slime", "atSec": 2, "count": 5, "intervalSec": 3, "repeatEverySec": 18 }, { "enemy": "en_golem", "trigger": { "type": "enemy_base_hp_below_pct", "value": 60 }, "count": 1 } ],
-    "rewards": { "firstClear": [ { "item": "gem", "n": 300 } ], "drop": [ { "item": "exp_m", "n": 1, "rate": 0.5 } ], "teamExp": 800 },
-    "starConditions": ["clear", "no_base_damage_pct_50", "within_sec_200"],
-    "unlocksOnClear": [] }
+  {
+    "id": "st_1_01",
+    "chapter": 1,
+    "name": "loc:stage/st_1_01.name",
+    "bg": "battle/bg/city_day",
+    "bgm": "bgm/battle_01",
+    "length": 2400,
+    "enemyBaseHp": 5000,
+    "timeLimitSec": 0,
+    "enemyStatPct": 100,
+    "waves": [
+      {
+        "enemy": "en_slime",
+        "atSec": 3,
+        "count": 3,
+        "intervalSec": 4,
+        "repeatEverySec": 25
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 100
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_s",
+          "n": 3,
+          "rate": 0.8
+        }
+      ],
+      "teamExp": 300
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_30",
+      "within_sec_120"
+    ],
+    "unlocksOnClear": [
+      "st_1_02"
+    ],
+    "enemyBaseTraits": [],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_1_02",
+    "chapter": 1,
+    "name": "loc:stage/st_1_02.name",
+    "bg": "battle/bg/city_day",
+    "bgm": "bgm/battle_01",
+    "length": 2800,
+    "enemyBaseHp": 9000,
+    "timeLimitSec": 0,
+    "enemyStatPct": 120,
+    "waves": [
+      {
+        "enemy": "en_slime",
+        "atSec": 2,
+        "count": 4,
+        "intervalSec": 3,
+        "repeatEverySec": 20
+      },
+      {
+        "enemy": "en_bat",
+        "atSec": 15,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 30
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 150
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_s",
+          "n": 4,
+          "rate": 0.8
+        }
+      ],
+      "teamExp": 500
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_30",
+      "within_sec_150"
+    ],
+    "unlocksOnClear": [
+      "st_1_03",
+      "spot_cafe"
+    ],
+    "enemyBaseTraits": [
+      "shockwave_on_hp_loss"
+    ],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_1_03",
+    "chapter": 1,
+    "name": "loc:stage/st_1_03.name",
+    "bg": "battle/bg/city_night",
+    "bgm": "bgm/battle_02",
+    "length": 3200,
+    "enemyBaseHp": 15000,
+    "timeLimitSec": 300,
+    "enemyStatPct": 150,
+    "waves": [
+      {
+        "enemy": "en_slime",
+        "atSec": 2,
+        "count": 5,
+        "intervalSec": 3,
+        "repeatEverySec": 18
+      },
+      {
+        "enemy": "en_golem",
+        "trigger": {
+          "type": "enemy_base_hp_below_pct",
+          "value": 60
+        },
+        "count": 1
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 300
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_m",
+          "n": 1,
+          "rate": 0.5
+        }
+      ],
+      "teamExp": 800
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_50",
+      "within_sec_200"
+    ],
+    "unlocksOnClear": [
+      "st_2_01",
+      "spot_shrine"
+    ],
+    "enemyBaseTraits": [
+      "immune_ranged"
+    ],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_2_01",
+    "chapter": 2,
+    "name": "loc:stage/st_2_01.name",
+    "bg": "battle/bg/forest_day",
+    "bgm": "bgm/battle_01",
+    "length": 2600,
+    "enemyBaseHp": 11000,
+    "timeLimitSec": 0,
+    "enemyStatPct": 115,
+    "waves": [
+      {
+        "enemy": "en_slime",
+        "atSec": 2,
+        "count": 3,
+        "intervalSec": 4,
+        "repeatEverySec": 24
+      },
+      {
+        "enemy": "en_harpy",
+        "atSec": 12,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 28
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 200
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_s",
+          "n": 5,
+          "rate": 0.8
+        }
+      ],
+      "teamExp": 900
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_30",
+      "within_sec_150"
+    ],
+    "unlocksOnClear": [
+      "st_2_02"
+    ],
+    "enemyBaseTraits": [],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_2_02",
+    "chapter": 2,
+    "name": "loc:stage/st_2_02.name",
+    "bg": "battle/bg/forest_day",
+    "bgm": "bgm/battle_01",
+    "length": 2800,
+    "enemyBaseHp": 13000,
+    "timeLimitSec": 0,
+    "enemyStatPct": 125,
+    "waves": [
+      {
+        "enemy": "en_bat",
+        "atSec": 3,
+        "count": 2,
+        "intervalSec": 4,
+        "repeatEverySec": 24
+      },
+      {
+        "enemy": "en_mage_skeleton",
+        "atSec": 12,
+        "count": 2,
+        "intervalSec": 6,
+        "repeatEverySec": 28
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 250
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_m",
+          "n": 1,
+          "rate": 0.6
+        }
+      ],
+      "teamExp": 1100
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_40",
+      "within_sec_180"
+    ],
+    "unlocksOnClear": [
+      "st_2_03"
+    ],
+    "enemyBaseTraits": [
+      "shockwave_on_hp_loss"
+    ],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_2_03",
+    "chapter": 2,
+    "name": "loc:stage/st_2_03.name",
+    "bg": "battle/bg/forest_night",
+    "bgm": "bgm/battle_02",
+    "length": 3000,
+    "enemyBaseHp": 16000,
+    "timeLimitSec": 300,
+    "enemyStatPct": 135,
+    "waves": [
+      {
+        "enemy": "en_harpy",
+        "atSec": 2,
+        "count": 3,
+        "intervalSec": 4,
+        "repeatEverySec": 22
+      },
+      {
+        "enemy": "en_mage_skeleton",
+        "atSec": 14,
+        "count": 2,
+        "intervalSec": 6,
+        "repeatEverySec": 26
+      },
+      {
+        "enemy": "en_golem",
+        "trigger": {
+          "type": "enemy_base_hp_below_pct",
+          "value": 50
+        },
+        "count": 1
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 400
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_m",
+          "n": 2,
+          "rate": 0.8
+        }
+      ],
+      "teamExp": 1500
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_50",
+      "within_sec_220"
+    ],
+    "unlocksOnClear": [
+      "st_3_01"
+    ],
+    "enemyBaseTraits": [
+      "immune_area"
+    ],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_3_01",
+    "chapter": 3,
+    "name": "loc:stage/st_3_01.name",
+    "bg": "battle/bg/forest_night",
+    "bgm": "bgm/battle_02",
+    "length": 3000,
+    "enemyBaseHp": 16500,
+    "timeLimitSec": 0,
+    "enemyStatPct": 138,
+    "waves": [
+      {
+        "enemy": "en_slime",
+        "atSec": 2,
+        "count": 3,
+        "intervalSec": 4,
+        "repeatEverySec": 22
+      },
+      {
+        "enemy": "en_wraith_assassin",
+        "atSec": 10,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 26
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 450
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_m",
+          "n": 2,
+          "rate": 0.8
+        }
+      ],
+      "teamExp": 1600
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_40",
+      "within_sec_200"
+    ],
+    "unlocksOnClear": [
+      "st_3_02"
+    ],
+    "enemyBaseTraits": [
+      "shockwave_on_hp_loss"
+    ],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_3_02",
+    "chapter": 3,
+    "name": "loc:stage/st_3_02.name",
+    "bg": "battle/bg/forest_night",
+    "bgm": "bgm/battle_02",
+    "length": 3200,
+    "enemyBaseHp": 17500,
+    "timeLimitSec": 0,
+    "enemyStatPct": 140,
+    "waves": [
+      {
+        "enemy": "en_bat",
+        "atSec": 2,
+        "count": 3,
+        "intervalSec": 4,
+        "repeatEverySec": 22
+      },
+      {
+        "enemy": "en_mage_skeleton",
+        "atSec": 12,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 26
+      },
+      {
+        "enemy": "en_wraith_assassin",
+        "atSec": 20,
+        "count": 2,
+        "intervalSec": 6,
+        "repeatEverySec": 28
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 500
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_m",
+          "n": 3,
+          "rate": 0.8
+        }
+      ],
+      "teamExp": 1800
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_50",
+      "within_sec_220"
+    ],
+    "unlocksOnClear": [
+      "st_3_03"
+    ],
+    "enemyBaseTraits": [
+      "immune_ranged"
+    ],
+    "allyBaseTraits": []
+  },
+  {
+    "id": "st_3_03",
+    "chapter": 3,
+    "name": "loc:stage/st_3_03.name",
+    "bg": "battle/bg/forest_night",
+    "bgm": "bgm/battle_02",
+    "length": 3400,
+    "enemyBaseHp": 18500,
+    "timeLimitSec": 0,
+    "enemyStatPct": 142,
+    "waves": [
+      {
+        "enemy": "en_wraith_assassin",
+        "atSec": 2,
+        "count": 2,
+        "intervalSec": 4,
+        "repeatEverySec": 24
+      },
+      {
+        "enemy": "en_mage_skeleton",
+        "atSec": 10,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 26
+      },
+      {
+        "enemy": "en_golem_colossus",
+        "trigger": {
+          "type": "enemy_base_hp_below_pct",
+          "value": "50"
+        },
+        "count": 1
+      }
+    ],
+    "rewards": {
+      "firstClear": [
+        {
+          "item": "gem",
+          "n": 600
+        }
+      ],
+      "drop": [
+        {
+          "item": "exp_m",
+          "n": 4,
+          "rate": 1.0
+        }
+      ],
+      "teamExp": 2200
+    },
+    "starConditions": [
+      "clear",
+      "no_base_damage_pct_50",
+      "within_sec_240"
+    ],
+    "unlocksOnClear": [],
+    "enemyBaseTraits": [
+      "shockwave_on_hp_loss",
+      "immune_ranged"
+    ],
+    "allyBaseTraits": []
+  }
 ]

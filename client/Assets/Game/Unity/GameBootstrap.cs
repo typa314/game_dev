@@ -2,17 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Game.Core;
+using Game.Core.Diagnostics;
 using Game.Core.Persistence;
+using Game.Core.Platform;
 using Game.Domain;
 using Game.Domain.MasterData;
 using Game.Domain.Player;
+using Game.Unity.Platform;
 using UnityEngine;
 
 namespace Game.Unity
 {
     /// <summary>
-    /// Boot 場景的進入點（design/03 §3）：載入主資料 → 驗證 → 讀取存檔 → 建立 GameCore → 註冊到 GameServices。
-    /// 之後定期把 GameCore.Dirty 寫回存檔。
+    /// Boot 場景的進入點（design/03 §3）：載入主資料 → 驗證 → 讀取存檔 → 建立 GameCore → 初始化平台服務 → 註冊到 GameServices。
+    /// 之後定期把 GameCore.Dirty 寫回存檔，並調度 Steam 回呼。
     /// TODO: 啟動完成後切換到 Main 場景；錯誤改成顯示錯誤畫面（目前只寫 log 並停止）。
     /// </summary>
     [DefaultExecutionOrder(-1000)]
@@ -24,6 +27,10 @@ namespace Game.Unity
         [SerializeField] private BuildProfile buildProfile;
 
         private float _saveTimer;
+        private LocalCrashLogger _crashLogger;
+
+        public LocalCrashLogger CrashLogger => _crashLogger;
+        public static LocalCrashLogger GlobalCrashLogger { get; private set; }
 
         private string GameVersion
         {
@@ -34,6 +41,13 @@ namespace Game.Unity
         {
             DontDestroyOnLoad(gameObject);
             GameServices.Clear();
+
+            // M3-7: 初始化本機結構化當機記錄器
+            string logDir = Path.Combine(Application.persistentDataPath, "logs");
+            _crashLogger = new LocalCrashLogger(logDir, maxLogFiles: 10);
+            GlobalCrashLogger = _crashLogger;
+            Application.logMessageReceivedThreaded += HandleUnityLog;
+
             if (buildProfile == null)
                 Debug.LogWarning("[Boot] BuildProfile 未指定，使用預設值（MaxRating = G）");
 
@@ -44,8 +58,26 @@ namespace Game.Unity
             catch (Exception e)
             {
                 Debug.LogError("[Boot] 啟動失敗：" + e);
+                _crashLogger.LogCrash(e, "GameBootstrap.Awake");
                 GameServices.Clear();
                 enabled = false;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            Application.logMessageReceivedThreaded -= HandleUnityLog;
+            if (ReferenceEquals(GlobalCrashLogger, _crashLogger))
+            {
+                GlobalCrashLogger = null;
+            }
+        }
+
+        private void HandleUnityLog(string logString, string stackTrace, LogType type)
+        {
+            if (type == LogType.Exception || type == LogType.Assert)
+            {
+                _crashLogger?.LogCrash(type.ToString(), logString, stackTrace);
             }
         }
 
@@ -91,14 +123,111 @@ namespace Game.Unity
             core.OnLoaded();
             if (isNew) core.Dirty = true;
 
-            GameServices.Install(core, store, new AssetService(rating), rating);
+            // 5. 平台服務與成就橋接 (D2, F8)
+            IPlatformService platform = null;
+            var steamPlatform = new SteamPlatformService();
+            if (steamPlatform.Initialize())
+            {
+                platform = steamPlatform;
+            }
+            else
+            {
+                steamPlatform.Dispose();
+                platform = new NullPlatformService();
+            }
+
+            var bridge = new PlatformAchievementBridge(platform, master, core.Bus);
+
+            // 6. 橫切服務與資產防線 (OPT-1)
+            var redDots = new Game.Core.UI.RedDotService(core);
+            string storySaveDir = Path.Combine(Application.persistentDataPath, "saves", "story");
+            var storySaves = new Game.Core.Persistence.StorySaveService(storySaveDir, clock);
+
+            Game.Core.Assets.AssetCatalog catalog = null;
+            string manifestPath = Path.Combine(Application.streamingAssetsPath, "asset_manifest.csv");
+            if (!File.Exists(manifestPath))
+            {
+                manifestPath = Path.Combine(Application.dataPath, "..", "..", "data", "asset_manifest.csv");
+            }
+            if (File.Exists(manifestPath))
+            {
+                try
+                {
+                    catalog = new Game.Core.Assets.AssetCatalog();
+                    catalog.LoadFromFile(manifestPath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("[Boot] AssetCatalog 載入警告：" + ex.Message);
+                }
+            }
+
+            var assetService = new AssetService(rating, catalog);
+
+            string settingsPath = Path.Combine(Application.persistentDataPath, "settings.json");
+            var settingsService = new Game.Core.Settings.SettingsService(settingsPath);
+            settingsService.Load();
+
+            var localization = new Game.Core.Localization.LocalizationService();
+            string locDir = Path.Combine(Application.streamingAssetsPath, "Loc");
+            if (Directory.Exists(locDir))
+            {
+                localization.LoadFromDirectory(locDir);
+            }
+            if (!string.IsNullOrEmpty(settingsService.Current.Language))
+            {
+                localization.SetLocale(settingsService.Current.Language);
+            }
+
+            var ageGateState = new Game.Core.AgeGate.AgeGateState
+            {
+                IsVerified = player.Profile.RatingOptIn != Rating.G,
+                RatingOptIn = player.Profile.RatingOptIn
+            };
+
+            // M2-4: 掛載實體 UnityAudioDriver 並註冊至 AudioService
+            var audioDriver = gameObject.GetComponent<Game.Unity.Audio.UnityAudioDriver>();
+            if (audioDriver == null)
+            {
+                audioDriver = gameObject.AddComponent<Game.Unity.Audio.UnityAudioDriver>();
+            }
+            var audioService = new Game.Core.Audio.AudioService(audioDriver);
+            if (player.Settings != null)
+            {
+                audioService.SetVolumes(1.0f, player.Settings.Bgm, player.Settings.Se, player.Settings.Voice);
+            }
+
+            GameServices.Install(
+                core,
+                store,
+                assetService,
+                rating,
+                platform,
+                bridge,
+                navigator: null,
+                dialogs: null,
+                toasts: null,
+                audio: audioService,
+                localization: localization,
+                settings: settingsService,
+                ageGate: ageGateState,
+                redDots: redDots,
+                storySaves: storySaves);
+
             Debug.Log("[Boot] 完成：masterDataVersion=" + master.Config.MasterDataVersion
-                      + " characters=" + player.Characters.Count + (isNew ? "（新玩家）" : ""));
+                      + " characters=" + player.Characters.Count + (isNew ? "（新玩家）" : "")
+                      + " platform=" + platform.GetType().Name);
         }
 
         private void Update()
         {
             if (!GameServices.IsReady) return;
+
+            if (GameServices.Platform is SteamPlatformService steamSvc)
+            {
+                steamSvc.RunCallbacks();
+            }
+
             _saveTimer += Time.unscaledDeltaTime;
             if (_saveTimer < AutoSaveIntervalSec) return;
             _saveTimer = 0f;

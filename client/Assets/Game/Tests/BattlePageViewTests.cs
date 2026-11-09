@@ -1,0 +1,353 @@
+#if UNITY_2021_1_OR_NEWER
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Game.Domain;
+using Game.Domain.Battle;
+using Game.Domain.MasterData;
+using Game.Unity;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Game.Tests
+{
+    [TestFixture]
+    public sealed class BattlePageViewTests
+    {
+        private List<GameObject> _createdObjects;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _createdObjects = new List<GameObject>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (_createdObjects != null)
+            {
+                for (int i = 0; i < _createdObjects.Count; i++)
+                {
+                    if (_createdObjects[i] != null)
+                    {
+                        UnityEngine.Object.DestroyImmediate(_createdObjects[i]);
+                    }
+                }
+                _createdObjects.Clear();
+            }
+        }
+
+        private GameObject Track(GameObject go)
+        {
+            _createdObjects.Add(go);
+            return go;
+        }
+
+        private static BattleSetup CreateTestSetup(int length = 1000)
+        {
+            var stage = new StageDef
+            {
+                Id = "st_test",
+                Length = length,
+                AllyBaseHp = 1000,
+                EnemyBaseHp = 1000,
+                Waves = new List<WaveDef>()
+            };
+
+            var rules = new BattleRules
+            {
+                TicksPerSecond = 30,
+                DefaultAllyBaseHp = 20000,
+                EnergyMaxByLevel = new List<int> { 1000, 2000 },
+                EnergyRegenPerSecByLevel = new List<int> { 50, 100 },
+                EnergyUpgradeCost = new List<int> { 500 },
+                StartEnergy = 500,
+                CannonChargeSec = 10,
+                CannonDamage = 200,
+                CannonRange = 800,
+                KnockbackDistance = 60,
+                MaxUnitsPerSide = 10,
+                MaxBattleSec = 300
+            };
+
+            return new BattleSetup
+            {
+                Stage = stage,
+                Rules = rules,
+                Team = new List<UnitTemplate>(),
+                EnemyTemplates = new Dictionary<string, UnitTemplate>(),
+                Seed = 12345UL
+            };
+        }
+
+        [Test]
+        public void OPT4_1_ContinuousSimSteps_ConsumeViewEvents_CollectsAllEventsWithoutLoss()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            var skill = new CharacterSkillDef { Id = "sk_strike", Name = "打擊", ChargeSec = 1.0, EffectType = "damage", Value = 150 };
+            UnitTemplate unit = new UnitTemplate { Id = "char_valkyrie", Cost = 100, CooldownTicks = 10, Hp = 500, Atk = 50, Skill = skill, SkillChargeTicks = 10 };
+            setup.Team.Add(unit);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            runner.InitializeForTesting(sim, setup);
+
+            // 1. 出兵指令
+            runner.Deploy(0);
+
+            // 2. 單一幀內連續推進 5 個 Step (模擬幀間時間積累)
+            for (int i = 0; i < 5; i++)
+            {
+                runner.StepSim();
+            }
+
+            // 驗證累積佇列中有事件
+            Assert.IsTrue(runner.PendingViewEventCount > 0, "多個 Step 產生的事件應成功累積於 Runner 緩衝中");
+
+            // 3. 消費所有事件
+            List<BattleEvent> buffer = new List<BattleEvent>();
+            runner.ConsumeViewEvents(buffer);
+
+            // 陽性查核：buffer 內應包含 Deploy 事件，且佇列清空
+            Assert.IsTrue(buffer.Any(e => e.Type == BattleEventType.Deploy), "緩衝清單應包含 Deploy 戰鬥事件");
+            Assert.AreEqual(0, runner.PendingViewEventCount, "ConsumeViewEvents 後佇列應完全清空");
+
+            // 4. 再次呼叫 ConsumeViewEvents，buffer 應為空，不重送舊事件
+            runner.ConsumeViewEvents(buffer);
+            Assert.AreEqual(0, buffer.Count, "無新事件時 ConsumeViewEvents 應傳回空清單");
+        }
+
+        [Test]
+        public void OPT4_2_SkillCast_TriggersCutIn_And_BaseImmune_TriggersAlert()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            setup.Stage.EnemyBaseTraits.Add("immune_ranged");
+            setup.Stage.EnemyBaseHp = 5000;
+
+            // Slot 0: 近戰充能技能角色
+            var skill = new CharacterSkillDef { Id = "sk_valkyrie", Name = "女武神戰歌", ChargeSec = 1.0, EffectType = "damage", Value = 200 };
+            UnitTemplate valkyrie = new UnitTemplate { Id = "char_valkyrie", Cost = 100, CooldownTicks = 10, Hp = 1000, Atk = 100, Skill = skill, SkillChargeTicks = 10 };
+            setup.Team.Add(valkyrie);
+
+            // Slot 1: 遠程射手 (Range = 300 > 150)
+            UnitTemplate sniper = new UnitTemplate { Id = "char_sniper", Cost = 100, Hp = 500, Atk = 200, RangeMilli = 300 * 1000 };
+            setup.Team.Add(sniper);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            // 1. 推進 10 ticks 使技能條充滿
+            for (int i = 0; i < 10; i++) runner.StepSim();
+            Assert.IsTrue(sim.IsSkillReady(0), "第 0 格技能應已滿充能");
+
+            // 點擊施放技能
+            runner.TapSlot(0);
+            runner.StepSim(); // 觸發 SkillCast 事件
+
+            // 驅動 View 更新並消費事件
+            pageView.Refresh();
+
+            // 查核 OPT4-2: 角色大招 Cut-in 面板啟動且包含技能名稱
+            Assert.IsNotNull(pageView.SkillCutInPanel, "SkillCutInPanel 應被建置");
+            Assert.IsTrue(pageView.SkillCutInPanel.activeSelf, "大招施放時 Cut-in 面板應為 active");
+            Assert.IsNotNull(pageView.LastSkillCutInText, "LastSkillCutInText 不應為 null");
+            StringAssert.Contains("女武神戰歌", pageView.LastSkillCutInText, "Cut-in 文字應包含角色大招名稱 '女武神戰歌'");
+
+            // 2. 測試 BaseImmune 主堡免疫視覺提示
+            runner.Deploy(1); // 部署遠程狙擊手
+            runner.StepSim();
+            BattleUnit uSniper = sim.Units.First(u => u.T.Id == "char_sniper");
+            uSniper.X = 800 * 1000; // 移動至敵方免疫主堡前開火 (距離 200 單位)
+
+            runner.StepSim(); // 產生 BaseImmune 事件
+            pageView.Refresh();
+
+            // 查核 OPT4-2: 主堡免疫警報視覺呈現
+            Assert.IsNotNull(pageView.BaseAlertLabel, "BaseAlertLabel 應被建置");
+            Assert.IsTrue(pageView.BaseAlertLabel.gameObject.activeSelf, "遭遇免疫時主堡警報橫幅應為 active");
+            Assert.IsNotNull(pageView.LastBaseAlertText, "LastBaseAlertText 不應為 null");
+            StringAssert.Contains("BASE IMMUNE", pageView.LastBaseAlertText, "警示文字應包含 'BASE IMMUNE'");
+        }
+
+        [Test]
+        public void OPT4_3_BaseShockwave_TriggersShockwaveAlert()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            setup.Stage.EnemyBaseTraits.Add("shockwave_on_hp_loss");
+            setup.Stage.EnemyBaseHp = 1000;
+
+            UnitTemplate siege = new UnitTemplate { Id = "char_siege", Cost = 100, Hp = 2000, Atk = 250, RangeMilli = 100 * 1000 };
+            setup.Team.Add(siege);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.Deploy(0);
+            runner.StepSim();
+            BattleUnit u = sim.Units.First(u => u.T.Id == "char_siege");
+            u.X = 950 * 1000;
+
+            // 攻擊主堡扣除 250 HP (> 20% 門檻)，引發 BaseShockwave
+            runner.StepSim();
+            pageView.Refresh();
+
+            Assert.IsNotNull(pageView.LastBaseAlertText, "LastBaseAlertText 不應為 null");
+            StringAssert.Contains("BASE SHOCKWAVE", pageView.LastBaseAlertText, "主堡觸發震波時應顯示 BASE SHOCKWAVE 警示");
+            Assert.IsTrue(pageView.BaseAlertLabel.gameObject.activeSelf, "警報橫幅應為 active");
+        }
+
+        [Test]
+        public void OPT4_4_UnitStatusLabels_DisplaysActiveBuffsAndDebuffs()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            UnitTemplate unit = new UnitTemplate { Id = "char_tank", Cost = 100, Hp = 1000, Atk = 50, RangeMilli = 100 * 1000 };
+            setup.Team.Add(unit);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.Deploy(0);
+            runner.StepSim();
+            pageView.Refresh();
+
+            BattleUnit u = sim.Units.First(u => u.T.Id == "char_tank");
+            // 施加狀態
+            u.AtkBuffTicks = 30;
+            u.SlowTicks = 30;
+            u.StunTicks = 15;
+
+            pageView.Refresh();
+
+            // 驗證單位視覺物件存在
+            RectTransform unitRt = pageView.GetUnitTransform(u.Uid);
+            Assert.IsNotNull(unitRt, "畫面中應存在 BattleUnit 物件");
+
+            // 驗證狀態文字
+            string status = pageView.GetUnitStatusText(u.Uid);
+            StringAssert.Contains("[ATK↑]", status, "狀態文字應包含 [ATK↑]");
+            StringAssert.Contains("[SLOW]", status, "狀態文字應包含 [SLOW]");
+            StringAssert.Contains("[STUN]", status, "狀態文字應包含 [STUN]");
+        }
+
+        [Test]
+        public void OPT4_5_EventQueue_CapAt256_DropsOldestOnOverflow()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            runner.InitializeForTesting(sim, setup);
+
+            // 人工大量灌入事件以測試上限保護
+            for (int i = 0; i < 300; i++)
+            {
+                sim.TickEvents.Add(new BattleEvent { Type = BattleEventType.EnergyUp, Value = i });
+                runner.CaptureTickEvents();
+                sim.TickEvents.Clear();
+            }
+
+            Assert.AreEqual(256, runner.PendingViewEventCount, "事件緩衝佇列應被嚴格限制在最多 256 筆");
+
+            List<BattleEvent> buffer = new List<BattleEvent>();
+            runner.ConsumeViewEvents(buffer);
+            Assert.AreEqual(256, buffer.Count);
+            // 驗證保留的是最新的事件（最舊的已被剔除）
+            Assert.AreEqual(299, buffer[buffer.Count - 1].Value, "最後一筆事件應為第 299 號最新事件");
+            Assert.AreEqual(44, buffer[0].Value, "第一筆事件應為第 44 號事件 (300 - 256 = 44)");
+        }
+
+        [Test]
+        public void M2_1_3_VictoryWithUnlockedNextStage_ShowsNextStageButton_AndDefeatHidesIt()
+        {
+            MasterDatabase master = Game.Core.MasterDataLoader.LoadFromDirectory(TestPaths.MasterDataDir());
+            var clock = new SystemClock();
+            var player = Game.Core.GameCore.NewPlayer(master, clock);
+            var rating = new RatingPolicy(Rating.G, Rating.G);
+            var core = new Game.Core.GameCore(master, player, new SplitMix64Random(99UL), clock, rating);
+            string tempDir = System.IO.Path.Combine(Application.temporaryCachePath, "test_m2_1_3_" + Guid.NewGuid().ToString("N"));
+            var store = new Game.Core.Persistence.FileSaveStore(tempDir);
+            GameServices.Install(core, store, new AssetService(rating), rating, new Game.Core.Platform.NullPlatformService(), null);
+
+            try
+            {
+                GameObject runnerGo = Track(new GameObject("TestBattleRunner_M2_1_3"));
+                BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+                BattlePageView pageView = runnerGo.GetComponent<BattlePageView>() ?? runnerGo.AddComponent<BattlePageView>();
+                pageView.InitializeForTesting(runner);
+
+                // 1. 啟動 st_1_01 並模擬戰敗 (陽性對照：戰敗時 NextStageButton 必須隱藏)
+                Assert.IsTrue(runner.StartBattle("st_1_01"));
+                // 直接將我方主堡血量扣至 0 使其戰敗
+                var loseSetup = CreateTestSetup(length: 500);
+                loseSetup.Stage.Id = "st_1_01";
+                loseSetup.Stage.AllyBaseHp = 10;
+                loseSetup.EnemyTemplates["en_killer"] = new UnitTemplate { Id = "en_killer", Hp = 500, Atk = 50, RangeMilli = 600 * 1000, AttackIntervalTicks = 1 };
+                loseSetup.Stage.Waves.Add(new WaveDef { Enemy = "en_killer", AtSec = 0, Count = 1 });
+                var loseSim = new BattleSimulator(loseSetup);
+                runner.InitializeForTesting(loseSim, loseSetup);
+                while (loseSim.Outcome == BattleOutcome.Ongoing)
+                {
+                    runner.StepSim();
+                }
+                Assert.AreEqual(BattleOutcome.Lose, loseSim.Outcome);
+                runner.Submit();
+                pageView.SetNextStageIdForTesting("st_1_02");
+                pageView.Refresh();
+
+                Assert.IsNotNull(pageView.NextStageButton);
+                Assert.IsFalse(pageView.NextStageButton.gameObject.activeSelf, "戰敗時 NextStageButton 必須隱藏 (陽性對照)");
+
+                // 2. 模擬勝利且下一關 st_1_02 已解鎖：NextStageButton 應顯示並可點擊進入 st_1_02
+                core.Player.Stages["st_1_02"] = new Game.Domain.Player.StageProgress { Unlocked = true, Stars = 0 };
+                pageView.SetNextStageIdForTesting(null); // 改由 GameServices.Core 動態解析
+
+                var winSetup = CreateTestSetup(length: 500);
+                winSetup.Stage.Id = "st_1_01";
+                winSetup.Stage.EnemyBaseHp = 50;
+                winSetup.Team.Add(new UnitTemplate { Id = "char01_claire", Cost = 0, Hp = 500, Atk = 100, RangeMilli = 600 * 1000, AttackIntervalTicks = 1 });
+                var winSim = new BattleSimulator(winSetup);
+                runner.InitializeForTesting(winSim, winSetup);
+                runner.Deploy(0);
+                while (winSim.Outcome == BattleOutcome.Ongoing)
+                {
+                    runner.StepSim();
+                }
+                Assert.AreEqual(BattleOutcome.Win, winSim.Outcome);
+                runner.Submit();
+                pageView.Refresh();
+
+                Assert.IsTrue(pageView.NextStageButton.gameObject.activeSelf, "勝利且下一關已解鎖時 NextStageButton 應顯示");
+                Assert.IsTrue(pageView.NextStageButton.interactable);
+
+                // 點擊「下一關」按鈕，應直接啟動 st_1_02 戰鬥
+                pageView.OnClickNextStage();
+                Assert.AreEqual("st_1_02", runner.StageId, "點擊 NextStageButton 後應自動啟動下一關 st_1_02");
+                Assert.IsTrue(runner.IsRunning, "新關卡應處於進行中狀態");
+            }
+            finally
+            {
+                GameServices.Clear();
+                if (System.IO.Directory.Exists(tempDir))
+                {
+                    try { System.IO.Directory.Delete(tempDir, true); } catch { }
+                }
+            }
+        }
+    }
+}
+#endif

@@ -331,5 +331,84 @@ line l4 Claire ""Take your time.""
             audio.SetVolumes(master: 1.0f, bgm: 1.0f, se: 1.0f, voice: 1.0f);
             Assert.AreEqual(1.0f, driver.BgmVolume, 0.001f);
         }
+
+        // =========================================================================================
+        // OPT-1: CurrencyBarPresenter & LobbyPresenter Default Alignment
+        // =========================================================================================
+        private class MockCurrencyBarView : ICurrencyBarView
+        {
+            public bool IsVisible { get; set; } = true;
+            public long Gold { get; private set; }
+            public long FreeDia { get; private set; }
+            public long PaidDia { get; private set; }
+            public int Stamina { get; private set; }
+
+            public void UpdateCurrencies(long gold, long freeDia, long paidDia, int stamina)
+            {
+                Gold = gold;
+                FreeDia = freeDia;
+                PaidDia = paidDia;
+                Stamina = stamina;
+            }
+        }
+
+        [Test]
+        public void OPT1_1_CurrencyBarPresenter_LoadsStandardMasterDataCurrencies()
+        {
+            // 1. 驗證新玩家 (GameCore.NewPlayer) 完全對齊 data/master/config.json initial: gold=5000, gem=3000, stamina=5
+            var freshPlayer = GameCore.NewPlayer(_master, new SystemClock());
+            var freshCore = new GameCore(_master, freshPlayer, new SplitMix64Random(1UL), new SystemClock(), new RatingPolicy(Rating.G, Rating.G));
+            var freshView = new MockCurrencyBarView();
+            var freshPresenter = new CurrencyBarPresenter(freshCore);
+            freshPresenter.AttachView(freshView);
+            freshPresenter.Initialize();
+
+            Assert.AreEqual(5000, freshView.Gold, "金幣應正確對齊 master config 之 gold 欄位");
+            Assert.AreEqual(3000, freshView.FreeDia, "寶石應正確對齊 master config 之 gem 欄位");
+            Assert.AreEqual(5, freshView.Stamina, "體力應正確讀取初始體力");
+            Assert.AreEqual(0, freshView.PaidDia);
+
+            // 2. 驗證 _core 當前狀態讀取
+            var view = new MockCurrencyBarView();
+            var presenter = new CurrencyBarPresenter(_core);
+            presenter.AttachView(view);
+            presenter.Refresh();
+            Assert.AreEqual(5000, view.Gold);
+            Assert.AreEqual(3000, view.FreeDia);
+            Assert.AreEqual(120, view.Stamina);
+
+            // 測試向下相容舊資料結構 item_gold 與 item_dia_free
+            var legacyPlayer = new Game.Domain.Player.PlayerState();
+            legacyPlayer.AddItem("item_gold", 1234);
+            legacyPlayer.AddItem("item_dia_free", 567);
+            legacyPlayer.Encounter.Stamina = 3;
+            var legacyCore = new GameCore(_master, legacyPlayer, new SplitMix64Random(1UL), new SystemClock(), new RatingPolicy(Rating.G, Rating.G));
+
+            var legacyView = new MockCurrencyBarView();
+            var legacyPresenter = new CurrencyBarPresenter(legacyCore);
+            legacyPresenter.AttachView(legacyView);
+            legacyPresenter.Refresh();
+
+            Assert.AreEqual(1234, legacyView.Gold, "無 gold 時應相容讀取 item_gold");
+            Assert.AreEqual(567, legacyView.FreeDia, "無 gem 時應相容讀取 item_dia_free");
+            Assert.AreEqual(3, legacyView.Stamina);
+        }
+
+        [Test]
+        public void OPT1_LobbyPresenter_DefaultFallback_UsesCorrectIdAndScene()
+        {
+            // 將玩家 Lobby 清空以測試預設 fallback
+            _core.Player.Lobby.Scene = null;
+            _core.Player.Lobby.Character = null;
+
+            var view = new MockLobbyView();
+            var lobby = new LobbyPresenter(_core);
+            lobby.AttachView(view);
+            lobby.Refresh();
+
+            Assert.AreEqual("scene_lobby_default", view.BackgroundScene, "預設場景 fallback 應為 scene_lobby_default");
+            lobby.OnCharacterClicked();
+            Assert.IsTrue(view.Greeting.Contains("char01_claire"), "預設看板娘 fallback 應為 char01_claire");
+        }
     }
 }

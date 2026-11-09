@@ -282,17 +282,20 @@ namespace Game.Tests
         {
             MasterDatabase m = LoadCleanMaster();
             BannerDef banner = CloneBanner(m.Banners["banner_std"]);
-            // banner_std: SSR 0.03 (1 角), SR 0.12 (2 角), R 0.85 (2 角)
+            // banner_std: SSR 0.03 (1 角), SR 0.12 (2 角), R 0.85 (5 角)
 
             Dictionary<string, double> rates = GachaEngine.DisplayRates(banner);
             double sum = rates.Values.Sum();
             Assert.IsTrue(Math.Abs(sum - 1.0) < 1e-9, "DisplayRates 加總應為 1.0");
 
             Assert.AreEqual(0.03, rates["char01_claire"], 1e-9, "Claire SSR 機率應為 0.03");
-            Assert.AreEqual(0.06, rates["char02_luna"], 1e-9, "Luna SR 機率應為 0.06 (0.12 / 2)");
+            Assert.AreEqual(0.06, rates["char04_elysia"], 1e-9, "Elysia SR 機率應為 0.06 (0.12 / 2)");
             Assert.AreEqual(0.06, rates["char03_scarlet"], 1e-9, "Scarlet SR 機率應為 0.06 (0.12 / 2)");
-            Assert.AreEqual(0.425, rates["char04_elysia"], 1e-9, "Elysia R 機率應為 0.425 (0.85 / 2)");
-            Assert.AreEqual(0.425, rates["char05_rin"], 1e-9, "Rin R 機率應為 0.425 (0.85 / 2)");
+            Assert.AreEqual(0.17, rates["char02_luna"], 1e-9, "Luna R 機率應為 0.17 (0.85 / 5)");
+            Assert.AreEqual(0.17, rates["char05_rin"], 1e-9, "Rin R 機率應為 0.17 (0.85 / 5)");
+            Assert.AreEqual(0.17, rates["char07_kagura"], 1e-9, "Kagura R 機率應為 0.17 (0.85 / 5)");
+            Assert.AreEqual(0.17, rates["char09_chloe"], 1e-9, "Chloe R 機率應為 0.17 (0.85 / 5)");
+            Assert.AreEqual(0.17, rates["char10_mirai"], 1e-9, "Mirai R 機率應為 0.17 (0.85 / 5)");
         }
 
         // =============================================================

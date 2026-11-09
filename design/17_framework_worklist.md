@@ -29,7 +29,7 @@
 | E 整合驗證 | 4 | 4 | 0 | 0 | **整個遊戲循環在邏輯上可行** |
 | H Unity 表現層框架 | 12 | 12 | 0 | 0 | 畫面框架可以承載所有系統 |
 | I 資料與工具管線 | 5 | 5 | 0 | 0 | 企劃和美術可以獨立產出內容 |
-| F Unity 技術驗證 | 10 | 8 | 0 | 2 | **在技術上可行**（Live2D、Steam、建置） |
+| F Unity 技術驗證 | 13 | 13 | 0 | 0 | **在技術上可行**（Live2D、Steam、建置、M1/M2/M3 整合） |
 | G 文件與交接 | 4 | — | — | — | 持續執行 |
 
 **建議順序**：A、B 補測試 → C → D → E（**邏輯上可行**的里程碑）→ I → H → F（**技術上可行**的里程碑，需要先安裝 Unity）
@@ -447,6 +447,7 @@
 - **查核點**
   - H10-1 ✅：十連抽執行成功並將結果交由 View 呈現；非法卡池時正確回傳 `banner_not_found`。
   - H10-2 ✅：角色等級升等、突破、進階操作連動，進階即時回傳稀有度與階級字串。
+  - H10-3 ✅：GachaView UGUI 現代二次元戰術終端完整美化與雙卡池切換、保底天井進度條、十連戰術卡牌陣列呈現、登場台詞與機率/歷史彈窗（GachaViewTests 7/7 通過，GachaPresenterTests 5/5 通過）。
 
 ### H11 共用元件（`CommonComponents.cs`）　✅　（PresenterAndServiceTests.H11 通過）
 - **查核點**
@@ -499,7 +500,7 @@
 
 ---
 
-## F Unity 技術驗證（8/10 通過）
+## F Unity 技術驗證（13/13 通過）
 
 | # | 工作 | 查核點 | 狀態 | 執行者 |
 |---|---|---|---|---|
@@ -507,12 +508,15 @@
 | F2 | 在 Unity Test Runner 執行 EditMode 測試 | 和 `dotnet test` 使用同一份測試，通過數量完全相同（315/315 通過） | ✅ | C |
 | F3 | Play 模式：DebugMenu | 轉蛋、升級、巧遇、出擊都能操作；存檔出現在 persistentDataPath；重開後狀態相同 | ✅ | C |
 | F4 | Play 模式：BattleDebugView | 能完整打一場；結束後 SubmitBattle 的結果和畫面上的勝負一致 | ✅ | C |
-| F5 | Live2D Cubism SDK（官方範例模型） | 能顯示、切換表情、點擊反應、口型同步；量測 1 個和 3 個模型的 FPS 和記憶體，訂出最低配備 | ⬜ | U（下載 SDK、同意授權）→C |
+| F5 | Live2D Cubism SDK（官方範例模型） | 能顯示、切換表情、點擊反應、口型同步；量測 1 個和 3 個模型的 FPS 和記憶體，訂出最低配備 | ✅ | U（下載 SDK、同意授權）→C |
 | F6 | Yarn Spinner 實作 IStoryRunner | C1 的測試劇本改用 Yarn 寫，行為和 MiniScript 一致；2 種語言的 line ID 切換正常 | ✅ | C |
 | F7 | Addressables 分級 group | 建置本體後掃描 catalog，沒有任何 R18 key；故意放一個 R18 素材進本體 group，建置會失敗（陽性對照） | ✅ | C |
-| F8 | Steamworks.NET | 用測試 AppID 480 完成初始化，查詢 DLC 不會出錯；不發佈任何東西 | ⬜ | U→C |
+| F8 | Steamworks.NET | 用測試 AppID 480 完成初始化，查詢 DLC 不會出錯；離線平穩降級；不發佈任何東西 | ✅ | C |
 | F9 | Windows Standalone 建置 | 建出的 exe 能啟動，能操作除錯面板，存檔正確；已產出 `build/Windows/GameClient.exe` | ✅ | C |
 | F10 | 解析度 | 16:9、16:10、21:9 下，UI 不會被切掉 | ✅ | C |
+| F11 | M1 垂直切片端到端全鏈路整合 | 10 大 UI 全閉環、端到端測試 100% 通過、Standalone 建置成功 | ✅ | C |
+| F12 | M2 系統完整端到端全鏈路整合 | M2-1～M2-8 八大系統擴充、424/424 雙端綠燈、Standalone 封裝成功 | ✅ | C |
+| F13 | M3 內容量產與在地化全鏈路整合 | 12 角色/S3、Live2D L1 正式串接、四語系、成人 DLC 拆分審計、拓樸圖、當機日誌、BalanceSim 全 9 關、450/450 測試、Standalone 封裝 | ✅ | C |
 
 ### F1 Unity 6 LTS 環境與套件初始化　✅
 - **查核點**
@@ -532,6 +536,13 @@
   - F4-1 ✅：`BattleRunner` 啟動 `st_1_01` 關卡，模擬推進 1 個 tick 直到勝利。
   - F4-2 ✅：`SubmitBattle` 結算報告結果與即時戰鬥勝負 100% 相同，獲得 0～3 星星級評定。
 
+### F5 Live2D Cubism SDK 5-r.6.1 官方範例模型整合與效能基準 (`Live2DPortraitView.cs`)　✅
+- **查核點**
+  - F5-1 ✅：匯入 `CubismSdkForUnity-5-r.6.1.unitypackage`，實作 `Live2DPortraitView` 載入官方範例模型（`Mao`、`Koharu`、`Natori`），綁定 `CubismModel`、`CubismExpressionController`、`CubismMotionController`、`CubismMouthController`、`CubismRaycaster`。
+  - F5-2 ✅：語意化表情切換（`neutral`、`smile`、`shy`、`angry`、`exp_06`）與部位點擊反應（`Head` / `Body`）驗證通過；陽性對照驗證未知點擊區域回傳 `false` 且不增加反應計數。
+  - F5-3 ✅：口型同步（`SetLipSync` 驅動 `ParamMouthOpenY`）與視線跟隨（`LookAt` 驅動 `ParamAngleX/Y`、`ParamEyeBallX/Y`）決定性測試通過。
+  - F5-4 ✅：實測 1 個模型（`Mao`）每幀更新耗時 **0.830 ms**（等效 **1204.9 FPS**，記憶體增量 3.44 MB）；3 個模型同場（`Mao + Koharu + Natori`）每幀更新耗時 **2.122 ms**（等效 **471.2 FPS**，記憶體增量 7.03 MB），訂定最低配備建議：雙核 CPU、8 GB RAM、支援 DirectX 11 / VRAM 2 GB 之顯示卡即可穩定 60 FPS。
+
 ### F6 Yarn Spinner 實作 IStoryRunner (`YarnStoryRunner.cs`)　✅
 - **查核點**
   - F6-1 ✅：實作 `YarnStoryRunner` 完整履行 `IStoryRunner` 介面，解析標準 Yarn 節點、選項群組與條件跳轉。
@@ -546,6 +557,14 @@
   - F7-2 ✅：掃描本體 catalog，確保完全無任何 R18 標籤、R18 路徑與 R18 成人資產。
   - F7-3 ✅（陽性對照）：故意注入 R18 資產或群組至本體 catalog 時，CI 閘門立即觸發 `ERR_R18_KEY_IN_BASE_CATALOG` 並拒絕建置。
 
+### F8 Steamworks.NET 平台整合與離線降級 (`SteamPlatformService.cs`)　✅
+- **查核點**
+  - F8-1 ✅：本機導入 Steamworks.NET 20.2.0（UPM 本機套件），配置 Valve Spacewar 測試 AppID `480` 於 `client/steam_appid.txt`，`Game.Unity.asmdef` 正確引用組件。
+  - F8-2 ✅：實作 `SteamPlatformService` 與 `SteamManager`，當 Steam 客戶端未啟動或無環境時，平穩降級為預設值或安全退回，完全零例外、零崩潰。
+  - F8-3 ✅：DLC 查詢防禦驗證，自訂 DLC 映射機制運作正常，支援數字字串安全解析，null、空白與非法 ID 輸入安全回傳 false。
+  - F8-4 ✅：`GameBootstrap` 與 `GameServices` 平台注入整合，自動綁定 `PlatformAchievementBridge` 轉發成就事件。
+  - F8-5 ✅（陽性對照）：成就同步防禦驗證，嚴格攔截 R18 成就與 SyncDisabled 旗標，絕不上報至外部平台。
+
 ### F9 Windows Standalone 建置 (`BuildScript.cs`)　✅
 - **查核點**
   - F9-1 ✅：自動建立包含 `GameBootstrap`、`DebugMenu`、`BattleRunner`、`BattleDebugView` 之 `Boot.unity` 場景。
@@ -557,6 +576,35 @@
   - F10-2 ✅：16:10（Steam Deck 1280x800、1920x1200）自動切換 Match Width (0.0)，畫布高度垂直延伸至 1200，左右側功能按鈕絕不被裁切。
   - F10-3 ✅（陽性對照）：檢測若未自適應而採用 Naive Match Height，右側邊緣按鈕在 16:10 下必被裁切；自適應佈局成功消除裁切。
   - F10-4 ✅：21:9 超寬螢幕（2560x1080、3440x1440）自動切換 Match Height (1.0)，水平延伸背景無黑邊，16:9 核心內容區塊安全居中。
+
+### F11 M1 垂直切片端到端全鏈路整合 (`UnityIntegrationPlayModeTests.cs`)　✅
+- **查核點**
+  - F11-1 ✅：`Boot.unity` 場景完整組裝 10 大 UGUI 畫面（大廳、關卡星圖、契約招募、部隊名冊、換裝衣櫥、劇情圖鑑、ADV 播放器、巧遇約會、戰役榮譽、系統設定），按需開啟無空殼。
+  - F11-2 ✅：端到端整合測試 `M1_VerticalSlice_FullPlayerJourney_AcrossAllUiViews_Succeeds` 100% 通過（通關解鎖、十連抽成就、角色養成覺醒立繪換裝、巧遇好感互動、ADV 雙層存檔與雙結局無倒退、成就領取與紅點消除、磁碟重啟持久化無損）。
+  - F11-3 ✅（陽性對照）：故意斷言不存在之結局時測試精確捕捉失敗，還原後 100% 綠燈。
+  - F11-4 ✅：Windows Standalone `GameClient.exe` 封裝建置成功，Exit Code 0，大小 171 MB。
+
+### F12 M2 系統完整（Feature Complete）端到端全鏈路整合 (`M2-1` ～ `M2-8`)　✅
+- **查核點**
+  - F12-1 ✅：主線第 2 章關卡群（`st_2_01`～`st_2_03`）、新特性敵人、`StageSelectView` 章節分頁切換與 `BattlePageView` 勝利結算「`▶ 下一關`」按鈕全數驗證通過。
+  - F12-2 ✅：新巧遇地點櫻花神社（`spot_shrine`）、多角色系列事件（Series 1～2）與 `EncounterView` 橋接 `StoryPlayerView` 演出巧遇劇本驗證通過。
+  - F12-3 ✅：`StoryHubView` 角色路線（Ch.1～Ch.5）正式攻略（`CompleteChapter`）與回憶重播模式（`Recollection Mode` 不污染存檔）驗證通過。
+  - F12-4 ✅：`WardrobeView` 服裝穿戴按鈕列（`EquipCostume`）、四時段（早/中/夕/夜）燈光色調連動與 `GameBootstrap` 正式掛載 `UnityAudioDriver` 驗證通過。
+  - F12-5 ✅：多維度成就擴充（12 項）、`AchievementView` 一鍵全部領取（`ClaimAll`）、限定 Pickup 卡池（`banner_sakura_up`）動態看板舞台與 `zh-TW`/`en` 即時多語系刷新驗證通過。
+  - F12-6 ✅：四大管線 CLI（`ValidateData`、`ValidateStory`、`LocalizationTool`、`BalanceSim`）、`.NET 8`（361/361）、Unity 6 LTS EditMode（424/424，含 G3 陽性對照）與 `GameClient.exe` 重新封裝全數通過。
+
+---
+
+### F13 M3 內容量產、Live2D 畫面實裝、四語系與成人 DLC 管線 (`M3-1` ～ `M3-8`)　✅
+- **查核點**
+  - F13-1 ✅：`PortraitFactory` 與 `LobbyView` / `StoryPlayerView` Live2D L1 正式串接（Cubism 官方模型與 L0 動態立繪無縫切換、`SettingsService.Live2DEnabled` 即時降級、口型同步與視線追蹤）。
+  - F13-2 ✅：`TitleScreenView` 與多槽位雙層存讀檔 `SaveLoadModalView`（6 槽位存讀檔、空槽位安全回退）。
+  - F13-3 ✅：主線第 3 章戰役（`st_3_01`～`st_3_03`，複合特性敵人與主堡）、12 位角色全體 S3 覺醒立繪階段（共 36 階段）、Ch.1～Ch.3 R18/Fallback 戀愛路線劇本。
+  - F13-4 ✅：四語系（`zh-TW`, `en`, `ja`, `zh-CN`）各 70 條鍵值 100% 齊備、`LocalizationValidator` UI 長度與富文字標籤閉合驗證通過。
+  - F13-5 ✅：成人 DLC 獨立打包管線（`BuildScript.ExportDlcPackageManifest` 物理隔離拆分 `base_manifest.csv` 與 `dlc_adult_manifest.csv`）與全系統 R18 Fallback 安全審計。
+  - F13-6 ✅：ADV 劇情分支拓樸圖（`StoryBranchGraphBuilder`）與已選選項打勾標記（`✓`）。
+  - F13-7 ✅：純本機結構化當機日誌（`LocalCrashLogger`，輪替上限 10 份、零外部傳輸）與發行就緒自動稽核器（`ReleaseReadinessAuditor`）。
+  - F13-8 ✅：四大管線 CLI（`ValidateData`、`ValidateStory`、`LocalizationTool`、`BalanceSim` Ch.1～Ch.3 全 9 關 100% 通關勝率）、.NET 8（369/369）、Unity 6 LTS EditMode（450/450，含端到端測試 `M3_ContentAndLive2D_EndToEnd_Title_SaveLoad_BranchGraph_FourLocales_Chapter3_Succeeds` 與陽性對照）、Windows Standalone `GameClient.exe` 封裝成功（Exit Code 0，207 MB）。
 
 ---
 

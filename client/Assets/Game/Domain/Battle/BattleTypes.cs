@@ -8,7 +8,7 @@ namespace Game.Domain.Battle
 
     public enum BattleOutcome { Ongoing, Win, Lose, Timeout }
 
-    public enum CommandType { Deploy, UpgradeEnergy, FireCannon }
+    public enum CommandType { Deploy, UpgradeEnergy, FireCannon, CastSkill }
 
     /// <summary>
     /// 一種單位在戰鬥中使用的數值，已經換算成 tick 和千分位距離（milli-unit）。
@@ -28,6 +28,8 @@ namespace Game.Domain.Battle
         public int Knockbacks;
         public bool Area;
         public List<string> Traits = new List<string>();
+        public CharacterSkillDef Skill;
+        public int SkillChargeTicks;
 
         public static UnitTemplate From(string id, string type, BattleStats s, int hp, int atk, int ticksPerSecond)
         {
@@ -45,6 +47,8 @@ namespace Game.Domain.Battle
                 Knockbacks = Math.Max(0, s.Knockbacks),
                 Area = s.Target == "area",
                 Traits = s.Traits != null ? new List<string>(s.Traits) : new List<string>(),
+                Skill = s.Skill ?? new CharacterSkillDef { Id = "skill_default", Name = "爆發重擊", EffectType = "damage", Value = Math.Max(50, atk * 2), ChargeSec = 15.0 },
+                SkillChargeTicks = Math.Max(1, SecToTicks((s.Skill != null && s.Skill.ChargeSec > 0) ? s.Skill.ChargeSec : 15.0, ticksPerSecond)),
             };
         }
 
@@ -65,6 +69,14 @@ namespace Game.Domain.Battle
         public int AttackTimer;
         public int StunTicks;          // 被擊退後的硬直
         public bool Alive = true;
+        public int AtkBuffTicks;
+        public int AtkBuffPct;
+        public int SlowTicks;
+        public int SlowPct;
+        public int PoisonTicks;
+        public int PoisonDmgPerSec;
+        public int BurnTicks;
+        public int BurnDmgPerSec;
     }
 
     public sealed class BattleCommand
@@ -77,7 +89,7 @@ namespace Game.Domain.Battle
         public BattleCommand(int tick, CommandType type, int slot) { Tick = tick; Type = type; Slot = slot; }
     }
 
-    public enum BattleEventType { Deploy, Spawn, Hit, BaseHit, Knockback, Death, Cannon, EnergyUp }
+    public enum BattleEventType { Deploy, Spawn, Hit, BaseHit, Knockback, Death, Cannon, EnergyUp, SkillCast, Heal, StatusApply, BaseShockwave, BaseImmune }
 
     /// <summary>給表現層（BattleView）播放動畫、特效用的事件；模擬本身不依賴它。</summary>
     public struct BattleEvent

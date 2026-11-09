@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char01_claire
+command expr char01_claire smile
+line l_r01_301 Claire commander_claire_ch3_start
+jump EveningEncounter
+
+[node EveningEncounter]
+line l_r01_302 Claire commander_claire_ch3_confession
+option opt_embrace -> AdultIntimacyNode
+option opt_handhold -> FallbackGentleNode
+
+[node AdultIntimacyNode rating:R18 fallback:FallbackGentleNode]
+set route_char01_ch3_intimate = 1
+line l_r01_303 Claire commander_claire_ch3_r18_dialogue
+command affection char01_claire 50
+end
+
+[node FallbackGentleNode]
+set route_char01_ch3_gentle = 1
+line l_r01_304 Claire commander_claire_ch3_g_dialogue
+command affection char01_claire 35
+end

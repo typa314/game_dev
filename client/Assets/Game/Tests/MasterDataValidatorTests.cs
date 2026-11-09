@@ -278,7 +278,7 @@ namespace Game.Tests
             MasterDatabase m = LoadCleanMaster();
             Mutate08(m);
             List<string> errors = MasterDataValidator.Validate(m);
-            AssertHasError(errors, "banner banner_std: ", "char04_elysia is R but listed under SSR");
+            AssertHasError(errors, "banner banner_std: ", "char04_elysia is SR but listed under SSR");
         }
 
         [Test]

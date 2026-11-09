@@ -1,17 +1,455 @@
 [
-  { "id": "char01_claire", "name": "loc:char/char01_claire.name", "rarity": "SSR", "role": "ranged",
-    "battle": { "cost": 450, "cooldownSec": 8, "hp": 1200, "atk": 180, "range": 320, "attackIntervalSec": 1.6, "moveSpeed": 10, "knockbacks": 3, "target": "single", "traits": ["anti_flying"], "growthCurve": "curve_standard" },
-    "portraitStages": ["ps_char01_s1", "ps_char01_s2", "ps_char01_s3"], "defaultCostume": "cos_char01_default", "storyRoute": "route_char01", "obtainableBy": ["gacha"] },
-  { "id": "char02_luna", "name": "loc:char/char02_luna.name", "rarity": "SR", "role": "area",
-    "battle": { "cost": 300, "cooldownSec": 6, "hp": 900, "atk": 90, "range": 200, "attackIntervalSec": 2.0, "moveSpeed": 9, "knockbacks": 3, "target": "area", "traits": [], "growthCurve": "curve_standard" },
-    "portraitStages": ["ps_char02_s1", "ps_char02_s2"], "defaultCostume": "cos_char02_default", "storyRoute": "route_char02", "obtainableBy": ["gacha"] },
-  { "id": "char03_scarlet", "name": "loc:char/char03_scarlet.name", "rarity": "SR", "role": "tank",
-    "battle": { "cost": 150, "cooldownSec": 2, "hp": 2000, "atk": 20, "range": 110, "attackIntervalSec": 1.2, "moveSpeed": 8, "knockbacks": 2, "target": "single", "traits": [], "growthCurve": "curve_tank" },
-    "portraitStages": ["ps_char03_s1", "ps_char03_s2"], "defaultCostume": "cos_char03_default", "storyRoute": "route_char03", "obtainableBy": ["gacha"] },
-  { "id": "char04_elysia", "name": "loc:char/char04_elysia.name", "rarity": "R", "role": "melee",
-    "battle": { "cost": 100, "cooldownSec": 2.5, "hp": 600, "atk": 60, "range": 120, "attackIntervalSec": 1.0, "moveSpeed": 12, "knockbacks": 2, "target": "single", "traits": [], "growthCurve": "curve_standard" },
-    "portraitStages": ["ps_char04_s1"], "defaultCostume": null, "storyRoute": null, "obtainableBy": ["gacha", "initial"] },
-  { "id": "char05_rin", "name": "loc:char/char05_rin.name", "rarity": "R", "role": "tank",
-    "battle": { "cost": 75, "cooldownSec": 1.5, "hp": 800, "atk": 15, "range": 100, "attackIntervalSec": 1.2, "moveSpeed": 10, "knockbacks": 1, "target": "single", "traits": [], "growthCurve": "curve_tank" },
-    "portraitStages": ["ps_char05_s1"], "defaultCostume": null, "storyRoute": null, "obtainableBy": ["gacha", "initial"] }
+  {
+    "id": "char01_claire",
+    "name": "loc:char/char01_claire.name",
+    "rarity": "SSR",
+    "role": "ranged",
+    "battle": {
+      "cost": 450,
+      "cooldownSec": 8,
+      "hp": 1200,
+      "atk": 180,
+      "range": 320,
+      "attackIntervalSec": 1.6,
+      "moveSpeed": 10,
+      "knockbacks": 3,
+      "target": "single",
+      "traits": [
+        "anti_flying"
+      ],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_valkyrie_warhorn",
+        "name": "女武神戰歌",
+        "chargeSec": 16.0,
+        "effectType": "buff_atk",
+        "value": 50,
+        "durationSec": 8.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char01_s1",
+      "ps_char01_s2",
+      "ps_char01_s3"
+    ],
+    "defaultCostume": "cos_char01_default",
+    "storyRoute": "route_char01",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char02_luna",
+    "name": "loc:char/char02_luna.name",
+    "rarity": "R",
+    "role": "area",
+    "battle": {
+      "cost": 300,
+      "cooldownSec": 6,
+      "hp": 900,
+      "atk": 90,
+      "range": 200,
+      "attackIntervalSec": 2.0,
+      "moveSpeed": 9,
+      "knockbacks": 3,
+      "target": "area",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_frost_nova",
+        "name": "月影極寒霜爆",
+        "chargeSec": 15.0,
+        "effectType": "slow",
+        "value": 50,
+        "durationSec": 7.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char02_s1",
+      "ps_char02_s2"
+    ],
+    "defaultCostume": "cos_char02_default",
+    "storyRoute": "route_char02",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char03_scarlet",
+    "name": "loc:char/char03_scarlet.name",
+    "rarity": "SR",
+    "role": "tank",
+    "battle": {
+      "cost": 150,
+      "cooldownSec": 2,
+      "hp": 2000,
+      "atk": 20,
+      "range": 110,
+      "attackIntervalSec": 1.2,
+      "moveSpeed": 8,
+      "knockbacks": 2,
+      "target": "single",
+      "traits": [],
+      "growthCurve": "curve_tank",
+      "skill": {
+        "id": "skill_scarlet_cannon",
+        "name": "猩紅殲滅巨砲",
+        "chargeSec": 15.0,
+        "effectType": "cannon",
+        "value": 350,
+        "durationSec": 0.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char03_s1",
+      "ps_char03_s2"
+    ],
+    "defaultCostume": "cos_char03_default",
+    "storyRoute": "route_char03",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char04_elysia",
+    "name": "loc:char/char04_elysia.name",
+    "rarity": "SR",
+    "role": "melee",
+    "battle": {
+      "cost": 100,
+      "cooldownSec": 2.5,
+      "hp": 600,
+      "atk": 60,
+      "range": 120,
+      "attackIntervalSec": 1.0,
+      "moveSpeed": 12,
+      "knockbacks": 2,
+      "target": "single",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_holy_blessing",
+        "name": "聖靈之祈",
+        "chargeSec": 14.0,
+        "effectType": "heal",
+        "value": 450,
+        "durationSec": 0.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char04_s1",
+      "ps_char04_s2"
+    ],
+    "defaultCostume": "cos_char04_default",
+    "storyRoute": "route_char04",
+    "obtainableBy": [
+      "gacha",
+      "initial"
+    ]
+  },
+  {
+    "id": "char05_rin",
+    "name": "loc:char/char05_rin.name",
+    "rarity": "R",
+    "role": "tank",
+    "battle": {
+      "cost": 75,
+      "cooldownSec": 1.5,
+      "hp": 800,
+      "atk": 15,
+      "range": 100,
+      "attackIntervalSec": 1.2,
+      "moveSpeed": 10,
+      "knockbacks": 1,
+      "target": "single",
+      "traits": [],
+      "growthCurve": "curve_tank",
+      "skill": {
+        "id": "skill_berserk_rush",
+        "name": "鬼神血氣激昂",
+        "chargeSec": 15.0,
+        "effectType": "buff_atk",
+        "value": 60,
+        "durationSec": 6.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char05_s1",
+      "ps_char05_s2"
+    ],
+    "defaultCostume": "cos_char05_default",
+    "storyRoute": "route_char05",
+    "obtainableBy": [
+      "gacha",
+      "initial"
+    ]
+  },
+  {
+    "id": "char06_seraphina",
+    "name": "loc:char/char06_seraphina.name",
+    "rarity": "SSR",
+    "role": "ranged",
+    "battle": {
+      "cost": 480,
+      "cooldownSec": 8.5,
+      "hp": 1100,
+      "atk": 210,
+      "range": 360,
+      "attackIntervalSec": 2.2,
+      "moveSpeed": 8,
+      "knockbacks": 4,
+      "target": "area",
+      "traits": [
+        "anti_flying"
+      ],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_angelic_grace",
+        "name": "熾天使之庇佑",
+        "chargeSec": 20.0,
+        "effectType": "heal",
+        "value": 550,
+        "durationSec": 0.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char06_s1",
+      "ps_char06_s2"
+    ],
+    "defaultCostume": "cos_char06_default",
+    "storyRoute": "route_char06",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char08_yuki",
+    "name": "loc:char/char08_yuki.name",
+    "rarity": "SR",
+    "role": "area",
+    "battle": {
+      "cost": 320,
+      "cooldownSec": 6.5,
+      "hp": 850,
+      "atk": 110,
+      "range": 240,
+      "attackIntervalSec": 2.4,
+      "moveSpeed": 8,
+      "knockbacks": 2,
+      "target": "area",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_blade_freeze",
+        "name": "居合·一閃急凍",
+        "chargeSec": 14.0,
+        "effectType": "stun",
+        "value": 100,
+        "durationSec": 3.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char08_s1",
+      "ps_char08_s2"
+    ],
+    "defaultCostume": "cos_char08_default",
+    "storyRoute": "route_char08",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char07_kagura",
+    "name": "loc:char/char07_kagura.name",
+    "rarity": "R",
+    "role": "melee",
+    "battle": {
+      "cost": 90,
+      "cooldownSec": 2.0,
+      "hp": 550,
+      "atk": 75,
+      "range": 90,
+      "attackIntervalSec": 0.8,
+      "moveSpeed": 16,
+      "knockbacks": 1,
+      "target": "single",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_kagura_shadow_bind",
+        "name": "影縛",
+        "chargeSec": 12.0,
+        "effectType": "poison",
+        "value": 40,
+        "durationSec": 6.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char07_s1",
+      "ps_char07_s2"
+    ],
+    "defaultCostume": "cos_char07_default",
+    "storyRoute": "route_char07",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char09_chloe",
+    "name": "loc:char/char09_chloe.name",
+    "rarity": "R",
+    "role": "area",
+    "battle": {
+      "cost": 300,
+      "cooldownSec": 6,
+      "hp": 900,
+      "atk": 90,
+      "range": 200,
+      "attackIntervalSec": 2.0,
+      "moveSpeed": 9,
+      "knockbacks": 3,
+      "target": "area",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_chloe_dusk_haze",
+        "name": "暮色遲滯",
+        "chargeSec": 15.0,
+        "effectType": "slow",
+        "value": 50,
+        "durationSec": 7.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char09_s1",
+      "ps_char09_s2"
+    ],
+    "defaultCostume": "cos_char09_default",
+    "storyRoute": "route_char09",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char10_mirai",
+    "name": "loc:char/char10_mirai.name",
+    "rarity": "R",
+    "role": "ranged",
+    "battle": {
+      "cost": 300,
+      "cooldownSec": 6,
+      "hp": 900,
+      "atk": 90,
+      "range": 200,
+      "attackIntervalSec": 2.0,
+      "moveSpeed": 9,
+      "knockbacks": 3,
+      "target": "single",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_mirai_warm_cheer",
+        "name": "溫暖應援",
+        "chargeSec": 15.0,
+        "effectType": "heal",
+        "value": 90,
+        "durationSec": 0.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char10_s1",
+      "ps_char10_s2"
+    ],
+    "defaultCostume": "cos_char10_beret_dress",
+    "storyRoute": "route_char10",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char18_sakura_miko",
+    "name": "loc:char/char18_sakura_miko.name",
+    "rarity": "SSR",
+    "role": "ranged",
+    "battle": {
+      "cost": 280,
+      "cooldownSec": 5.0,
+      "hp": 950,
+      "atk": 105,
+      "range": 300,
+      "attackIntervalSec": 1.8,
+      "moveSpeed": 9,
+      "knockbacks": 3,
+      "target": "single",
+      "traits": [
+        "anti_flying"
+      ],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_crimson_purgatory",
+        "name": "紅蓮滅世祓除",
+        "chargeSec": 18.0,
+        "effectType": "burn",
+        "value": 180,
+        "durationSec": 5.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char18_s1",
+      "ps_char18_s2"
+    ],
+    "defaultCostume": "cos_char18_default",
+    "storyRoute": "route_char18",
+    "obtainableBy": [
+      "gacha"
+    ]
+  },
+  {
+    "id": "char26_ayame_ninja",
+    "name": "loc:char/char26_ayame_ninja.name",
+    "rarity": "R",
+    "role": "melee",
+    "battle": {
+      "cost": 90,
+      "cooldownSec": 2.0,
+      "hp": 550,
+      "atk": 75,
+      "range": 90,
+      "attackIntervalSec": 0.8,
+      "moveSpeed": 16,
+      "knockbacks": 1,
+      "target": "single",
+      "traits": [],
+      "growthCurve": "curve_standard",
+      "skill": {
+        "id": "skill_shadow_toxin",
+        "name": "夜影劇毒暗湧",
+        "chargeSec": 12.0,
+        "effectType": "poison",
+        "value": 40,
+        "durationSec": 6.0,
+        "range": 0
+      }
+    },
+    "portraitStages": [
+      "ps_char26_s1",
+      "ps_char26_s2"
+    ],
+    "defaultCostume": "cos_char26_default",
+    "storyRoute": "route_char26",
+    "obtainableBy": [
+      "gacha"
+    ]
+  }
 ]

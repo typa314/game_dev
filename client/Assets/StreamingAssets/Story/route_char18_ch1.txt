@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char18_sakura_miko
+command expr char18_sakura_miko smile
+line l_r18_001 Sakura commander_sakura_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r18_002 Sakura commander_sakura_ch1_question
+option opt_blessing -> BlessingBranch
+option opt_walk -> WalkBranch
+
+[node BlessingBranch]
+set route_char18_ch1_choice = 1
+line l_r18_003 Sakura commander_sakura_ch1_blessing
+command affection char18_sakura_miko 25
+end
+
+[node WalkBranch]
+set route_char18_ch1_choice = 2
+line l_r18_004 Sakura commander_sakura_ch1_walk
+command affection char18_sakura_miko 15
+end

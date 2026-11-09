@@ -200,7 +200,7 @@ namespace Game.Core
             return item;
         }
 
-        private bool InPeriod(BannerDef b)
+        public bool InPeriod(BannerDef b)
         {
             DateTime now = _clock.UtcNow;
             if (b.PeriodStartUtc != null && now < ParseIso(b.PeriodStartUtc)) return false;

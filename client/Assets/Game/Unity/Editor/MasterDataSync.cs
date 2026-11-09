@@ -81,8 +81,44 @@ namespace Game.Unity.EditorTools
                 File.Copy(sf, Path.Combine(dst, Path.GetFileName(sf)), true);
             }
 
+            // 3. 同步劇本檔案 (data/story/*.txt -> StreamingAssets/Story/) 與 asset_manifest.csv
+            string storySrc = Path.GetFullPath(Path.Combine(projectRoot, "..", "data", "story"));
+            if (Directory.Exists(storySrc))
+            {
+                string storyDst = Path.Combine(Application.dataPath, "StreamingAssets", "Story");
+                Directory.CreateDirectory(storyDst);
+                foreach (string stFile in Directory.GetFiles(storySrc, "*.txt"))
+                {
+                    File.Copy(stFile, Path.Combine(storyDst, Path.GetFileName(stFile)), true);
+                }
+            }
+
+            string manifestSrc = Path.GetFullPath(Path.Combine(projectRoot, "..", "data", "asset_manifest.csv"));
+            if (File.Exists(manifestSrc))
+            {
+                File.Copy(manifestSrc, Path.Combine(Application.dataPath, "StreamingAssets", "asset_manifest.csv"), true);
+            }
+
+            // 4. 同步多語系字典檔案 (data/loc/*/*.json -> StreamingAssets/Loc/*/*.json)
+            string locSrc = Path.GetFullPath(Path.Combine(projectRoot, "..", "data", "loc"));
+            if (Directory.Exists(locSrc))
+            {
+                string locDstRoot = Path.Combine(Application.dataPath, "StreamingAssets", "Loc");
+                Directory.CreateDirectory(locDstRoot);
+                foreach (string langDir in Directory.GetDirectories(locSrc))
+                {
+                    string langName = Path.GetFileName(langDir);
+                    string targetLangDir = Path.Combine(locDstRoot, langName);
+                    Directory.CreateDirectory(targetLangDir);
+                    foreach (string locFile in Directory.GetFiles(langDir, "*.json"))
+                    {
+                        File.Copy(locFile, Path.Combine(targetLangDir, Path.GetFileName(locFile)), true);
+                    }
+                }
+            }
+
             AssetDatabase.Refresh();
-            Debug.Log($"[MasterDataSync] ✅ 主資料驗證通過並同步成功！已複製 {srcFiles.Length} 個檔案（清理廢棄檔案: {removedCount} 個）：{src} → {dst}");
+            Debug.Log($"[MasterDataSync] ✅ 主資料、劇本與多語系驗證通過並同步成功！已複製 {srcFiles.Length} 個檔案（清理廢棄檔案: {removedCount} 個）：{src} → {dst}");
         }
     }
 }

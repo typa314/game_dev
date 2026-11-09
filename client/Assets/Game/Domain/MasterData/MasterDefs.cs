@@ -21,6 +21,17 @@ namespace Game.Domain.MasterData
         public string Rating;
     }
 
+    public sealed class CharacterSkillDef
+    {
+        public string Id;
+        public string Name;
+        public double ChargeSec = 15.0;
+        public string EffectType = "damage"; // "cannon", "damage", "heal", "buff_atk", "slow", "poison", "burn", "stun"
+        public int Value = 200;
+        public double DurationSec = 5.0;
+        public int Range = 0;              // 0 = 全場
+    }
+
     public sealed class BattleStats
     {
         public int Cost;
@@ -34,6 +45,7 @@ namespace Game.Domain.MasterData
         public string Target = "single"; // single / area
         public List<string> Traits = new List<string>();
         public string GrowthCurve;
+        public CharacterSkillDef Skill;
     }
 
     public sealed class PortraitArt
@@ -143,6 +155,8 @@ namespace Game.Domain.MasterData
         public StageRewards Rewards = new StageRewards();
         public List<string> StarConditions = new List<string>();
         public List<string> UnlocksOnClear = new List<string>();
+        public List<string> AllyBaseTraits = new List<string>();
+        public List<string> EnemyBaseTraits = new List<string>();
     }
 
     public sealed class BannerCost

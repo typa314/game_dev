@@ -211,8 +211,19 @@ namespace Game.Core.UI
         public void Refresh()
         {
             if (View == null || _core.Player == null) return;
-            long gold = _core.Player.ItemCount("item_gold");
-            long freeDia = _core.Player.ItemCount("item_dia_free");
+            string goldKey = _core.Master?.Config?.Growth?.GoldItem ?? "gold";
+            long gold = _core.Player.ItemCount(goldKey);
+            if (gold == 0 && _core.Player.ItemCount("item_gold") > 0)
+            {
+                gold = _core.Player.ItemCount("item_gold");
+            }
+
+            long freeDia = _core.Player.ItemCount("gem");
+            if (freeDia == 0 && _core.Player.ItemCount("item_dia_free") > 0)
+            {
+                freeDia = _core.Player.ItemCount("item_dia_free");
+            }
+
             long paidDia = _core.Player.ItemCount("item_dia_paid");
             int stamina = _core.Player.Encounter?.Stamina ?? 0;
 

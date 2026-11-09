@@ -156,5 +156,54 @@ namespace Game.Tests
                 Assert.IsTrue(valResult.IsValid, $"Disk loc files should validate cleanly. Errors: {string.Join("; ", valResult.Errors)}");
             }
         }
+
+        [Test]
+        public void M3_4_1_And_M3_4_2_FourLocalesAndUiLengthAndTagValidation()
+        {
+            string locDir = Path.Combine(TestPaths.DataDir(), "loc");
+            var loc = new LocalizationService("zh-TW");
+            loc.LoadFromDirectory(locDir);
+
+            // 1. M3-4-1: 驗證四大語系 (zh-TW, en, ja, zh-CN) 完整存在且無缺漏
+            CollectionAssert.AreEquivalent(new[] { "zh-TW", "en", "ja", "zh-CN" }, loc.AvailableLocales);
+
+            var baseVal = LocalizationValidator.Validate(loc, master: _master, baseLocale: "zh-TW");
+            Assert.IsTrue(baseVal.IsValid, $"四大語系靜態驗證應 100% 通過: {string.Join("; ", baseVal.Errors)}");
+            Assert.AreEqual(0, baseVal.Warnings.Count, $"四大語系翻譯集合應完全對齊，無缺失 key: {string.Join("; ", baseVal.Warnings)}");
+
+            // 2. M3-4-2: 驗證正式字典符合 UI 文字長度上限與富文字標籤閉合
+            var lengthVal = LocalizationValidator.ValidateUiLengthAndTags(loc, maxUiButtonChars: 40, maxGeneralChars: 200);
+            Assert.IsTrue(lengthVal.IsValid, $"真實字典 UI 長度與標籤應 100% 通過: {string.Join("; ", lengthVal.Errors)}");
+
+            // 3. 陽性對照：超長 UI 按鈕字串檢測
+            var mockLoc = new LocalizationService("zh-TW");
+            mockLoc.LoadLocale("zh-TW", new Dictionary<string, string>
+            {
+                { "ui.oversized_button", "這是一個超過四十個字元的超長使用者介面按鈕標題文字用來觸發爆框測試驗證，文字長度必須切實超越四十個字元限制以利驗證" }
+            });
+            var posOverLength = LocalizationValidator.ValidateUiLengthAndTags(mockLoc, maxUiButtonChars: 40, maxGeneralChars: 200);
+            Assert.IsFalse(posOverLength.IsValid, "超長 UI 按鈕應觸發校驗失敗 (陽性對照)");
+            Assert.IsTrue(posOverLength.Errors.Exists(e => e.Contains("ERR_UI_LENGTH_EXCEEDED")));
+
+            // 4. 陽性對照：未閉合富文字標籤 <b> 檢測
+            var mockUnclosed = new LocalizationService("zh-TW");
+            mockUnclosed.LoadLocale("zh-TW", new Dictionary<string, string>
+            {
+                { "ui.unclosed_tag", "<b>粗體未閉合文字" }
+            });
+            var posUnclosed = LocalizationValidator.ValidateUiLengthAndTags(mockUnclosed, maxUiButtonChars: 40, maxGeneralChars: 200);
+            Assert.IsFalse(posUnclosed.IsValid, "未閉合富文字標籤應觸發校驗失敗 (陽性對照)");
+            Assert.IsTrue(posUnclosed.Errors.Exists(e => e.Contains("ERR_UNCLOSED_TAG")));
+
+            // 5. 陽性對照：交錯閉合富文字標籤 <b><i>...</b></i> 檢測
+            var mockMismatched = new LocalizationService("zh-TW");
+            mockMismatched.LoadLocale("zh-TW", new Dictionary<string, string>
+            {
+                { "general.mismatched", "<b><i>交錯閉合標籤</b></i>" }
+            });
+            var posMismatched = LocalizationValidator.ValidateUiLengthAndTags(mockMismatched, maxUiButtonChars: 40, maxGeneralChars: 200);
+            Assert.IsFalse(posMismatched.IsValid, "交錯標籤應觸發校驗失敗 (陽性對照)");
+            Assert.IsTrue(posMismatched.Errors.Exists(e => e.Contains("ERR_UNCLOSED_TAG")));
+        }
     }
 }

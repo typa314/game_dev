@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char08_yuki
+command expr char08_yuki smile
+line l_r08_001 Yuki route_char08_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r08_002 Yuki route_char08_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char08_ch1_choice = 1
+line l_r08_003 Yuki route_char08_ch1_stay
+command affection char08_yuki 25
+end
+
+[node WalkBranch]
+set route_char08_ch1_choice = 2
+line l_r08_004 Yuki route_char08_ch1_walk
+command affection char08_yuki 15
+end

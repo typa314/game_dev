@@ -1,20 +1,24 @@
 using System;
+using System.Globalization;
 using Game.Domain.Player;
 
 namespace Game.Core.Story
 {
     /// <summary>
     /// ADV 劇情播放控制器，負責協同 StoryRunner 推進、自動標記已讀節點/行，以及提供快進判定（只快進已讀 vs 快進全部）。
+    /// 支援回憶重播模式 (IsRecallMode)：回憶模式下不寫入已讀節點或全域旗標，確保正式存檔 100% 不受污染。
     /// </summary>
     public sealed class StoryPlaybackController
     {
         public IStoryRunner Runner { get; }
         public GameCore Core { get; }
+        public bool IsRecallMode { get; set; }
 
-        public StoryPlaybackController(IStoryRunner runner, GameCore core)
+        public StoryPlaybackController(IStoryRunner runner, GameCore core, bool isRecallMode = false)
         {
             Runner = runner ?? throw new ArgumentNullException(nameof(runner));
             Core = core ?? throw new ArgumentNullException(nameof(core));
+            IsRecallMode = isRecallMode;
         }
 
         /// <summary>
@@ -48,6 +52,7 @@ namespace Game.Core.Story
         {
             Runner.Continue();
             RecordCurrentAsRead();
+            SyncVariablesToFlags();
         }
 
         /// <summary>
@@ -57,6 +62,7 @@ namespace Game.Core.Story
         {
             Runner.Choose(index);
             RecordCurrentAsRead();
+            SyncVariablesToFlags();
         }
 
         /// <summary>
@@ -83,7 +89,7 @@ namespace Game.Core.Story
 
         private void RecordCurrentAsRead()
         {
-            if (Core == null) return;
+            if (Core == null || IsRecallMode) return;
 
             string node = Runner.CurrentNodeName;
             if (!string.IsNullOrEmpty(node))
@@ -96,6 +102,24 @@ namespace Game.Core.Story
             {
                 Core.MarkLineRead(line.LineId);
                 Core.MarkNodeRead(line.LineId);
+            }
+        }
+
+        private void SyncVariablesToFlags()
+        {
+            if (Core == null || IsRecallMode || Runner?.Variables == null) return;
+            foreach (var kvp in Runner.Variables)
+            {
+                if (string.IsNullOrWhiteSpace(kvp.Key) || kvp.Value == null) continue;
+                if (kvp.Value is int || kvp.Value is long || kvp.Value is float || kvp.Value is double || kvp.Value is decimal)
+                {
+                    double val = Convert.ToDouble(kvp.Value, CultureInfo.InvariantCulture);
+                    Core.SetGlobalFlag(kvp.Key, val);
+                }
+                else if (kvp.Value is bool b)
+                {
+                    Core.SetGlobalFlag(kvp.Key, b ? 1.0 : 0.0);
+                }
             }
         }
     }

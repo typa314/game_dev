@@ -16,6 +16,12 @@
 - 多 agent 同時工作時，各 agent 先在自己的變更中新增紀錄；整合者合併前檢查 `run_id` 唯一性並保留所有紀錄，避免後寫覆蓋先寫。
 - 只有使用者明確接受或指定驗收者留下驗收證據後，才可標成 `accepted`。回報時清楚區分已生成、已驗收與未驗證。
 
+## 工作目錄與 Unity 執行資料
+
+- 唯一的工作副本是本機 `C:\Users\typa3\dev\game_dev`。Unity 專案（`client/`）只能從這個本機路徑開啟、建置與測試。
+- Unity 及 dotnet 的執行與建置資料（`Library/`、`Temp/`、`Logs/`、`UserSettings/`、`obj/`、`bin/`、`build/`）不得寫到 Google Drive（`F:`、`G:`、`H:` 都是 Drive 虛擬磁碟），避免暫存檔反覆上傳干擾環境。
+- 舊的 Drive 副本（`H:\...\我的筆記型電腦\game_dev`／`F:\game_dev`）不可再當工作目錄使用，也不可在那裡開 Unity 或執行 build/test。
+
 ## 其他工程規範
 
 - 遵守使用者提供的工程品質規範、程式碼範圍限制與檔案存放規則；本檔只補充生圖 seed 流程，不取代它們。

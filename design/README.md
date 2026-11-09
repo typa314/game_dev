@@ -27,6 +27,8 @@ Steam PC 平台的「類貓咪大戰爭」推線塔防，加上角色收集（�
 | 15 | [美術資產對接規範](15_asset_pipeline_contract.md) | 邏輯 key、manifest、分級下限、美術差距清單 |
 | 16 | [路線圖](16_roadmap.md) | M0–M4 範圍和驗收、主要風險 |
 | 17 | [框架工作清單與查核點](17_framework_worklist.md) | 框架和可行性驗證的每一項工作、查核點、狀態、執行者 |
+| 18 | [角色生圖 Seed 追蹤與執行紀錄](18_image_generation_seed_tracking.md) | 角色基準 seed 與生圖參數追溯規範 |
+| 19 | [架構優化與 M1 垂直切片實作藍圖](19_optimization_and_m1_implementation_plan.md) | 架構診斷 (`ARCH-01`～`07`) 與 Gemini 3.8 八階段實作計畫 (`OPT-1`～`OPT-8`) |
 
 ## 需要使用者決定的事項
 | # | 決策 | 建議 | 影響 |

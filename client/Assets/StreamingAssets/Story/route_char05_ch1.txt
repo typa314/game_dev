@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char05_rin
+command expr char05_rin smile
+line l_r05_001 Rin route_char05_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r05_002 Rin route_char05_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char05_ch1_choice = 1
+line l_r05_003 Rin route_char05_ch1_stay
+command affection char05_rin 25
+end
+
+[node WalkBranch]
+set route_char05_ch1_choice = 2
+line l_r05_004 Rin route_char05_ch1_walk
+command affection char05_rin 15
+end

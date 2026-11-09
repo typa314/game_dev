@@ -1,0 +1,23 @@
+[node Start]
+command bg scene_lobby_default
+command show char03_scarlet
+command expr char03_scarlet smile
+line l_r03_001 Scarlet route_char03_ch1_start
+jump ChoiceNode
+
+[node ChoiceNode]
+line l_r03_002 Scarlet route_char03_ch1_question
+option opt_stay -> StayBranch
+option opt_walk -> WalkBranch
+
+[node StayBranch]
+set route_char03_ch1_choice = 1
+line l_r03_003 Scarlet route_char03_ch1_stay
+command affection char03_scarlet 25
+end
+
+[node WalkBranch]
+set route_char03_ch1_choice = 2
+line l_r03_004 Scarlet route_char03_ch1_walk
+command affection char03_scarlet 15
+end

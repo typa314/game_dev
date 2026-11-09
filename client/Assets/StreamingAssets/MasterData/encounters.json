@@ -5,10 +5,22 @@
   { "id": "enc_char04_elysia_02", "spot": "spot_park", "character": "char04_elysia", "series": "encs_char04", "order": 2, "weight": 10,
     "conditions": { "type": "affection_gte", "char": "self", "value": 30 }, "story": "Encounter_Elysia_02", "rating": "G", "repeatable": false,
     "outcomes": { "choice0": [ { "affectionChar": "char04_elysia", "n": 50 }, { "item": "awaken_shard_char04_elysia", "n": 5 } ] } },
+  { "id": "enc_char04_elysia_03", "spot": "spot_cafe", "character": "char04_elysia", "series": "encs_char04", "order": 3, "weight": 10,
+    "conditions": { "type": "affection_gte", "char": "self", "value": 60 }, "story": "Encounter_Elysia_03", "rating": "G", "repeatable": false,
+    "outcomes": { "choice0": [ { "affectionChar": "char04_elysia", "n": 80 }, { "item": "awaken_shard_char04_elysia", "n": 8 } ] } },
   { "id": "enc_park_generic", "spot": "spot_park", "character": null, "series": null, "order": 0, "weight": 20,
     "conditions": null, "story": "Encounter_Park_Generic", "rating": "G", "repeatable": true,
     "outcomes": { "choice0": [ { "item": "exp_s", "n": 2 } ] } },
   { "id": "enc_char01_claire_cafe", "spot": "spot_cafe", "character": "char01_claire", "series": null, "order": 0, "weight": 10,
     "conditions": { "type": "char_owned", "char": "char01_claire" }, "story": "Encounter_Claire_Cafe", "rating": "G", "repeatable": true,
-    "outcomes": { "choice0": [ { "affectionChar": "char01_claire", "n": 30 } ], "choice1": [ { "item": "awaken_shard_char01_claire", "n": 1 } ] } }
+    "outcomes": { "choice0": [ { "affectionChar": "char01_claire", "n": 30 } ], "choice1": [ { "item": "awaken_shard_char01_claire", "n": 1 } ] } },
+  { "id": "enc_char18_sakura_01", "spot": "spot_shrine", "character": "char18_sakura_miko", "series": "encs_char18", "order": 1, "weight": 15,
+    "conditions": { "type": "char_owned", "char": "char18_sakura_miko" }, "story": "Encounter_Sakura_01", "rating": "G", "repeatable": false,
+    "outcomes": { "choice0": [ { "affectionChar": "char18_sakura_miko", "n": 40 } ], "choice1": [ { "item": "exp_m", "n": 2 } ] } },
+  { "id": "enc_char18_sakura_02", "spot": "spot_shrine", "character": "char18_sakura_miko", "series": "encs_char18", "order": 2, "weight": 15,
+    "conditions": { "type": "affection_gte", "char": "self", "value": 40 }, "story": "Encounter_Sakura_02", "rating": "G", "repeatable": false,
+    "outcomes": { "choice0": [ { "affectionChar": "char18_sakura_miko", "n": 60 }, { "item": "gem", "n": 50 } ] } },
+  { "id": "enc_shrine_generic", "spot": "spot_shrine", "character": null, "series": null, "order": 0, "weight": 10,
+    "conditions": null, "story": "Encounter_Shrine_Generic", "rating": "G", "repeatable": true,
+    "outcomes": { "choice0": [ { "item": "exp_s", "n": 3 } ] } }
 ]

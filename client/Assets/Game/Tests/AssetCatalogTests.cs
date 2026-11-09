@@ -110,5 +110,43 @@ art/icon,sample/icon.png,G,final,正式產物
                 Assert.IsTrue(result.IsValid, $"Disk manifest should be valid. Errors: {string.Join("; ", result.Errors)}");
             }
         }
+
+        [Test]
+        public void OPT1_2_Catalog_ResolvingR18UnderGPolicy_DisallowsAndReportsPlaceholder()
+        {
+            var catalog = new AssetCatalog();
+            catalog.LoadFromCsv(@"key,source,rating,status,note
+cg/cg_char01_t3_01,sample/anime/tier3_climax_poses/anime_tier3_char01_claire_pony.png,R18,draft,克萊兒高潮CG
+char/char01_claire/portrait/ps_char01_s1/stand,sample/anime/characters_roster/anime_char01_claire_tsundere_stand_fullbody.png,G,draft,
+");
+
+            var gPolicy = new RatingPolicy(Rating.G, Rating.G);
+            var resR18 = catalog.Resolve("cg/cg_char01_t3_01", gPolicy);
+            Assert.IsFalse(resR18.Allowed, "G 政策下必須禁止 R18 資產");
+            Assert.IsTrue(resR18.IsPlaceholder, "禁止的資產應標記為 Placeholder");
+            Assert.AreEqual("RatingDisallowed", resR18.Reason);
+
+            var r18Policy = new RatingPolicy(Rating.R18, Rating.R18);
+            var resR18Allowed = catalog.Resolve("cg/cg_char01_t3_01", r18Policy);
+            Assert.IsTrue(resR18Allowed.Allowed, "R18 政策下應允許 R18 資產");
+        }
+
+#if UNITY_2021_1_OR_NEWER
+        [Test]
+        public void OPT1_2_AssetService_WithCatalog_EnforcesR18Filtering()
+        {
+            var catalog = new AssetCatalog();
+            catalog.LoadFromCsv(@"key,source,rating,status,note
+cg/cg_char01_t3_01,sample/anime/tier3_climax_poses/anime_tier3_char01_claire_pony.png,R18,draft,克萊兒高潮CG
+");
+
+            var gPolicy = new RatingPolicy(Rating.G, Rating.G);
+            var assetService = new Game.Unity.AssetService(gPolicy, catalog);
+
+            var sprite = assetService.LoadSprite("cg/cg_char01_t3_01");
+            Assert.IsNotNull(sprite);
+            Assert.AreSame(assetService.Placeholder, sprite, "G 政策下載入 R18 資產必須強制回傳 Placeholder");
+        }
+#endif
     }
 }
