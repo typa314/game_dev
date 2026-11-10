@@ -47,12 +47,20 @@ namespace Game.Unity.UI
         [SerializeField] private Text _starConditionsText;
         [SerializeField] private Text _rewardsText;
 
-        [Header("右下出戰編隊整備區")]
+        [Header("右下出戰編隊整備區與主堡強化")]
         [SerializeField] private Text _teamCountText;
         [SerializeField] private Transform _rosterGridRoot;
         [SerializeField] private Button _btnStartBattle;
         [SerializeField] private Text _btnStartBattleText;
+        [SerializeField] private Text _baseLevelText;
+        [SerializeField] private Text _baseHpText;
+        [SerializeField] private Button _btnUpgradeBase;
+        [SerializeField] private Text _btnUpgradeBaseText;
         private readonly List<GameObject> _rosterCardItems = new List<GameObject>();
+
+        public Button UpgradeBaseButton => _btnUpgradeBase;
+        public Text BaseLevelText => _baseLevelText;
+        public Text BaseHpText => _baseHpText;
 
         [Header("Toast 浮動提示")]
         [SerializeField] private GameObject _toastRoot;
@@ -595,6 +603,34 @@ namespace Game.Unity.UI
             }
         }
 
+        public void DisplayBaseStatus(int baseLevel, int maxLevel, int currentHp, int nextHp, int upgradeGoldCost, bool canAfford)
+        {
+            RefreshCurrencies();
+            bool isMax = baseLevel >= maxLevel;
+            if (_baseLevelText != null)
+            {
+                _baseLevelText.text = isMax
+                    ? $"🏰 我方主堡 LV.{baseLevel} (MAX)"
+                    : $"🏰 我方主堡 LV.{baseLevel} / {maxLevel}";
+            }
+            if (_baseHpText != null)
+            {
+                _baseHpText.text = isMax
+                    ? $"主堡耐久：{currentHp:N0} HP (已滿級)"
+                    : $"耐久：{currentHp:N0} → {nextHp:N0} (+{nextHp - currentHp:N0})";
+            }
+            if (_btnUpgradeBase != null)
+            {
+                _btnUpgradeBase.interactable = !isMax && canAfford;
+            }
+            if (_btnUpgradeBaseText != null)
+            {
+                _btnUpgradeBaseText.text = isMax
+                    ? "已達最高防禦等級"
+                    : $"🔨 強化主堡 ({upgradeGoldCost:N0} G)";
+            }
+        }
+
         public void ShowError(string message)
         {
             ShowToast($"[提示] {message}");
@@ -617,6 +653,16 @@ namespace Game.Unity.UI
             if (_presenter != null)
             {
                 _presenter.ToggleTeamMember(charId);
+            }
+        }
+
+        public void OnClickUpgradeBase()
+        {
+            if (_presenter == null) return;
+            var res = _presenter.UpgradeBase();
+            if (res.Ok)
+            {
+                ShowToast($"🏰 主堡強化成功！等級提升至 LV.{res.Value}");
             }
         }
 
@@ -961,14 +1007,75 @@ namespace Game.Unity.UI
             hlg.childControlHeight = false;
             _rosterGridRoot = gridGo.transform;
 
+            // 我方主堡強化面板 (Bastion Fortify Card)
+            var basePanelGo = ProceduralUiKit.CreateUiObject("BastionFortifyPanel", teamPanelGo.transform);
+            var bpRt = basePanelGo.GetComponent<RectTransform>();
+            bpRt.anchorMin = new Vector2(1f, 1f);
+            bpRt.anchorMax = new Vector2(1f, 1f);
+            bpRt.pivot = new Vector2(1f, 1f);
+            bpRt.anchoredPosition = new Vector2(-25, -20);
+            bpRt.sizeDelta = new Vector2(290, 210);
+            var bpImg = basePanelGo.AddComponent<Image>();
+            bpImg.sprite = ProceduralUiKit.GetGradientSprite(290, 210, new Color(0.10f, 0.16f, 0.26f, 0.96f), new Color(0.06f, 0.10f, 0.18f, 0.96f), new Color(0.35f, 0.85f, 1f, 0.7f), 2, 8);
+
+            var blGo = ProceduralUiKit.CreateUiObject("BaseLevelText", basePanelGo.transform);
+            var blRt = blGo.GetComponent<RectTransform>();
+            blRt.anchorMin = new Vector2(0f, 1f);
+            blRt.anchorMax = new Vector2(1f, 1f);
+            blRt.pivot = new Vector2(0.5f, 1f);
+            blRt.anchoredPosition = new Vector2(0, -14);
+            blRt.sizeDelta = new Vector2(-24, 32);
+            _baseLevelText = blGo.AddComponent<Text>();
+            _baseLevelText.font = defaultFont;
+            _baseLevelText.fontSize = 18;
+            _baseLevelText.fontStyle = FontStyle.Bold;
+            _baseLevelText.alignment = TextAnchor.MiddleLeft;
+            _baseLevelText.color = new Color(0.45f, 0.92f, 1f, 1f);
+            _baseLevelText.text = "🏰 我方主堡 LV.1 / 20";
+
+            var bhpGo = ProceduralUiKit.CreateUiObject("BaseHpText", basePanelGo.transform);
+            var bhpRt = bhpGo.GetComponent<RectTransform>();
+            bhpRt.anchorMin = new Vector2(0f, 0.44f);
+            bhpRt.anchorMax = new Vector2(1f, 0.78f);
+            bhpRt.offsetMin = new Vector2(14, 0);
+            bhpRt.offsetMax = new Vector2(-14, 0);
+            _baseHpText = bhpGo.AddComponent<Text>();
+            _baseHpText.font = defaultFont;
+            _baseHpText.fontSize = 15;
+            _baseHpText.alignment = TextAnchor.MiddleLeft;
+            _baseHpText.color = new Color(0.92f, 0.97f, 1f, 0.95f);
+            _baseHpText.text = "耐久：20,000 → 22,500 (+2,500)";
+
+            var upGo = ProceduralUiKit.CreateUiObject("BtnUpgradeBase", basePanelGo.transform);
+            var upRt = upGo.GetComponent<RectTransform>();
+            upRt.anchorMin = new Vector2(0f, 0f);
+            upRt.anchorMax = new Vector2(1f, 0f);
+            upRt.pivot = new Vector2(0.5f, 0f);
+            upRt.anchoredPosition = new Vector2(0, 14);
+            upRt.sizeDelta = new Vector2(-24, 52);
+            var upImg = upGo.AddComponent<Image>();
+            upImg.sprite = ProceduralUiKit.GetGradientSprite(266, 52, new Color(0.14f, 0.55f, 0.78f, 1f), new Color(0.08f, 0.35f, 0.56f, 1f), new Color(0.5f, 0.95f, 1f, 0.9f), 2, 6);
+            _btnUpgradeBase = upGo.AddComponent<Button>();
+            _btnUpgradeBase.onClick.AddListener(OnClickUpgradeBase);
+
+            var upTxtGo = ProceduralUiKit.CreateUiObject("Text", upGo.transform);
+            ProceduralUiKit.StretchFull(upTxtGo.GetComponent<RectTransform>());
+            _btnUpgradeBaseText = upTxtGo.AddComponent<Text>();
+            _btnUpgradeBaseText.font = defaultFont;
+            _btnUpgradeBaseText.fontSize = 16;
+            _btnUpgradeBaseText.fontStyle = FontStyle.Bold;
+            _btnUpgradeBaseText.alignment = TextAnchor.MiddleCenter;
+            _btnUpgradeBaseText.color = Color.white;
+            _btnUpgradeBaseText.text = "🔨 強化主堡 (500 G)";
+
             // 烈焰出擊大按鈕 (Sortie Action Button)
             var sortieGo = ProceduralUiKit.CreateUiObject("BtnStartBattle", teamPanelGo.transform);
             var sRt = sortieGo.GetComponent<RectTransform>();
-            sRt.anchorMin = new Vector2(1f, 0.5f);
-            sRt.anchorMax = new Vector2(1f, 0.5f);
-            sRt.pivot = new Vector2(1f, 0.5f);
-            sRt.anchoredPosition = new Vector2(-25, 0);
-            sRt.sizeDelta = new Vector2(280, 100);
+            sRt.anchorMin = new Vector2(1f, 0f);
+            sRt.anchorMax = new Vector2(1f, 0f);
+            sRt.pivot = new Vector2(1f, 0f);
+            sRt.anchoredPosition = new Vector2(-25, 22);
+            sRt.sizeDelta = new Vector2(290, 96);
 
             var sImg = sortieGo.AddComponent<Image>();
             sImg.sprite = ProceduralUiKit.GetGradientSprite(280, 100, new Color(1f, 0.75f, 0.12f, 1f), new Color(1f, 0.32f, 0.12f, 1f), new Color(1f, 0.95f, 0.6f, 1f), 3, 8);

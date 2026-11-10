@@ -210,6 +210,43 @@ namespace Game.Core
 
         // ================= 養成 =================
 
+        public int GetAllyBaseLevel()
+        {
+            return Math.Max(1, Player != null ? Player.BaseLevel : 1);
+        }
+
+        public int GetAllyBaseMaxHp()
+        {
+            return Growth.ComputeBaseMaxHp(GetAllyBaseLevel(), Master.Config.Battle.DefaultAllyBaseHp);
+        }
+
+        public int GetNextBaseUpgradeCost()
+        {
+            return Growth.BaseUpgradeGoldCost(GetAllyBaseLevel());
+        }
+
+        public Result<int> UpgradeBase()
+        {
+            if (Player == null) return Result<int>.Fail("no_player");
+            int currentLv = GetAllyBaseLevel();
+            if (currentLv >= Growth.BaseMaxLevel) return Result<int>.Fail("base_max_level");
+
+            int costGold = Growth.BaseUpgradeGoldCost(currentLv);
+            string goldItem = Master.Config.Growth.GoldItem;
+            var cost = new List<ItemStack> { new ItemStack(goldItem, costGold) };
+            if (!HasItems(cost)) return Result<int>.Fail("insufficient_item");
+            ConsumeItems(cost);
+
+            Player.BaseLevel = currentLv + 1;
+            int newMaxHp = GetAllyBaseMaxHp();
+            Bus.Publish(new DomainEvent(Ev.BaseUpgraded)
+                .With("level", Player.BaseLevel)
+                .With("maxHp", newMaxHp)
+                .With("cost", costGold));
+            Dirty = true;
+            return Result<int>.Success(Player.BaseLevel);
+        }
+
         public Result<int> LevelUp(string charId, List<ItemStack> materials)
         {
             CharacterDef def = Master.Characters.GetOrNull(charId);
@@ -519,7 +556,16 @@ namespace Game.Core
         public BattleSetup BuildSetup(StageDef st, List<string> team, ulong seed)
         {
             BattleRules rules = Master.Config.Battle;
-            var setup = new BattleSetup { Stage = st, Rules = rules, Seed = seed };
+            int baseLv = GetAllyBaseLevel();
+            int baseHp = st.AllyBaseHp > 0 ? st.AllyBaseHp : Growth.ComputeBaseMaxHp(baseLv, rules.DefaultAllyBaseHp);
+            var setup = new BattleSetup
+            {
+                Stage = st,
+                Rules = rules,
+                Seed = seed,
+                AllyBaseLevel = baseLv,
+                AllyBaseHpOverride = baseHp,
+            };
             foreach (string c in team)
             {
                 CharacterDef def = c != null ? Master.Characters.GetOrNull(c) : null;

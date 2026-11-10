@@ -555,6 +555,7 @@ namespace Game.Core.UI
         void DisplayStages(IReadOnlyList<StageSummaryItem> stages, string selectedStageId);
         void DisplayStageDetail(StageSummaryItem summary, StageDef stageDef);
         void DisplayTeam(IReadOnlyList<string> teamCharacterIds, IReadOnlyList<string> allOwnedCharacterIds);
+        void DisplayBaseStatus(int baseLevel, int maxLevel, int currentHp, int nextHp, int upgradeGoldCost, bool canAfford);
         void ShowError(string message);
     }
 
@@ -694,6 +695,42 @@ namespace Game.Core.UI
             View?.DisplayStageDetail(currentItem, SelectedStage);
 
             View?.DisplayTeam(GetTeam(), GetOwnedCharacterIds());
+            RefreshBaseStatus();
+        }
+
+        public void RefreshBaseStatus()
+        {
+            if (_core == null || View == null) return;
+            int lv = _core.GetAllyBaseLevel();
+            int maxLv = _core.Growth.BaseMaxLevel;
+            int curHp = _core.GetAllyBaseMaxHp();
+            int nextHp = lv < maxLv
+                ? _core.Growth.ComputeBaseMaxHp(lv + 1, _core.Master.Config.Battle.DefaultAllyBaseHp)
+                : curHp;
+            int cost = lv < maxLv ? _core.GetNextBaseUpgradeCost() : 0;
+            bool canAfford = lv < maxLv && _core.Player.ItemCount(_core.Master.Config.Growth.GoldItem) >= cost;
+            View.DisplayBaseStatus(lv, maxLv, curHp, nextHp, cost, canAfford);
+        }
+
+        public Result<int> UpgradeBase()
+        {
+            if (_core == null) return Result<int>.Fail("no_core");
+            var res = _core.UpgradeBase();
+            if (res.Ok)
+            {
+                RefreshBaseStatus();
+            }
+            else
+            {
+                string msg = res.Error switch
+                {
+                    "base_max_level" => "我方主堡已達最高強化等級",
+                    "insufficient_item" => "金幣不足，無法強化主堡",
+                    _ => res.Error,
+                };
+                View?.ShowError(msg);
+            }
+            return res;
         }
 
         public bool SelectStage(string stageId)

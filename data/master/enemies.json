@@ -1,16 +1,156 @@
 [
-  { "id": "en_slime", "type": "normal", "defeatGold": 10,
-    "battle": { "hp": 300, "atk": 20, "range": 100, "attackIntervalSec": 1.5, "moveSpeed": 8, "knockbacks": 1, "target": "single" } },
-  { "id": "en_bat", "type": "flying", "defeatGold": 15,
-    "battle": { "hp": 200, "atk": 30, "range": 120, "attackIntervalSec": 1.2, "moveSpeed": 14, "knockbacks": 1, "target": "single" } },
-  { "id": "en_golem", "type": "armored", "defeatGold": 200,
-    "battle": { "hp": 6000, "atk": 250, "range": 150, "attackIntervalSec": 3.0, "moveSpeed": 5, "knockbacks": 3, "target": "area" } },
-  { "id": "en_harpy", "type": "flying", "defeatGold": 25,
-    "battle": { "hp": 320, "atk": 35, "range": 130, "attackIntervalSec": 1.3, "moveSpeed": 15, "knockbacks": 2, "target": "single" } },
-  { "id": "en_mage_skeleton", "type": "ranged", "defeatGold": 40,
-    "battle": { "hp": 380, "atk": 45, "range": 220, "attackIntervalSec": 2.4, "moveSpeed": 6, "knockbacks": 1, "target": "single" } },
-  { "id": "en_wraith_assassin", "type": "flying", "defeatGold": 45,
-    "battle": { "hp": 360, "atk": 45, "range": 135, "attackIntervalSec": 1.2, "moveSpeed": 15, "knockbacks": 2, "target": "single" } },
-  { "id": "en_golem_colossus", "type": "armored", "defeatGold": 250,
-    "battle": { "hp": 7500, "atk": 280, "range": 155, "attackIntervalSec": 3.0, "moveSpeed": 5, "knockbacks": 3, "target": "area" } }
+  {
+    "id": "en_slime",
+    "type": "normal",
+    "defeatGold": 10,
+    "battle": {
+      "hp": 300,
+      "atk": 20,
+      "range": 100,
+      "attackIntervalSec": 1.5,
+      "moveSpeed": 8,
+      "knockbacks": 1,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_goblin_raider",
+    "type": "normal",
+    "defeatGold": 18,
+    "battle": {
+      "hp": 340,
+      "atk": 28,
+      "range": 95,
+      "attackIntervalSec": 1.2,
+      "moveSpeed": 11,
+      "knockbacks": 1,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_bat",
+    "type": "flying",
+    "defeatGold": 15,
+    "battle": {
+      "hp": 200,
+      "atk": 30,
+      "range": 120,
+      "attackIntervalSec": 1.2,
+      "moveSpeed": 14,
+      "knockbacks": 1,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_goblin_shaman",
+    "type": "ranged",
+    "defeatGold": 32,
+    "battle": {
+      "hp": 310,
+      "atk": 40,
+      "range": 210,
+      "attackIntervalSec": 2.1,
+      "moveSpeed": 7,
+      "knockbacks": 1,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_harpy",
+    "type": "flying",
+    "defeatGold": 25,
+    "battle": {
+      "hp": 320,
+      "atk": 35,
+      "range": 130,
+      "attackIntervalSec": 1.3,
+      "moveSpeed": 15,
+      "knockbacks": 2,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_mage_skeleton",
+    "type": "ranged",
+    "defeatGold": 40,
+    "battle": {
+      "hp": 380,
+      "atk": 45,
+      "range": 220,
+      "attackIntervalSec": 2.4,
+      "moveSpeed": 6,
+      "knockbacks": 1,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_dark_elf_blade",
+    "type": "normal",
+    "defeatGold": 48,
+    "battle": {
+      "hp": 520,
+      "atk": 55,
+      "range": 115,
+      "attackIntervalSec": 1.1,
+      "moveSpeed": 13,
+      "knockbacks": 2,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_dark_elf_archer",
+    "type": "ranged",
+    "defeatGold": 55,
+    "battle": {
+      "hp": 420,
+      "atk": 62,
+      "range": 260,
+      "attackIntervalSec": 1.8,
+      "moveSpeed": 8,
+      "knockbacks": 2,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_wraith_assassin",
+    "type": "flying",
+    "defeatGold": 45,
+    "battle": {
+      "hp": 360,
+      "atk": 45,
+      "range": 135,
+      "attackIntervalSec": 1.2,
+      "moveSpeed": 15,
+      "knockbacks": 2,
+      "target": "single"
+    }
+  },
+  {
+    "id": "en_golem",
+    "type": "armored",
+    "defeatGold": 200,
+    "battle": {
+      "hp": 6000,
+      "atk": 250,
+      "range": 150,
+      "attackIntervalSec": 3.0,
+      "moveSpeed": 5,
+      "knockbacks": 3,
+      "target": "area"
+    }
+  },
+  {
+    "id": "en_golem_colossus",
+    "type": "armored",
+    "defeatGold": 250,
+    "battle": {
+      "hp": 7500,
+      "atk": 280,
+      "range": 155,
+      "attackIntervalSec": 3.0,
+      "moveSpeed": 5,
+      "knockbacks": 3,
+      "target": "area"
+    }
+  }
 ]

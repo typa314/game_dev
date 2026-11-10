@@ -738,5 +738,100 @@ namespace Game.Tests
             Assert.IsTrue(u.X < 950 * 1000, "靠近主堡的攻城單位應被衝擊波強制擊退後移");
             Assert.IsTrue(u.StunTicks > 0, "攻城單位應進入震波眩暈狀態");
         }
+
+        [Test]
+        public void A7_21_HealerAura_HealsAlliesWithinRange_BoundToAtkAndAttackInterval()
+        {
+            BattleSetup setup = CreateSimpleSetup(length: 1500);
+
+            UnitTemplate tank = new UnitTemplate { Id = "tank_unit", Cost = 50, Hp = 1000, Atk = 10, RangeMilli = 50 * 1000, AttackIntervalTicks = 30, SpeedMilliPerTick = 0 };
+            var healSkill = new CharacterSkillDef { Id = "sk_heal", EffectType = "heal", Value = 450, ChargeSec = 14.0 };
+            UnitTemplate healer = new UnitTemplate { Id = "char04_elysia", Cost = 100, Hp = 600, Atk = 60, RangeMilli = 150 * 1000, AttackIntervalTicks = 10, SpeedMilliPerTick = 0, Skill = healSkill, SkillChargeTicks = 420 };
+            setup.Team.Add(tank);
+            setup.Team.Add(healer);
+
+            var sim = new BattleSimulator(setup);
+            sim.Enqueue(CommandType.Deploy, 0); // Deploy Tank 1 (near)
+            sim.Step();
+            sim.Enqueue(CommandType.Deploy, 0); // Deploy Tank 2 (far)
+            sim.Step();
+            sim.Enqueue(CommandType.Deploy, 1); // Deploy Healer
+            sim.Step(); // On this step, Healer spawns with HealTimer = 10 -> decrements to 9
+
+            var tanks = sim.Units.Where(u => u.T.Id == "tank_unit").ToList();
+            BattleUnit nearTank = tanks[0];
+            BattleUnit farTank = tanks[1];
+            BattleUnit healerUnit = sim.Units.First(u => u.T.Id == "char04_elysia");
+
+            healerUnit.X = 200 * 1000;
+            nearTank.X = 250 * 1000;   // Distance 50 <= 150 aura reach
+            farTank.X = 500 * 1000;    // Distance 300 > 150 aura reach
+
+            nearTank.Hp = 500;
+            farTank.Hp = 400;
+
+            // Step 9 more times (total 10 ticks since healer spawned)
+            for (int i = 0; i < 9; i++) sim.Step();
+
+            Assert.AreEqual(560, nearTank.Hp, "光環內友軍應依補師 ATK(60) 回復 60 HP");
+            Assert.AreEqual(400, farTank.Hp, "光環外友軍不應受到回復效果");
+            Assert.IsTrue(sim.TickEvents.Any(e => e.Type == BattleEventType.Heal && e.Uid == nearTank.Uid && e.Value == 60), "應發出 Value=60 的 Heal 事件");
+
+            // 給予補師 50% ATK Buff，驗證回血量動態隨能力提升 (60 * 1.5 = 90)
+            healerUnit.AtkBuffTicks = 20;
+            healerUnit.AtkBuffPct = 50;
+
+            for (int i = 0; i < 10; i++) sim.Step();
+            Assert.AreEqual(650, nearTank.Hp, "帶有 +50% ATK Buff 時，光環應回復 90 HP (560 + 90 = 650)");
+
+            // 驗證上限鉗位 (不超過 Max HP 1000)
+            nearTank.Hp = 970;
+            for (int i = 0; i < 10; i++) sim.Step();
+            Assert.AreEqual(1000, nearTank.Hp, "治癒後 HP 不可超過最大生命值 1000");
+        }
+
+        [Test]
+        public void A7_22_HealerAura_HealingSpeedScalesWithAttackIntervalTicks()
+        {
+            BattleSetup setupFast = CreateSimpleSetup(length: 1500);
+            BattleSetup setupSlow = CreateSimpleSetup(length: 1500);
+
+            UnitTemplate tank = new UnitTemplate { Id = "tank_unit", Cost = 50, Hp = 1000, Atk = 10, RangeMilli = 50 * 1000, AttackIntervalTicks = 30, SpeedMilliPerTick = 0 };
+            var healSkill = new CharacterSkillDef { Id = "sk_heal", EffectType = "heal", Value = 450, ChargeSec = 14.0 };
+
+            UnitTemplate fastHealer = new UnitTemplate { Id = "char04_elysia", Cost = 50, Hp = 600, Atk = 40, RangeMilli = 150 * 1000, AttackIntervalTicks = 5, SpeedMilliPerTick = 0, Skill = healSkill, SkillChargeTicks = 420 };
+            UnitTemplate slowHealer = new UnitTemplate { Id = "char04_elysia", Cost = 50, Hp = 600, Atk = 40, RangeMilli = 150 * 1000, AttackIntervalTicks = 20, SpeedMilliPerTick = 0, Skill = healSkill, SkillChargeTicks = 420 };
+
+            setupFast.Team.Add(tank);
+            setupFast.Team.Add(fastHealer);
+            setupSlow.Team.Add(tank);
+            setupSlow.Team.Add(slowHealer);
+
+            var simFast = new BattleSimulator(setupFast);
+            var simSlow = new BattleSimulator(setupSlow);
+
+            // Deploy tank + healer in both sims
+            simFast.Enqueue(CommandType.Deploy, 0); simFast.Step();
+            simFast.Enqueue(CommandType.Deploy, 1); simFast.Step();
+            simSlow.Enqueue(CommandType.Deploy, 0); simSlow.Step();
+            simSlow.Enqueue(CommandType.Deploy, 1); simSlow.Step();
+
+            BattleUnit tankFast = simFast.Units.First(u => u.T.Id == "tank_unit");
+            BattleUnit tankSlow = simSlow.Units.First(u => u.T.Id == "tank_unit");
+            tankFast.Hp = 200;
+            tankSlow.Hp = 200;
+
+            // Advance 19 more steps (total 20 ticks since healer spawned)
+            for (int i = 0; i < 19; i++)
+            {
+                simFast.Step();
+                simSlow.Step();
+            }
+
+            // Fast healer (interval=5): pulses 4 times (ticks 5,10,15,20) -> 4 * 40 = 160 -> HP = 360
+            // Slow healer (interval=20): pulses 1 time (tick 20) -> 1 * 40 = 40 -> HP = 240
+            Assert.AreEqual(360, tankFast.Hp, "高攻速補師 (間隔5 ticks) 在 20 ticks 內應治療 4 次共 +160 HP");
+            Assert.AreEqual(240, tankSlow.Hp, "低攻速補師 (間隔20 ticks) 在 20 ticks 內應治療 1 次共 +40 HP");
+        }
     }
 }

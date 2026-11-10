@@ -50,6 +50,7 @@ namespace Game.Domain.Events
         public const string RouteChapterCompleted = "RouteChapterCompleted"; // char, chapter
         public const string CharacterTierAdvanced = "CharacterTierAdvanced"; // char, rarity, tier
         public const string CharacterRarityPromoted = "CharacterRarityPromoted"; // char, oldRarity, newRarity
+        public const string BaseUpgraded = "BaseUpgraded"; // level, maxHp, cost
     }
 
     /// <summary>

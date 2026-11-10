@@ -72,6 +72,25 @@ namespace Game.Domain.Growth
 
         public string ShardItem(string charId) { return _cfg.ShardItemPrefix + charId; }
 
+        public int BaseMaxLevel { get { return _cfg.BaseMaxLevel > 0 ? _cfg.BaseMaxLevel : 20; } }
+
+        public int ComputeBaseMaxHp(int baseLevel, int defaultAllyBaseHp)
+        {
+            int lv = Math.Max(1, Math.Min(baseLevel, BaseMaxLevel));
+            int bonus = _cfg.BaseHpBonusPerLevel > 0 ? _cfg.BaseHpBonusPerLevel : 2500;
+            long hp = (long)Math.Max(1, defaultAllyBaseHp) + (long)(lv - 1) * bonus;
+            return (int)Math.Min(int.MaxValue, hp);
+        }
+
+        public int BaseUpgradeGoldCost(int currentBaseLevel)
+        {
+            int lv = Math.Max(1, currentBaseLevel);
+            int baseCost = _cfg.BaseUpgradeGoldBase > 0 ? _cfg.BaseUpgradeGoldBase : 500;
+            int stepCost = _cfg.BaseUpgradeGoldStep >= 0 ? _cfg.BaseUpgradeGoldStep : 500;
+            long cost = (long)baseCost + (long)(lv - 1) * stepCost;
+            return (int)Math.Min(int.MaxValue, cost);
+        }
+
         public ComputedStats ComputeStats(CharacterDef def, CharacterState s, PortraitStageDef selectedStage)
         {
             int perLevel = 0;

@@ -270,6 +270,10 @@ namespace Game.Domain.MasterData
         public string MaxedDuplicateItem;
         public int MaxedDuplicateCount;
         public int AffectionPerWin;
+        public int BaseHpBonusPerLevel = 2500;
+        public int BaseUpgradeGoldBase = 500;
+        public int BaseUpgradeGoldStep = 500;
+        public int BaseMaxLevel = 20;
     }
 
     public sealed class EncounterConfig

@@ -59,9 +59,16 @@
       {
         "enemy": "en_slime",
         "atSec": 2,
-        "count": 4,
+        "count": 2,
         "intervalSec": 3,
-        "repeatEverySec": 20
+        "repeatEverySec": 22
+      },
+      {
+        "enemy": "en_goblin_raider",
+        "atSec": 6,
+        "count": 2,
+        "intervalSec": 4,
+        "repeatEverySec": 24
       },
       {
         "enemy": "en_bat",
@@ -113,11 +120,11 @@
     "enemyStatPct": 150,
     "waves": [
       {
-        "enemy": "en_slime",
+        "enemy": "en_goblin_raider",
         "atSec": 2,
-        "count": 5,
+        "count": 4,
         "intervalSec": 3,
-        "repeatEverySec": 18
+        "repeatEverySec": 20
       },
       {
         "enemy": "en_golem",
@@ -170,15 +177,22 @@
     "enemyStatPct": 115,
     "waves": [
       {
-        "enemy": "en_slime",
+        "enemy": "en_goblin_raider",
         "atSec": 2,
         "count": 3,
         "intervalSec": 4,
         "repeatEverySec": 24
       },
       {
+        "enemy": "en_goblin_shaman",
+        "atSec": 10,
+        "count": 1,
+        "intervalSec": 6,
+        "repeatEverySec": 28
+      },
+      {
         "enemy": "en_harpy",
-        "atSec": 12,
+        "atSec": 14,
         "count": 2,
         "intervalSec": 5,
         "repeatEverySec": 28
@@ -230,11 +244,18 @@
         "repeatEverySec": 24
       },
       {
-        "enemy": "en_mage_skeleton",
-        "atSec": 12,
+        "enemy": "en_goblin_shaman",
+        "atSec": 10,
         "count": 2,
         "intervalSec": 6,
         "repeatEverySec": 28
+      },
+      {
+        "enemy": "en_mage_skeleton",
+        "atSec": 16,
+        "count": 1,
+        "intervalSec": 6,
+        "repeatEverySec": 30
       }
     ],
     "rewards": {
@@ -278,18 +299,25 @@
     "enemyStatPct": 135,
     "waves": [
       {
+        "enemy": "en_dark_elf_blade",
+        "atSec": 3,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 24
+      },
+      {
         "enemy": "en_harpy",
-        "atSec": 2,
-        "count": 3,
-        "intervalSec": 4,
-        "repeatEverySec": 22
+        "atSec": 10,
+        "count": 2,
+        "intervalSec": 5,
+        "repeatEverySec": 24
       },
       {
         "enemy": "en_mage_skeleton",
-        "atSec": 14,
+        "atSec": 16,
         "count": 2,
         "intervalSec": 6,
-        "repeatEverySec": 26
+        "repeatEverySec": 28
       },
       {
         "enemy": "en_golem",
@@ -341,11 +369,11 @@
     "enemyStatPct": 138,
     "waves": [
       {
-        "enemy": "en_slime",
+        "enemy": "en_dark_elf_blade",
         "atSec": 2,
-        "count": 3,
+        "count": 2,
         "intervalSec": 4,
-        "repeatEverySec": 22
+        "repeatEverySec": 24
       },
       {
         "enemy": "en_wraith_assassin",
@@ -396,23 +424,23 @@
     "enemyStatPct": 140,
     "waves": [
       {
-        "enemy": "en_bat",
+        "enemy": "en_dark_elf_blade",
         "atSec": 2,
-        "count": 3,
+        "count": 2,
         "intervalSec": 4,
-        "repeatEverySec": 22
+        "repeatEverySec": 24
       },
       {
-        "enemy": "en_mage_skeleton",
+        "enemy": "en_dark_elf_archer",
         "atSec": 12,
         "count": 2,
-        "intervalSec": 5,
-        "repeatEverySec": 26
+        "intervalSec": 6,
+        "repeatEverySec": 28
       },
       {
         "enemy": "en_wraith_assassin",
         "atSec": 20,
-        "count": 2,
+        "count": 1,
         "intervalSec": 6,
         "repeatEverySec": 28
       }
@@ -458,18 +486,25 @@
     "enemyStatPct": 142,
     "waves": [
       {
-        "enemy": "en_wraith_assassin",
+        "enemy": "en_dark_elf_blade",
         "atSec": 2,
         "count": 2,
         "intervalSec": 4,
         "repeatEverySec": 24
       },
       {
-        "enemy": "en_mage_skeleton",
+        "enemy": "en_dark_elf_archer",
         "atSec": 10,
-        "count": 2,
+        "count": 1,
         "intervalSec": 5,
         "repeatEverySec": 26
+      },
+      {
+        "enemy": "en_wraith_assassin",
+        "atSec": 16,
+        "count": 1,
+        "intervalSec": 5,
+        "repeatEverySec": 28
       },
       {
         "enemy": "en_golem_colossus",

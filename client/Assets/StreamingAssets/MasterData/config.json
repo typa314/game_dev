@@ -21,7 +21,11 @@
     "shardsPerDuplicate": 10,
     "maxedDuplicateItem": "heart_crystal",
     "maxedDuplicateCount": 5,
-    "affectionPerWin": 5
+    "affectionPerWin": 5,
+    "baseHpBonusPerLevel": 2500,
+    "baseUpgradeGoldBase": 500,
+    "baseUpgradeGoldStep": 500,
+    "baseMaxLevel": 20
   },
   "encounter": {
     "staminaMax": 5,

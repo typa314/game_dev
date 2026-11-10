@@ -49,10 +49,25 @@ namespace Game.Tests
                 DetailDef = stageDef;
             }
 
+            public int BaseLevel { get; private set; }
+            public int BaseMaxHp { get; private set; }
+            public int BaseNextHp { get; private set; }
+            public int BaseUpgradeCost { get; private set; }
+            public bool BaseCanAfford { get; private set; }
+
             public void DisplayTeam(IReadOnlyList<string> currentTeam, IReadOnlyList<string> ownedCharacters)
             {
                 CurrentTeam = currentTeam;
                 OwnedCharacters = ownedCharacters;
+            }
+
+            public void DisplayBaseStatus(int baseLevel, int maxLevel, int currentHp, int nextHp, int upgradeGoldCost, bool canAfford)
+            {
+                BaseLevel = baseLevel;
+                BaseMaxHp = currentHp;
+                BaseNextHp = nextHp;
+                BaseUpgradeCost = upgradeGoldCost;
+                BaseCanAfford = canAfford;
             }
 
             public void ShowError(string message)
@@ -247,6 +262,63 @@ namespace Game.Tests
             CollectionAssert.Contains(st303.EnemyBaseTraits, "immune_ranged");
         }
 
+        [Test]
+        public void BaseUpgrade_IncreasesBaseHp_DeductsGold_AndPersistsThroughSaveAndBattleReplay()
+        {
+            var view = new MockStageSelectView();
+            var presenter = new StageSelectPresenter(_core);
+            presenter.AttachView(view);
+            presenter.Initialize();
+
+            // 1. 初始狀態 (Lv.1, 20,000 HP, 升級花費 500 G)
+            Assert.AreEqual(1, _core.GetAllyBaseLevel());
+            Assert.AreEqual(20000, _core.GetAllyBaseMaxHp());
+            Assert.AreEqual(500, _core.GetNextBaseUpgradeCost());
+            Assert.AreEqual(1, view.BaseLevel);
+            Assert.AreEqual(20000, view.BaseMaxHp);
+            Assert.AreEqual(22500, view.BaseNextHp);
+
+            long goldBefore = _core.Player.ItemCount("gold");
+            var upRes = presenter.UpgradeBase();
+            Assert.IsTrue(upRes.Ok, "首次強化應成功");
+            Assert.AreEqual(2, upRes.Value);
+            Assert.AreEqual(2, _core.GetAllyBaseLevel());
+            Assert.AreEqual(22500, _core.GetAllyBaseMaxHp());
+            Assert.AreEqual(goldBefore - 500, _core.Player.ItemCount("gold"), "應扣除 500 金幣");
+            Assert.AreEqual(2, view.BaseLevel);
+            Assert.AreEqual(22500, view.BaseMaxHp);
+            Assert.AreEqual(1000, view.BaseUpgradeCost);
+
+            // 2. 驗證戰鬥模擬器建置直接套用升級後主堡血量與等級
+            var battleRes = _core.PrepareBattle("st_1_01", 42UL);
+            Assert.IsTrue(battleRes.Ok);
+            var sim = new Game.Domain.Battle.BattleSimulator(battleRes.Value);
+            Assert.AreEqual(2, sim.AllyBaseLevel);
+            Assert.AreEqual(22500, sim.AllyBaseMaxHp);
+            Assert.AreEqual(22500, sim.AllyBaseHp);
+
+            // 3. 驗證存檔編碼/解碼保存 BaseLevel
+            string savedJson = Game.Core.Persistence.SaveCodec.Encode(_core.Player, "1.0.0", DateTime.UtcNow);
+            var decodedPlayer = Game.Core.Persistence.SaveCodec.Decode(savedJson);
+            Assert.AreEqual(2, decodedPlayer.BaseLevel, "存檔回讀後應保留主堡等級 Lv.2");
+
+            // 4. 驗證金幣不足時拒絕強化
+            _core.Player.AddItem("gold", -_core.Player.ItemCount("gold"));
+            var failRes = presenter.UpgradeBase();
+            Assert.IsFalse(failRes.Ok);
+            Assert.AreEqual("insufficient_item", failRes.Error);
+
+            // 5. 驗證滿級保護
+            _core.Player.AddItem("gold", 9999999);
+            while (_core.GetAllyBaseLevel() < _core.Growth.BaseMaxLevel)
+            {
+                Assert.IsTrue(_core.UpgradeBase().Ok);
+            }
+            var maxRes = _core.UpgradeBase();
+            Assert.IsFalse(maxRes.Ok);
+            Assert.AreEqual("base_max_level", maxRes.Error);
+        }
+
 #if UNITY_2021_1_OR_NEWER
         [Test]
         public void OPT3_3_StageSelectView_EnsureUIHierarchy_BuildsAllComponentsAndDisplaysThreatBadge()
@@ -348,6 +420,34 @@ namespace Game.Tests
                 {
                     try { System.IO.Directory.Delete(tempDir, true); } catch { }
                 }
+            }
+        }
+
+        [Test]
+        public void StageSelectView_BaseUpgradeButton_UpgradesBaseHpAndUpdatesLabels()
+        {
+            var stageGo = new GameObject("Test_StageSelectBaseUI");
+            var stageView = stageGo.AddComponent<StageSelectView>();
+            try
+            {
+                stageView.EnsureUIHierarchy();
+                stageView.Initialize(_core);
+
+                Assert.IsNotNull(stageView.UpgradeBaseButton, "應建立強化主堡按鈕");
+                Assert.IsNotNull(stageView.BaseLevelText, "應建立主堡等級標籤");
+                Assert.IsNotNull(stageView.BaseHpText, "應建立主堡血量標籤");
+                StringAssert.Contains("LV.1", stageView.BaseLevelText.text);
+                StringAssert.Contains("20,000", stageView.BaseHpText.text);
+
+                stageView.OnClickUpgradeBase();
+
+                Assert.AreEqual(2, _core.GetAllyBaseLevel());
+                StringAssert.Contains("LV.2", stageView.BaseLevelText.text);
+                StringAssert.Contains("22,500", stageView.BaseHpText.text);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(stageGo);
             }
         }
 #endif

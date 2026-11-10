@@ -348,6 +348,206 @@ namespace Game.Tests
                 }
             }
         }
+
+        [Test]
+        public void BattleUnit_LoadsSpriteFromStreamingAssets_AndConfiguresVisualNode()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            UnitTemplate unit = new UnitTemplate { Id = "char01_claire", Cost = 100, Hp = 1000, Atk = 50, RangeMilli = 100 * 1000 };
+            setup.Team.Add(unit);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.Deploy(0);
+            runner.StepSim();
+            pageView.Refresh();
+
+            BattleUnit u = sim.Units.First(u => u.T.Id == "char01_claire");
+            RectTransform unitRt = pageView.GetUnitTransform(u.Uid);
+            Assert.IsNotNull(unitRt, "BattleUnit_Uid transform should exist");
+
+            Transform visual = unitRt.Find("Visual");
+            Assert.IsNotNull(visual, "BattleUnit should have Visual child when sprite exists");
+            Image vImg = visual.GetComponent<Image>();
+            Assert.IsNotNull(vImg, "Visual should have Image component");
+            Assert.IsNotNull(vImg.sprite, "Visual Image should have loaded Sprite");
+            Assert.AreEqual(Vector3.one, visual.localScale, "Ally should face right (localScale.x = 1)");
+
+            // Non-healer should not have HealAura
+            Transform aura = unitRt.Find("HealAura");
+            Assert.IsNull(aura, "Non-healer unit (Claire) should NOT have HealAura at feet");
+            Image rootImg = unitRt.GetComponent<Image>();
+            Assert.AreEqual(Color.clear, rootImg.color, "Root image should be clear (no faction aura)");
+        }
+
+        [Test]
+        public void BattleUnit_Healer_ConfiguresHealAuraAtFeet()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            var healSkill = new CharacterSkillDef { Id = "skill_holy_blessing", EffectType = "heal", Value = 450 };
+            UnitTemplate healerUnit = new UnitTemplate { Id = "char04_elysia", Cost = 100, Hp = 600, Atk = 60, Skill = healSkill };
+            setup.Team.Add(healerUnit);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner_Healer"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.Deploy(0);
+            runner.StepSim();
+            pageView.Refresh();
+
+            BattleUnit u = sim.Units.First(u => u.T.Id == "char04_elysia");
+            RectTransform unitRt = pageView.GetUnitTransform(u.Uid);
+            Assert.IsNotNull(unitRt, "BattleUnit_Uid transform should exist");
+
+            Transform aura = unitRt.Find("HealAura");
+            Assert.IsNotNull(aura, "Healer unit (Elysia) MUST have HealAura at feet");
+            RectTransform auraRt = aura.GetComponent<RectTransform>();
+            Assert.AreEqual(new Vector2(0.5f, 0f), auraRt.anchorMin, "HealAura anchorMin should be at feet (0.5, 0)");
+            Assert.AreEqual(new Vector2(0.5f, 0f), auraRt.anchorMax, "HealAura anchorMax should be at feet (0.5, 0)");
+            Image auraImg = aura.GetComponent<Image>();
+            Assert.IsNotNull(auraImg, "HealAura should have Image component");
+            Assert.AreEqual(0, aura.GetSiblingIndex(), "HealAura should be first sibling behind sprite");
+
+            // Check dynamic aura scaling with range
+            Assert.IsTrue(auraRt.sizeDelta.x >= 84f, "HealAura width should be configured smoothly");
+        }
+
+        [Test]
+        public void BattleUnit_HealEvent_HighlightsUnitHpGreen()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1500);
+            UnitTemplate tank = new UnitTemplate { Id = "char05_rin", Cost = 50, Hp = 1000, Atk = 10, SpeedMilliPerTick = 0 };
+            var healSkill = new CharacterSkillDef { Id = "sk_heal", EffectType = "heal", Value = 450 };
+            UnitTemplate healer = new UnitTemplate { Id = "char04_elysia", Cost = 100, Hp = 600, Atk = 60, RangeMilli = 150 * 1000, AttackIntervalTicks = 2, SpeedMilliPerTick = 0, Skill = healSkill };
+            setup.Team.Add(tank);
+            setup.Team.Add(healer);
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner_HealFeedback"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.Deploy(0);
+            runner.StepSim();
+            runner.Deploy(1);
+            runner.StepSim();
+
+            BattleUnit tankUnit = sim.Units.First(u => u.T.Id == "char05_rin");
+            tankUnit.Hp = 500;
+            pageView.Refresh();
+
+            // Advance 1 step so healer aura triggers (AttackIntervalTicks = 2)
+            runner.StepSim();
+            pageView.Refresh();
+
+            Assert.AreEqual(560, tankUnit.Hp, "Tank should be healed by 60 HP from Elysia aura");
+            RectTransform tankRt = pageView.GetUnitTransform(tankUnit.Uid);
+            Text hpText = tankRt.Find("Hp").GetComponent<Text>();
+            Assert.AreEqual(new Color(0.35f, 1f, 0.55f), hpText.color, "Healed unit HP label should flash bright healing green");
+        }
+
+        [Test]
+        public void BattlePage_LoadsAllyAndEnemyBaseSprites_AndDisplaysUpgradedLevel()
+        {
+            BattleSetup setup = CreateTestSetup(length: 1000);
+            setup.AllyBaseLevel = 5;
+            setup.AllyBaseHpOverride = 30000;
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner_Bases"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+            pageView.Refresh();
+
+            Transform board = runnerGo.transform.Find("BattlePageCanvas/Board");
+            Assert.IsNotNull(board, "Board should exist");
+
+            Transform allyBase = board.Find("AllyBaseVisual");
+            Assert.IsNotNull(allyBase, "AllyBaseVisual should exist on Board");
+            Image allyImg = allyBase.GetComponent<Image>();
+            Assert.IsNotNull(allyImg.sprite, "AllyBaseVisual should load ally_base.png sprite");
+
+            Transform enemyBase = board.Find("EnemyBaseVisual");
+            Assert.IsNotNull(enemyBase, "EnemyBaseVisual should exist on Board");
+            Image enemyImg = enemyBase.GetComponent<Image>();
+            Assert.IsNotNull(enemyImg.sprite, "EnemyBaseVisual should load enemy_base.png sprite");
+
+            Text baseLvlText = allyBase.GetComponentInChildren<Text>();
+            Assert.IsNotNull(baseLvlText);
+            Assert.AreEqual("ALLY BASTION LV.5", baseLvlText.text, "Should display upgraded Ally Base Level on battlefield");
+
+            // 模擬敵方攻擊主堡，驗證主堡受擊閃爍視覺回饋
+            sim.TickEvents.Add(new BattleEvent { Type = BattleEventType.BaseHit, Side = Side.Enemy, Value = 100 });
+            runner.CaptureTickEvents();
+            sim.TickEvents.Clear();
+            pageView.Refresh();
+            Assert.AreEqual(new Color(1f, 0.45f, 0.45f, 1f), allyImg.color, "Ally Base should flash red on BaseHit event");
+        }
+
+        [Test]
+        public void BattleUnit_LoadsAllEnemySprites_FacesLeft_AndScalesBossVsSmallMonsters()
+        {
+            string[] allEnemies = new[]
+            {
+                "en_slime", "en_bat", "en_harpy", "en_mage_skeleton",
+                "en_wraith_assassin", "en_golem", "en_golem_colossus",
+                "en_goblin_raider", "en_goblin_shaman",
+                "en_dark_elf_blade", "en_dark_elf_archer"
+            };
+
+            foreach (string eid in allEnemies)
+            {
+                Sprite sp = BattlePageView.TryLoadBattleUnitSprite(eid);
+                Assert.IsNotNull(sp, $"Enemy sprite {eid}.png should load from StreamingAssets/Battle/Units");
+            }
+
+            BattleSetup setup = CreateTestSetup(length: 1500);
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_dark_elf_blade", AtSec = 0, Count = 1 });
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_golem_colossus", AtSec = 0, Count = 1 });
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_slime", AtSec = 0, Count = 1 });
+            setup.EnemyTemplates["en_dark_elf_blade"] = new UnitTemplate { Id = "en_dark_elf_blade", Type = "normal", Hp = 520, Atk = 55 };
+            setup.EnemyTemplates["en_golem_colossus"] = new UnitTemplate { Id = "en_golem_colossus", Type = "armored", Hp = 7500, Atk = 280 };
+            setup.EnemyTemplates["en_slime"] = new UnitTemplate { Id = "en_slime", Type = "normal", Hp = 300, Atk = 20 };
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner_Enemies"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.StepSim();
+            pageView.Refresh();
+
+            var deUnit = sim.Units.First(u => u.T.Id == "en_dark_elf_blade");
+            var bossUnit = sim.Units.First(u => u.T.Id == "en_golem_colossus");
+            var slimeUnit = sim.Units.First(u => u.T.Id == "en_slime");
+
+            RectTransform deRt = pageView.GetUnitTransform(deUnit.Uid);
+            RectTransform bossRt = pageView.GetUnitTransform(bossUnit.Uid);
+            RectTransform slimeRt = pageView.GetUnitTransform(slimeUnit.Uid);
+
+            Assert.AreEqual(new Vector2(96, 110), deRt.sizeDelta, "Dark Elf should use standard chibi dimensions");
+            Assert.AreEqual(new Vector2(142, 162), bossRt.sizeDelta, "Armored Boss should use larger overlord scale");
+            Assert.AreEqual(new Vector2(74, 84), slimeRt.sizeDelta, "Slime should use compact monster scale");
+
+            Transform deVisual = deRt.Find("Visual");
+            Assert.IsNotNull(deVisual);
+            Assert.AreEqual(new Vector3(-1f, 1f, 1f), deVisual.localScale, "Enemy sprite must flip left (scale.x = -1)");
+        }
     }
 }
 #endif

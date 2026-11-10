@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Collections.Generic;
 using Game.Core.UI;
 using Game.Domain.Battle;
@@ -25,11 +27,22 @@ namespace Game.Unity
         private readonly Dictionary<int, RectTransform> _units = new Dictionary<int, RectTransform>();
         private readonly Dictionary<int, Text> _unitHpLabels = new Dictionary<int, Text>();
         private readonly Dictionary<int, Text> _unitStatusLabels = new Dictionary<int, Text>();
+
+        private readonly Dictionary<int, float> _unitHealPulseTimers = new Dictionary<int, float>();
+        private static readonly Dictionary<string, Sprite> _battleSpriteCache = new Dictionary<string, Sprite>();
         private readonly List<BattleEvent> _eventBuffer = new List<BattleEvent>();
         private GameObject _skillCutInPanel;
         private Text _skillCutInTitle;
         private Text _skillCutInSubtitle;
         private Text _baseAlertText;
+        private Image _allyBaseImage;
+        private Image _enemyBaseImage;
+        private Text _allyBaseBoardLabel;
+        private Text _enemyBaseBoardLabel;
+        private bool _hasAllyBaseSprite;
+        private bool _hasEnemyBaseSprite;
+        private float _allyBaseHitTimer;
+        private float _enemyBaseHitTimer;
         private float _cutInTimer;
         private float _baseAlertTimer;
         private GameObject _resultPanel;
@@ -159,17 +172,11 @@ namespace Game.Unity
 
             BattleSimulator sim = _runner.Sim;
 
-            // 1. 消費並處理自上個更新週期累積的視圖事件
-            _runner.ConsumeViewEvents(_eventBuffer);
-            for (int i = 0; i < _eventBuffer.Count; i++)
-            {
-                ProcessEvent(_eventBuffer[i]);
-            }
-
-            // 2. 更新 Cut-in 與主堡警報計時器
+            // 1. 更新現有計時器 (上一幀累積至此幀之經過時間)
+            float dt = Time.deltaTime;
             if (_cutInTimer > 0f)
             {
-                _cutInTimer -= Time.deltaTime;
+                _cutInTimer -= dt;
                 if (_cutInTimer <= 0f && _skillCutInPanel != null)
                 {
                     _skillCutInPanel.SetActive(false);
@@ -177,18 +184,47 @@ namespace Game.Unity
             }
             if (_baseAlertTimer > 0f)
             {
-                _baseAlertTimer -= Time.deltaTime;
+                _baseAlertTimer -= dt;
                 if (_baseAlertTimer <= 0f && _baseAlertText != null)
                 {
                     _baseAlertText.gameObject.SetActive(false);
                 }
             }
+            if (_unitHealPulseTimers.Count > 0)
+            {
+                var keys = new List<int>(_unitHealPulseTimers.Keys);
+                foreach (int k in keys)
+                {
+                    _unitHealPulseTimers[k] -= dt;
+                    if (_unitHealPulseTimers[k] <= 0f) _unitHealPulseTimers.Remove(k);
+                }
+            }
+            if (_allyBaseHitTimer > 0f) _allyBaseHitTimer -= dt;
+            if (_enemyBaseHitTimer > 0f) _enemyBaseHitTimer -= dt;
+
+            // 2. 消費並處理自上個更新週期累積的視圖事件
+            _runner.ConsumeViewEvents(_eventBuffer);
+            for (int i = 0; i < _eventBuffer.Count; i++)
+            {
+                ProcessEvent(_eventBuffer[i]);
+            }
 
             // 3. 更新基本 UI 數據
             _title.text = "FIELD OPERATION  /  " + _runner.StageId;
             _clock.text = string.Format("{0:00}:{1:00}", sim.Tick / sim.TicksPerSecond / 60, sim.Tick / sim.TicksPerSecond % 60);
-            _allyHp.text = "ALLY BASE  " + sim.AllyBaseHp + " / " + sim.AllyBaseMaxHp;
+            _allyHp.text = "ALLY BASE (LV." + sim.AllyBaseLevel + ")  " + sim.AllyBaseHp + " / " + sim.AllyBaseMaxHp;
             _enemyHp.text = "ENEMY CORE  " + sim.EnemyBaseHp + " / " + sim.EnemyBaseMaxHp;
+            if (_allyBaseBoardLabel != null) _allyBaseBoardLabel.text = "ALLY BASTION LV." + sim.AllyBaseLevel;
+            if (_allyBaseImage != null)
+            {
+                Color allyNormal = _hasAllyBaseSprite ? Color.white : new Color(0.20f, 0.45f, 0.68f, 0.92f);
+                _allyBaseImage.color = _allyBaseHitTimer > 0f ? new Color(1f, 0.45f, 0.45f, 1f) : allyNormal;
+            }
+            if (_enemyBaseImage != null)
+            {
+                Color enemyNormal = _hasEnemyBaseSprite ? Color.white : new Color(0.52f, 0.16f, 0.22f, 0.92f);
+                _enemyBaseImage.color = _enemyBaseHitTimer > 0f ? new Color(1f, 0.45f, 0.45f, 1f) : enemyNormal;
+            }
             SetFill(_allyBar, Ratio(sim.AllyBaseHp, sim.AllyBaseMaxHp));
             SetFill(_enemyBar, Ratio(sim.EnemyBaseHp, sim.EnemyBaseMaxHp));
             _energy.text = "ENERGY  " + sim.EnergyMilli / 1000 + " / " + sim.EnergyMax + "   •   LV " + (sim.EnergyLevel + 1);
@@ -225,13 +261,36 @@ namespace Game.Unity
                 RectTransform rt;
                 if (!_units.TryGetValue(unit.Uid, out rt)) rt = CreateUnit(unit);
                 float p = sim.LengthMilli > 0 ? Mathf.Clamp01((float)unit.X / sim.LengthMilli) : 0.5f;
-                float laneY = unit.Side == Side.Ally ? .23f : .48f;
+                float laneY = (unit.T != null && unit.T.Type == "flying")
+                    ? .28f
+                    : (unit.Side == Side.Ally ? .22f : .25f);
                 rt.anchorMin = rt.anchorMax = new Vector2(Mathf.Lerp(.04f, .96f, p), laneY);
                 rt.anchoredPosition = Vector2.zero;
                 Image icon = rt.GetComponent<Image>();
-                icon.color = unit.Side == Side.Ally ? new Color(0.28f, 0.71f, 0.88f) : new Color(0.91f, 0.36f, 0.37f);
+                Transform visualTransform = rt.Find("Visual");
+                if (visualTransform != null)
+                {
+                    icon.color = Color.clear;
+                    visualTransform.localScale = new Vector3(unit.Side == Side.Enemy ? -1f : 1f, 1f, 1f);
+                }
+                else
+                {
+                    icon.color = unit.Side == Side.Ally ? new Color(0.28f, 0.71f, 0.88f) : new Color(0.91f, 0.36f, 0.37f);
+                }
                 Text hpLabel;
-                if (_unitHpLabels.TryGetValue(unit.Uid, out hpLabel)) hpLabel.text = unit.Hp.ToString();
+                if (_unitHpLabels.TryGetValue(unit.Uid, out hpLabel))
+                {
+                    hpLabel.text = unit.Hp.ToString();
+                    float pulseTimer;
+                    if (_unitHealPulseTimers.TryGetValue(unit.Uid, out pulseTimer) && pulseTimer > 0f)
+                    {
+                        hpLabel.color = new Color(0.35f, 1f, 0.55f);
+                    }
+                    else
+                    {
+                        hpLabel.color = Color.white;
+                    }
+                }
 
                 // 狀態視覺化標籤
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
@@ -261,6 +320,7 @@ namespace Game.Unity
                 _units.Remove(uid);
                 _unitHpLabels.Remove(uid);
                 _unitStatusLabels.Remove(uid);
+                _unitHealPulseTimers.Remove(uid);
             }
 
             if (!_runner.IsRunning && _runner.HasSubmitted)
@@ -279,6 +339,17 @@ namespace Game.Unity
         {
             switch (evt.Type)
             {
+                case BattleEventType.Heal:
+                {
+                    _unitHealPulseTimers[evt.Uid] = 0.45f;
+                    break;
+                }
+                case BattleEventType.BaseHit:
+                {
+                    if (evt.Side == Side.Ally) _enemyBaseHitTimer = 0.18f;
+                    else _allyBaseHitTimer = 0.18f;
+                    break;
+                }
                 case BattleEventType.SkillCast:
                 {
                     int slot = evt.Value;
@@ -404,19 +475,160 @@ namespace Game.Unity
             }
         }
 
+        private static Sprite TryLoadCachedSprite(string cacheKey, string[] candidatePaths, Vector2 pivot)
+        {
+            if (string.IsNullOrEmpty(cacheKey) || candidatePaths == null) return null;
+            if (_battleSpriteCache.TryGetValue(cacheKey, out var cached) && cached != null)
+                return cached;
+
+            try
+            {
+                foreach (string p in candidatePaths)
+                {
+                    if (File.Exists(p))
+                    {
+                        byte[] bytes = File.ReadAllBytes(p);
+                        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                        if (tex.LoadImage(bytes))
+                        {
+                            Sprite sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100f);
+                            _battleSpriteCache[cacheKey] = sp;
+                            return sp;
+                        }
+                        DestroyImmediate(tex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[BattlePageView] Failed to load sprite for {cacheKey}: {ex.Message}");
+            }
+            return null;
+        }
+
+        public static Sprite TryLoadBattleUnitSprite(string charId)
+        {
+            if (string.IsNullOrEmpty(charId)) return null;
+            string streaming = Application.streamingAssetsPath;
+            return TryLoadCachedSprite(
+                charId,
+                new[]
+                {
+                    Path.Combine(streaming, "Battle", "Units", charId + ".png"),
+                    Path.Combine(streaming, "Portraits", charId + ".png")
+                },
+                new Vector2(0.5f, 0f));
+        }
+
+        public static Sprite TryLoadAuraSprite(string auraKey)
+        {
+            if (string.IsNullOrEmpty(auraKey)) return null;
+            string streaming = Application.streamingAssetsPath;
+            return TryLoadCachedSprite(
+                "aura_" + auraKey,
+                new[] { Path.Combine(streaming, "Battle", "Auras", auraKey + ".png") },
+                new Vector2(0.5f, 0.5f));
+        }
+
+        public static Sprite TryLoadBaseSprite(string baseKey)
+        {
+            if (string.IsNullOrEmpty(baseKey)) return null;
+            string streaming = Application.streamingAssetsPath;
+            return TryLoadCachedSprite(
+                "base_" + baseKey,
+                new[] { Path.Combine(streaming, "Battle", "Bases", baseKey + ".png") },
+                new Vector2(0.5f, 0f));
+        }
+
+        public static bool IsHealerUnit(BattleUnit unit)
+        {
+            return BattleSimulator.IsHealer(unit);
+        }
+
+        private static Vector2 GetBattleUnitDisplaySize(BattleUnit unit, bool hasSprite)
+        {
+            if (!hasSprite) return new Vector2(62, 76);
+            if (unit?.T != null)
+            {
+                if (unit.T.Type == "armored") return new Vector2(142, 162);
+                if (unit.T.Id == "en_slime" || unit.T.Id == "en_bat") return new Vector2(74, 84);
+            }
+            return new Vector2(96, 110);
+        }
+
         private RectTransform CreateUnit(BattleUnit unit)
         {
-            GameObject go = Make("BattleUnit_" + unit.Uid, _board, new Vector2(62, 76), Vector2.zero);
+            Sprite battleSprite = TryLoadBattleUnitSprite(unit.T.Id);
+            bool hasSprite = battleSprite != null;
+
+            Vector2 size = GetBattleUnitDisplaySize(unit, hasSprite);
+            GameObject go = Make("BattleUnit_" + unit.Uid, _board, size, Vector2.zero);
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.pivot = new Vector2(0.5f, 0f);
+
             Image image = go.AddComponent<Image>();
-            image.color = unit.Side == Side.Ally ? new Color(0.28f, 0.71f, 0.88f) : new Color(0.91f, 0.36f, 0.37f);
-            string code = ShortName(unit.T.Id).Replace(" ", "");
-            Text label = Label(go.transform, code.Substring(0, Mathf.Min(2, code.Length)), 18, Color.white, TextAnchor.MiddleCenter);
-            Stretch(label.rectTransform, 2);
+            image.color = hasSprite
+                ? Color.clear
+                : (unit.Side == Side.Ally ? new Color(0.28f, 0.71f, 0.88f) : new Color(0.91f, 0.36f, 0.37f));
+
+            bool isHealer = IsHealerUnit(unit);
+            if (isHealer)
+            {
+                GameObject auraGo = new GameObject("HealAura", typeof(RectTransform), typeof(Image));
+                auraGo.transform.SetParent(go.transform, false);
+                RectTransform aRt = auraGo.GetComponent<RectTransform>();
+                aRt.anchorMin = new Vector2(0.5f, 0f);
+                aRt.anchorMax = new Vector2(0.5f, 0f);
+                aRt.pivot = new Vector2(0.5f, 0.5f);
+                float auraWidth = Mathf.Clamp(unit.T != null && unit.T.RangeMilli > 0 ? (unit.T.RangeMilli / 1000f) * 0.75f : 88f, 84f, 160f);
+
+                aRt.sizeDelta = new Vector2(auraWidth, auraWidth * 0.30f);
+                aRt.anchoredPosition = new Vector2(0f, 4f);
+                Image aImg = auraGo.GetComponent<Image>();
+                Sprite auraSp = TryLoadAuraSprite("heal_aura");
+                if (auraSp != null)
+                {
+                    aImg.sprite = auraSp;
+                    aImg.color = Color.white;
+                }
+                else
+                {
+                    aImg.color = new Color(0.25f, 0.95f, 0.55f, 0.50f);
+                }
+                auraGo.transform.SetAsFirstSibling();
+            }
+
+            if (hasSprite)
+            {
+                GameObject visualGo = new GameObject("Visual", typeof(RectTransform), typeof(Image));
+                visualGo.transform.SetParent(go.transform, false);
+                RectTransform vRt = visualGo.GetComponent<RectTransform>();
+                Stretch(vRt, 0);
+                vRt.pivot = new Vector2(0.5f, 0f);
+                vRt.localScale = new Vector3(unit.Side == Side.Enemy ? -1f : 1f, 1f, 1f);
+                Image vImg = visualGo.GetComponent<Image>();
+                vImg.sprite = battleSprite;
+                vImg.color = Color.white;
+                vImg.preserveAspect = true;
+            }
+            else
+            {
+                string code = ShortName(unit.T.Id).Replace(" ", "");
+                Text label = Label(go.transform, code.Substring(0, Mathf.Min(2, code.Length)), 18, Color.white, TextAnchor.MiddleCenter);
+                Stretch(label.rectTransform, 2);
+            }
+
             Text hp = Label(go.transform, "", 11, Color.white, TextAnchor.LowerCenter);
             hp.name = "Hp";
+            RectTransform hpRt = hp.rectTransform;
+            hpRt.anchorMin = new Vector2(0f, 0f);
+            hpRt.anchorMax = new Vector2(1f, 0f);
+            hpRt.pivot = new Vector2(0.5f, 1f);
+            hpRt.anchoredPosition = new Vector2(0f, -2f);
+            hpRt.sizeDelta = new Vector2(80f, 16f);
             _unitHpLabels[unit.Uid] = hp;
 
-            // 狀態視覺化標籤
+            // 狀態標籤
             Text status = Label(go.transform, "", 10, new Color(1f, 0.88f, 0.25f), TextAnchor.MiddleCenter);
             status.name = "Status";
             RectTransform sRt = status.rectTransform;
@@ -427,7 +639,6 @@ namespace Game.Unity
             sRt.sizeDelta = new Vector2(80f, 16f);
             _unitStatusLabels[unit.Uid] = status;
 
-            RectTransform rt = go.GetComponent<RectTransform>();
             _units.Add(unit.Uid, rt);
             return rt;
         }
@@ -451,8 +662,60 @@ namespace Game.Unity
 
             _board = Panel(root.transform, "Board", new Vector2(.035f, .29f), new Vector2(.965f, .83f), new Color(.08f, .12f, .16f)).GetComponent<RectTransform>();
             Panel(_board, "Ground", new Vector2(.032f, .18f), new Vector2(.968f, .28f), new Color(.24f, .29f, .29f));
-            AnchoredLabel(root.transform, "ALLY BASE", new Vector2(.05f, .46f), new Vector2(.22f, .52f), 17, new Color(.48f, .82f, .96f), TextAnchor.MiddleLeft);
-            AnchoredLabel(root.transform, "ENEMY CORE", new Vector2(.78f, .46f), new Vector2(.95f, .52f), 17, new Color(1f, .52f, .46f), TextAnchor.MiddleRight);
+
+            // 我方主堡視覺建築節點
+            Sprite allyBaseSp = TryLoadBaseSprite("ally_base");
+            _hasAllyBaseSprite = allyBaseSp != null;
+            GameObject allyBaseGo = Make("AllyBaseVisual", _board, new Vector2(210, 210), Vector2.zero);
+            RectTransform abRt = allyBaseGo.GetComponent<RectTransform>();
+            abRt.anchorMin = abRt.anchorMax = new Vector2(0.06f, 0.21f);
+            abRt.pivot = new Vector2(0.5f, 0f);
+            abRt.anchoredPosition = Vector2.zero;
+            _allyBaseImage = allyBaseGo.AddComponent<Image>();
+            if (_hasAllyBaseSprite)
+            {
+                _allyBaseImage.sprite = allyBaseSp;
+                _allyBaseImage.color = Color.white;
+                _allyBaseImage.preserveAspect = true;
+            }
+            else
+            {
+                _allyBaseImage.color = new Color(0.20f, 0.45f, 0.68f, 0.92f);
+            }
+            _allyBaseBoardLabel = Label(allyBaseGo.transform, "ALLY BASTION LV.1", 12, new Color(.55f, .88f, 1f), TextAnchor.MiddleCenter);
+            RectTransform abLblRt = _allyBaseBoardLabel.rectTransform;
+            abLblRt.anchorMin = new Vector2(0f, 0f);
+            abLblRt.anchorMax = new Vector2(1f, 0f);
+            abLblRt.pivot = new Vector2(0.5f, 1f);
+            abLblRt.anchoredPosition = new Vector2(0f, -6f);
+            abLblRt.sizeDelta = new Vector2(40f, 20f);
+
+            // 敵方主堡視覺建築節點
+            Sprite enemyBaseSp = TryLoadBaseSprite("enemy_base");
+            _hasEnemyBaseSprite = enemyBaseSp != null;
+            GameObject enemyBaseGo = Make("EnemyBaseVisual", _board, new Vector2(220, 220), Vector2.zero);
+            RectTransform ebRt = enemyBaseGo.GetComponent<RectTransform>();
+            ebRt.anchorMin = ebRt.anchorMax = new Vector2(0.94f, 0.21f);
+            ebRt.pivot = new Vector2(0.5f, 0f);
+            ebRt.anchoredPosition = Vector2.zero;
+            _enemyBaseImage = enemyBaseGo.AddComponent<Image>();
+            if (_hasEnemyBaseSprite)
+            {
+                _enemyBaseImage.sprite = enemyBaseSp;
+                _enemyBaseImage.color = Color.white;
+                _enemyBaseImage.preserveAspect = true;
+            }
+            else
+            {
+                _enemyBaseImage.color = new Color(0.52f, 0.16f, 0.22f, 0.92f);
+            }
+            _enemyBaseBoardLabel = Label(enemyBaseGo.transform, "ENEMY CORE", 12, new Color(1f, .52f, .46f), TextAnchor.MiddleCenter);
+            RectTransform ebLblRt = _enemyBaseBoardLabel.rectTransform;
+            ebLblRt.anchorMin = new Vector2(0f, 0f);
+            ebLblRt.anchorMax = new Vector2(1f, 0f);
+            ebLblRt.pivot = new Vector2(0.5f, 1f);
+            ebLblRt.anchoredPosition = new Vector2(0f, -6f);
+            ebLblRt.sizeDelta = new Vector2(40f, 20f);
             _allyHp = AnchoredLabel(root.transform, "ALLY BASE", new Vector2(.05f, .82f), new Vector2(.46f, .86f), 16, Color.white, TextAnchor.MiddleLeft);
             _enemyHp = AnchoredLabel(root.transform, "ENEMY CORE", new Vector2(.54f, .82f), new Vector2(.95f, .86f), 16, Color.white, TextAnchor.MiddleRight);
             _allyBar = Bar(root.transform, new Vector2(.05f, .79f), new Vector2(.46f, .81f), new Color(.23f, .67f, .82f));
@@ -567,6 +830,9 @@ namespace Game.Unity
             _units.Clear();
             _unitHpLabels.Clear();
             _unitStatusLabels.Clear();
+            _unitHealPulseTimers.Clear();
+            _allyBaseHitTimer = 0f;
+            _enemyBaseHitTimer = 0f;
         }
         private static float Ratio(int value, int max) { return max > 0 ? Mathf.Clamp01((float)value / max) : 0; }
         private static void SetFill(Image image, float value)

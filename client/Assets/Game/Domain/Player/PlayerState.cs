@@ -16,6 +16,7 @@ namespace Game.Domain.Player
         public HashSet<string> Costumes = new HashSet<string>();
         public HashSet<string> Scenes = new HashSet<string>();
         public LobbyState Lobby = new LobbyState();
+        public int BaseLevel = 1;
         public List<string> Team = new List<string>();
         public Dictionary<string, StageProgress> Stages = new Dictionary<string, StageProgress>();
         public GachaState Gacha = new GachaState();

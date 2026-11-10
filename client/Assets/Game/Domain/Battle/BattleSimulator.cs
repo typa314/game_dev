@@ -35,6 +35,7 @@ namespace Game.Domain.Battle
         public int EnergyLevel { get; private set; }
         public int CannonChargeTicks { get; private set; }
         public int CannonFullTicks { get; private set; }
+        public int AllyBaseLevel { get; private set; }
         public int AllyBaseHp { get; private set; }
         public int AllyBaseMaxHp { get; private set; }
         public int EnemyBaseHp { get; private set; }
@@ -61,7 +62,11 @@ namespace Game.Domain.Battle
             TickEvents = new List<BattleEvent>();
             Recorded = new List<BattleCommand>();
 
-            AllyBaseMaxHp = AllyBaseHp = setup.Stage.AllyBaseHp > 0 ? setup.Stage.AllyBaseHp : _rules.DefaultAllyBaseHp;
+            AllyBaseLevel = Math.Max(1, setup.AllyBaseLevel);
+            int resolvedAllyHp = setup.AllyBaseHpOverride > 0
+                ? setup.AllyBaseHpOverride
+                : (setup.Stage.AllyBaseHp > 0 ? setup.Stage.AllyBaseHp : _rules.DefaultAllyBaseHp);
+            AllyBaseMaxHp = AllyBaseHp = resolvedAllyHp;
             EnemyBaseMaxHp = EnemyBaseHp = setup.Stage.EnemyBaseHp;
             EnergyMilli = (long)_rules.StartEnergy * 1000;
             CannonFullTicks = UnitTemplate.SecToTicks(_rules.CannonChargeSec, _tps);
@@ -306,6 +311,12 @@ namespace Game.Domain.Battle
 
                 if (u.AttackTimer > 0) u.AttackTimer--;
                 if (u.StunTicks > 0) { u.StunTicks--; continue; }
+
+                // 補師光環治癒：回血量與速度與角色能力綁定
+                if (IsHealer(u))
+                {
+                    UpdateHealerAura(u);
+                }
 
                 List<BattleUnit> targets;
                 bool baseInRange;
@@ -603,9 +614,51 @@ namespace Game.Domain.Battle
             if (Tick + 1 >= Math.Min(limit, hardCap)) Outcome = BattleOutcome.Timeout;
         }
 
+        public static bool IsHealer(BattleUnit u)
+        {
+            if (u == null || u.T == null) return false;
+            if (u.T.Skill != null && string.Equals(u.T.Skill.EffectType, "heal", StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (u.T.Traits != null && u.T.Traits.Contains("healer"))
+                return true;
+            if (!string.IsNullOrEmpty(u.T.Id) && (u.T.Id == "char04_elysia" || u.T.Id.IndexOf("healer", StringComparison.OrdinalIgnoreCase) >= 0))
+                return true;
+            return false;
+        }
+
+        private void UpdateHealerAura(BattleUnit u)
+        {
+            if (u.T.AttackIntervalTicks <= 0 || u.T.Atk <= 0) return;
+
+            if (u.HealTimer > 0) u.HealTimer--;
+            if (u.HealTimer > 0) return;
+
+            u.HealTimer = u.T.AttackIntervalTicks;
+            int healAmount = u.T.Atk;
+            if (u.AtkBuffTicks > 0 && u.AtkBuffPct > 0)
+            {
+                healAmount = healAmount * (100 + u.AtkBuffPct) / 100;
+            }
+            if (healAmount <= 0) return;
+
+            long auraReach = u.T.RangeMilli > 0 ? u.T.RangeMilli : 120 * 1000;
+
+            for (int j = 0; j < _units.Count; j++)
+            {
+                BattleUnit a = _units[j];
+                if (!a.Alive || a.Side != u.Side) continue;
+                if (Math.Abs(a.X - u.X) > auraReach) continue;
+                if (a.Hp >= a.T.Hp) continue;
+
+                int actual = Math.Min(healAmount, a.T.Hp - a.Hp);
+                a.Hp += actual;
+                TickEvents.Add(new BattleEvent { Type = BattleEventType.Heal, Uid = a.Uid, Side = u.Side, X = a.X, Value = actual });
+            }
+        }
+
         private BattleUnit Spawn(Side side, UnitTemplate t, long x)
         {
-            var u = new BattleUnit { Uid = _nextUid++, Side = side, T = t, X = x, Hp = t.Hp };
+            var u = new BattleUnit { Uid = _nextUid++, Side = side, T = t, X = x, Hp = t.Hp, HealTimer = t.AttackIntervalTicks };
             _units.Add(u);
             return u;
         }

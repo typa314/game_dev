@@ -77,6 +77,7 @@ namespace Game.Domain.Battle
         public int PoisonDmgPerSec;
         public int BurnTicks;
         public int BurnDmgPerSec;
+        public int HealTimer;
     }
 
     public sealed class BattleCommand
@@ -109,6 +110,8 @@ namespace Game.Domain.Battle
         public List<UnitTemplate> Team = new List<UnitTemplate>();
         public Dictionary<string, UnitTemplate> EnemyTemplates = new Dictionary<string, UnitTemplate>();
         public ulong Seed;
+        public int AllyBaseLevel = 1;
+        public int AllyBaseHpOverride;
     }
 
     public sealed class BattleResult
