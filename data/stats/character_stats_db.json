@@ -1,0 +1,3459 @@
+{
+  "schema_version": "1.0.0",
+  "database_name": "project_tower_character_stats_db",
+  "master_data_version": 1,
+  "source_master_hashes": {
+    "data/master/characters.json": "088cc664da84a66f54299f6daa49d84a37a5443dafea2dd7d1c8e07d001b6096",
+    "data/master/enemies.json": "c7813816f077e5da55daf18ab8da97437eaefc80e9f2ee9e09da251508933bd0",
+    "data/master/config.json": "1a82430b61365c41a7288aa99d256671990a97525473d962198668d6135e6e2a",
+    "data/master/portrait_stages.json": "292bc96c2fc40740e1f0b502eac6c45710599da5fd903c26f5a514418a5093cd",
+    "data/master/stages.json": "d57f5d6fea95ba4b1cc3e66379c612806230fc0d4b2d62e72cf581df73cdeb3e",
+    "data/loc/zh-TW/strings.json": "a1f9383f97db8164cae000094a0c0aa1db693c2cb9913840c36406a05d72c1e7",
+    "data/loc/en/strings.json": "ca77de861f328dec9c8a02fd465dafe74527d8e7df343f5f648d0005d18e28fa",
+    "presets/characters_dna.json": "cb38c8a1f8833165b9ad4c110099cc7db53872d9de0f3d2051b4b6d9fe301a6e"
+  },
+  "combat_rules_summary": {
+    "ticks_per_second": 30,
+    "default_ally_base_hp": 20000,
+    "max_units_per_side": 50,
+    "max_battle_sec": 900,
+    "knockback_distance": 60,
+    "stat_curve_per_level_pct": {
+      "curve_standard": 8,
+      "curve_tank": 10
+    },
+    "level_cap_by_awaken": [
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "awaken_stat_bonus_pct": [
+      0,
+      5,
+      10,
+      15,
+      20,
+      30
+    ],
+    "awaken_shard_cost": [
+      10,
+      20,
+      30,
+      40,
+      50
+    ],
+    "base_max_level": 20,
+    "base_hp_bonus_per_level": 2500,
+    "base_upgrade_gold_base": 500,
+    "base_upgrade_gold_step": 500
+  },
+  "summary": {
+    "active_allies": 12,
+    "healer_allies": 3,
+    "planned_unimplemented_allies": 38,
+    "total_dna_roster": 50,
+    "enemies": 11,
+    "enemies_by_faction": {
+      "dark_elf": 2,
+      "goblin": 2,
+      "monster": 7
+    },
+    "stages": 9
+  },
+  "allies": [
+    {
+      "id": "char01_claire",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "克萊兒",
+        "en": "Claire",
+        "archetype_zh": "Claire (金髮傲嬌千金)"
+      },
+      "rarity": "SSR",
+      "role": "ranged",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 450,
+        "cooldown_sec": 8.0,
+        "cooldown_ticks": 240,
+        "hp": 1200,
+        "atk": 180,
+        "dps": 112.5,
+        "range": 320,
+        "range_milli": 320000,
+        "attack_interval_sec": 1.6,
+        "attack_interval_ticks": 48,
+        "move_speed": 10,
+        "speed_milli_per_tick": 333,
+        "knockbacks": 3,
+        "target": "single",
+        "hp_per_cost": 2.67,
+        "dps_per_cost": 0.25,
+        "traits": [
+          "anti_flying"
+        ]
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_valkyrie_warhorn",
+        "name": "女武神戰歌",
+        "charge_sec": 16.0,
+        "charge_ticks": 480,
+        "effect_type": "buff_atk",
+        "value": 50,
+        "duration_sec": 8.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char01_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char01_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 5,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char01_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char01_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1200,
+          "atk": 180,
+          "dps": 112.5,
+          "hp_per_cost": 2.67,
+          "dps_per_cost": 0.25,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char01_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 3024,
+          "atk": 453,
+          "dps": 283.12,
+          "hp_per_cost": 6.72,
+          "dps_per_cost": 0.63,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char01_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 3175,
+          "atk": 475,
+          "dps": 296.88,
+          "hp_per_cost": 7.06,
+          "dps_per_cost": 0.66,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char01_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 5,
+          "portrait_hp_pct": 0,
+          "hp": 4910,
+          "atk": 769,
+          "dps": 480.62,
+          "hp_per_cost": 10.91,
+          "dps_per_cost": 1.07,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char01_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 7675,
+          "atk": 1150,
+          "dps": 718.75,
+          "hp_per_cost": 17.06,
+          "dps_per_cost": 1.6,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char01_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 10953,
+          "atk": 1642,
+          "dps": 1026.25,
+          "hp_per_cost": 24.34,
+          "dps_per_cost": 2.28,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char01_claire.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char01_default",
+        "story_route": "route_char01",
+        "default_seed": 501
+      }
+    },
+    {
+      "id": "char02_luna",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "露娜",
+        "en": "Luna",
+        "archetype_zh": "Luna (銀髮高冷刺客)"
+      },
+      "rarity": "R",
+      "role": "area",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 300,
+        "cooldown_sec": 6.0,
+        "cooldown_ticks": 180,
+        "hp": 900,
+        "atk": 90,
+        "dps": 45.0,
+        "range": 200,
+        "range_milli": 200000,
+        "attack_interval_sec": 2.0,
+        "attack_interval_ticks": 60,
+        "move_speed": 9,
+        "speed_milli_per_tick": 300,
+        "knockbacks": 3,
+        "target": "area",
+        "hp_per_cost": 3.0,
+        "dps_per_cost": 0.15,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_frost_nova",
+        "name": "月影極寒霜爆",
+        "charge_sec": 15.0,
+        "charge_ticks": 450,
+        "effect_type": "slow",
+        "value": 50,
+        "duration_sec": 7.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char02_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char02_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char02_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char02_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 900,
+          "atk": 90,
+          "dps": 45.0,
+          "hp_per_cost": 3.0,
+          "dps_per_cost": 0.15,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char02_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2268,
+          "atk": 226,
+          "dps": 113.0,
+          "hp_per_cost": 7.56,
+          "dps_per_cost": 0.38,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char02_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2381,
+          "atk": 237,
+          "dps": 118.5,
+          "hp_per_cost": 7.94,
+          "dps_per_cost": 0.4,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char02_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 3682,
+          "atk": 367,
+          "dps": 183.5,
+          "hp_per_cost": 12.27,
+          "dps_per_cost": 0.61,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char02_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5756,
+          "atk": 574,
+          "dps": 287.0,
+          "hp_per_cost": 19.19,
+          "dps_per_cost": 0.96,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char02_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 8215,
+          "atk": 820,
+          "dps": 410.0,
+          "hp_per_cost": 27.38,
+          "dps_per_cost": 1.37,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char02_luna.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char02_default",
+        "story_route": "route_char02",
+        "default_seed": 601
+      }
+    },
+    {
+      "id": "char03_scarlet",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "史卡蕾特",
+        "en": "Scarlet",
+        "archetype_zh": "Scarlet (紅髮成熟御姐)"
+      },
+      "rarity": "SR",
+      "role": "tank",
+      "growth_curve": "curve_tank",
+      "per_level_pct": 10,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 150,
+        "cooldown_sec": 2.0,
+        "cooldown_ticks": 60,
+        "hp": 2000,
+        "atk": 20,
+        "dps": 16.67,
+        "range": 110,
+        "range_milli": 110000,
+        "attack_interval_sec": 1.2,
+        "attack_interval_ticks": 36,
+        "move_speed": 8,
+        "speed_milli_per_tick": 266,
+        "knockbacks": 2,
+        "target": "single",
+        "hp_per_cost": 13.33,
+        "dps_per_cost": 0.11,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_scarlet_cannon",
+        "name": "猩紅殲滅巨砲",
+        "charge_sec": 15.0,
+        "charge_ticks": 450,
+        "effect_type": "cannon",
+        "value": 350,
+        "duration_sec": 0.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char03_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char03_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char03_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char03_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2000,
+          "atk": 20,
+          "dps": 16.67,
+          "hp_per_cost": 13.33,
+          "dps_per_cost": 0.11,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char03_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 5800,
+          "atk": 58,
+          "dps": 48.33,
+          "hp_per_cost": 38.67,
+          "dps_per_cost": 0.32,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char03_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 6090,
+          "atk": 60,
+          "dps": 50.0,
+          "hp_per_cost": 40.6,
+          "dps_per_cost": 0.33,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char03_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 9680,
+          "atk": 96,
+          "dps": 80.0,
+          "hp_per_cost": 64.53,
+          "dps_per_cost": 0.53,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char03_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 15340,
+          "atk": 153,
+          "dps": 127.5,
+          "hp_per_cost": 102.27,
+          "dps_per_cost": 0.85,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char03_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 22120,
+          "atk": 221,
+          "dps": 184.17,
+          "hp_per_cost": 147.47,
+          "dps_per_cost": 1.23,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char03_scarlet.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char03_default",
+        "story_route": "route_char03",
+        "default_seed": 701
+      }
+    },
+    {
+      "id": "char04_elysia",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "愛麗西亞",
+        "en": "Elysia",
+        "archetype_zh": "Elysia (粉髮溫柔大姐姐)"
+      },
+      "rarity": "SR",
+      "role": "melee",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha",
+        "initial"
+      ],
+      "base_stats": {
+        "cost": 100,
+        "cooldown_sec": 2.5,
+        "cooldown_ticks": 75,
+        "hp": 600,
+        "atk": 60,
+        "dps": 60.0,
+        "range": 120,
+        "range_milli": 120000,
+        "attack_interval_sec": 1.0,
+        "attack_interval_ticks": 30,
+        "move_speed": 12,
+        "speed_milli_per_tick": 400,
+        "knockbacks": 2,
+        "target": "single",
+        "hp_per_cost": 6.0,
+        "dps_per_cost": 0.6,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": true,
+        "aura_heal_base": 60,
+        "aura_heal_per_sec_base": 60.0,
+        "aura_interval_ticks": 30,
+        "aura_reach_units": 120
+      },
+      "skill": {
+        "id": "skill_holy_blessing",
+        "name": "聖靈之祈",
+        "charge_sec": 14.0,
+        "charge_ticks": 420,
+        "effect_type": "heal",
+        "value": 450,
+        "duration_sec": 0.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char04_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char04_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 0,
+          "hp_pct": 10
+        },
+        {
+          "stage_id": "ps_char04_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char04_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 600,
+          "atk": 60,
+          "dps": 60.0,
+          "hp_per_cost": 6.0,
+          "dps_per_cost": 0.6,
+          "aura_heal_per_pulse": 60,
+          "aura_heal_per_sec": 60.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char04_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1512,
+          "atk": 151,
+          "dps": 151.0,
+          "hp_per_cost": 15.12,
+          "dps_per_cost": 1.51,
+          "aura_heal_per_pulse": 151,
+          "aura_heal_per_sec": 151.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char04_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1587,
+          "atk": 158,
+          "dps": 158.0,
+          "hp_per_cost": 15.87,
+          "dps_per_cost": 1.58,
+          "aura_heal_per_pulse": 158,
+          "aura_heal_per_sec": 158.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char04_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 10,
+          "hp": 2678,
+          "atk": 245,
+          "dps": 245.0,
+          "hp_per_cost": 26.78,
+          "dps_per_cost": 2.45,
+          "aura_heal_per_pulse": 245,
+          "aura_heal_per_sec": 245.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char04_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 3837,
+          "atk": 383,
+          "dps": 383.0,
+          "hp_per_cost": 38.37,
+          "dps_per_cost": 3.83,
+          "aura_heal_per_pulse": 383,
+          "aura_heal_per_sec": 383.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char04_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5476,
+          "atk": 547,
+          "dps": 547.0,
+          "hp_per_cost": 54.76,
+          "dps_per_cost": 5.47,
+          "aura_heal_per_pulse": 547,
+          "aura_heal_per_sec": 547.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char04_elysia.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char04_default",
+        "story_route": "route_char04",
+        "default_seed": 801
+      }
+    },
+    {
+      "id": "char05_rin",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "凜",
+        "en": "Rin",
+        "archetype_zh": "Rin (深藍髮元氣少女)"
+      },
+      "rarity": "R",
+      "role": "tank",
+      "growth_curve": "curve_tank",
+      "per_level_pct": 10,
+      "obtainable_by": [
+        "gacha",
+        "initial"
+      ],
+      "base_stats": {
+        "cost": 75,
+        "cooldown_sec": 1.5,
+        "cooldown_ticks": 45,
+        "hp": 800,
+        "atk": 15,
+        "dps": 12.5,
+        "range": 100,
+        "range_milli": 100000,
+        "attack_interval_sec": 1.2,
+        "attack_interval_ticks": 36,
+        "move_speed": 10,
+        "speed_milli_per_tick": 333,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_cost": 10.67,
+        "dps_per_cost": 0.17,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_berserk_rush",
+        "name": "鬼神血氣激昂",
+        "charge_sec": 15.0,
+        "charge_ticks": 450,
+        "effect_type": "buff_atk",
+        "value": 60,
+        "duration_sec": 6.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char05_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char05_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 0,
+          "hp_pct": 10
+        },
+        {
+          "stage_id": "ps_char05_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char05_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 800,
+          "atk": 15,
+          "dps": 12.5,
+          "hp_per_cost": 10.67,
+          "dps_per_cost": 0.17,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char05_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2320,
+          "atk": 43,
+          "dps": 35.83,
+          "hp_per_cost": 30.93,
+          "dps_per_cost": 0.48,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char05_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2436,
+          "atk": 45,
+          "dps": 37.5,
+          "hp_per_cost": 32.48,
+          "dps_per_cost": 0.5,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char05_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 10,
+          "hp": 4224,
+          "atk": 72,
+          "dps": 60.0,
+          "hp_per_cost": 56.32,
+          "dps_per_cost": 0.8,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char05_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 6136,
+          "atk": 114,
+          "dps": 95.0,
+          "hp_per_cost": 81.81,
+          "dps_per_cost": 1.27,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char05_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 8848,
+          "atk": 165,
+          "dps": 137.5,
+          "hp_per_cost": 117.97,
+          "dps_per_cost": 1.83,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char05_rin.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char05_default",
+        "story_route": "route_char05",
+        "default_seed": 901
+      }
+    },
+    {
+      "id": "char06_seraphina",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "塞拉菲娜",
+        "en": "Seraphina",
+        "archetype_zh": "Seraphina (白髮精靈聖女)"
+      },
+      "rarity": "SSR",
+      "role": "ranged",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 480,
+        "cooldown_sec": 8.5,
+        "cooldown_ticks": 255,
+        "hp": 1100,
+        "atk": 210,
+        "dps": 95.45,
+        "range": 360,
+        "range_milli": 360000,
+        "attack_interval_sec": 2.2,
+        "attack_interval_ticks": 66,
+        "move_speed": 8,
+        "speed_milli_per_tick": 266,
+        "knockbacks": 4,
+        "target": "area",
+        "hp_per_cost": 2.29,
+        "dps_per_cost": 0.2,
+        "traits": [
+          "anti_flying"
+        ]
+      },
+      "healer_aura": {
+        "is_healer": true,
+        "aura_heal_base": 210,
+        "aura_heal_per_sec_base": 95.45,
+        "aura_interval_ticks": 66,
+        "aura_reach_units": 360
+      },
+      "skill": {
+        "id": "skill_angelic_grace",
+        "name": "熾天使之庇佑",
+        "charge_sec": 20.0,
+        "charge_ticks": 600,
+        "effect_type": "heal",
+        "value": 550,
+        "duration_sec": 0.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char06_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char06_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 10,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char06_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char06_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1100,
+          "atk": 210,
+          "dps": 95.45,
+          "hp_per_cost": 2.29,
+          "dps_per_cost": 0.2,
+          "aura_heal_per_pulse": 210,
+          "aura_heal_per_sec": 95.45
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char06_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2772,
+          "atk": 529,
+          "dps": 240.45,
+          "hp_per_cost": 5.78,
+          "dps_per_cost": 0.5,
+          "aura_heal_per_pulse": 529,
+          "aura_heal_per_sec": 240.45
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char06_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2910,
+          "atk": 555,
+          "dps": 252.27,
+          "hp_per_cost": 6.06,
+          "dps_per_cost": 0.53,
+          "aura_heal_per_pulse": 555,
+          "aura_heal_per_sec": 252.27
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char06_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 0,
+          "hp": 4501,
+          "atk": 937,
+          "dps": 425.91,
+          "hp_per_cost": 9.38,
+          "dps_per_cost": 0.89,
+          "aura_heal_per_pulse": 937,
+          "aura_heal_per_sec": 425.91
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char06_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 7035,
+          "atk": 1342,
+          "dps": 610.0,
+          "hp_per_cost": 14.66,
+          "dps_per_cost": 1.27,
+          "aura_heal_per_pulse": 1342,
+          "aura_heal_per_sec": 610.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char06_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 10040,
+          "atk": 1916,
+          "dps": 870.91,
+          "hp_per_cost": 20.92,
+          "dps_per_cost": 1.81,
+          "aura_heal_per_pulse": 1916,
+          "aura_heal_per_sec": 870.91
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char06_seraphina.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char06_default",
+        "story_route": "route_char06",
+        "default_seed": 1001
+      }
+    },
+    {
+      "id": "char08_yuki",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "雪",
+        "en": "Yuki",
+        "archetype_zh": "Yuki (冰藍髮理系病嬌)"
+      },
+      "rarity": "SR",
+      "role": "area",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 320,
+        "cooldown_sec": 6.5,
+        "cooldown_ticks": 195,
+        "hp": 850,
+        "atk": 110,
+        "dps": 45.83,
+        "range": 240,
+        "range_milli": 240000,
+        "attack_interval_sec": 2.4,
+        "attack_interval_ticks": 72,
+        "move_speed": 8,
+        "speed_milli_per_tick": 266,
+        "knockbacks": 2,
+        "target": "area",
+        "hp_per_cost": 2.66,
+        "dps_per_cost": 0.14,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_blade_freeze",
+        "name": "居合·一閃急凍",
+        "charge_sec": 14.0,
+        "charge_ticks": 420,
+        "effect_type": "stun",
+        "value": 100,
+        "duration_sec": 3.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char08_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char08_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 5,
+          "hp_pct": 5
+        },
+        {
+          "stage_id": "ps_char08_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char08_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 850,
+          "atk": 110,
+          "dps": 45.83,
+          "hp_per_cost": 2.66,
+          "dps_per_cost": 0.14,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char08_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2142,
+          "atk": 277,
+          "dps": 115.42,
+          "hp_per_cost": 6.69,
+          "dps_per_cost": 0.36,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char08_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2249,
+          "atk": 290,
+          "dps": 120.83,
+          "hp_per_cost": 7.03,
+          "dps_per_cost": 0.38,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char08_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 5,
+          "portrait_hp_pct": 5,
+          "hp": 3636,
+          "atk": 470,
+          "dps": 195.83,
+          "hp_per_cost": 11.36,
+          "dps_per_cost": 0.61,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char08_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5436,
+          "atk": 703,
+          "dps": 292.92,
+          "hp_per_cost": 16.99,
+          "dps_per_cost": 0.92,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char08_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 7758,
+          "atk": 1003,
+          "dps": 417.92,
+          "hp_per_cost": 24.24,
+          "dps_per_cost": 1.31,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char08_yuki.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char08_default",
+        "story_route": "route_char08",
+        "default_seed": 1201
+      }
+    },
+    {
+      "id": "char07_kagura",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "神樂",
+        "en": "Kagura",
+        "archetype_zh": "Kagura (黑髮和風女忍)"
+      },
+      "rarity": "R",
+      "role": "melee",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 90,
+        "cooldown_sec": 2.0,
+        "cooldown_ticks": 60,
+        "hp": 550,
+        "atk": 75,
+        "dps": 93.75,
+        "range": 90,
+        "range_milli": 90000,
+        "attack_interval_sec": 0.8,
+        "attack_interval_ticks": 24,
+        "move_speed": 16,
+        "speed_milli_per_tick": 533,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_cost": 6.11,
+        "dps_per_cost": 1.04,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_kagura_shadow_bind",
+        "name": "影縛",
+        "charge_sec": 12.0,
+        "charge_ticks": 360,
+        "effect_type": "poison",
+        "value": 40,
+        "duration_sec": 6.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char07_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char07_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 5,
+          "hp_pct": 5
+        },
+        {
+          "stage_id": "ps_char07_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char07_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 550,
+          "atk": 75,
+          "dps": 93.75,
+          "hp_per_cost": 6.11,
+          "dps_per_cost": 1.04,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char07_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1386,
+          "atk": 189,
+          "dps": 236.25,
+          "hp_per_cost": 15.4,
+          "dps_per_cost": 2.62,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char07_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1455,
+          "atk": 198,
+          "dps": 247.5,
+          "hp_per_cost": 16.17,
+          "dps_per_cost": 2.75,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char07_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 5,
+          "portrait_hp_pct": 5,
+          "hp": 2352,
+          "atk": 320,
+          "dps": 400.0,
+          "hp_per_cost": 26.13,
+          "dps_per_cost": 4.44,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char07_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 3517,
+          "atk": 479,
+          "dps": 598.75,
+          "hp_per_cost": 39.08,
+          "dps_per_cost": 6.65,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char07_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5020,
+          "atk": 684,
+          "dps": 855.0,
+          "hp_per_cost": 55.78,
+          "dps_per_cost": 9.5,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char07_kagura.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char07_default",
+        "story_route": "route_char07",
+        "default_seed": 1101
+      }
+    },
+    {
+      "id": "char09_chloe",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "克蘿伊",
+        "en": "Chloe",
+        "archetype_zh": "Chloe (深紫髮小惡魔魅魔)"
+      },
+      "rarity": "R",
+      "role": "area",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 300,
+        "cooldown_sec": 6.0,
+        "cooldown_ticks": 180,
+        "hp": 900,
+        "atk": 90,
+        "dps": 45.0,
+        "range": 200,
+        "range_milli": 200000,
+        "attack_interval_sec": 2.0,
+        "attack_interval_ticks": 60,
+        "move_speed": 9,
+        "speed_milli_per_tick": 300,
+        "knockbacks": 3,
+        "target": "area",
+        "hp_per_cost": 3.0,
+        "dps_per_cost": 0.15,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_chloe_dusk_haze",
+        "name": "暮色遲滯",
+        "charge_sec": 15.0,
+        "charge_ticks": 450,
+        "effect_type": "slow",
+        "value": 50,
+        "duration_sec": 7.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char09_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char09_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 5,
+          "hp_pct": 5
+        },
+        {
+          "stage_id": "ps_char09_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char09_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 900,
+          "atk": 90,
+          "dps": 45.0,
+          "hp_per_cost": 3.0,
+          "dps_per_cost": 0.15,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char09_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2268,
+          "atk": 226,
+          "dps": 113.0,
+          "hp_per_cost": 7.56,
+          "dps_per_cost": 0.38,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char09_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2381,
+          "atk": 237,
+          "dps": 118.5,
+          "hp_per_cost": 7.94,
+          "dps_per_cost": 0.4,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char09_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 5,
+          "portrait_hp_pct": 5,
+          "hp": 3850,
+          "atk": 384,
+          "dps": 192.0,
+          "hp_per_cost": 12.83,
+          "dps_per_cost": 0.64,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char09_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5756,
+          "atk": 574,
+          "dps": 287.0,
+          "hp_per_cost": 19.19,
+          "dps_per_cost": 0.96,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char09_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 8215,
+          "atk": 820,
+          "dps": 410.0,
+          "hp_per_cost": 27.38,
+          "dps_per_cost": 1.37,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char09_chloe.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char09_default",
+        "story_route": "route_char09",
+        "default_seed": 1301
+      }
+    },
+    {
+      "id": "char10_mirai",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "未來",
+        "en": "Mirai",
+        "archetype_zh": "Mirai (金茶髮青梅竹馬)"
+      },
+      "rarity": "R",
+      "role": "ranged",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 300,
+        "cooldown_sec": 6.0,
+        "cooldown_ticks": 180,
+        "hp": 900,
+        "atk": 90,
+        "dps": 45.0,
+        "range": 200,
+        "range_milli": 200000,
+        "attack_interval_sec": 2.0,
+        "attack_interval_ticks": 60,
+        "move_speed": 9,
+        "speed_milli_per_tick": 300,
+        "knockbacks": 3,
+        "target": "single",
+        "hp_per_cost": 3.0,
+        "dps_per_cost": 0.15,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": true,
+        "aura_heal_base": 90,
+        "aura_heal_per_sec_base": 45.0,
+        "aura_interval_ticks": 60,
+        "aura_reach_units": 200
+      },
+      "skill": {
+        "id": "skill_mirai_warm_cheer",
+        "name": "溫暖應援",
+        "charge_sec": 15.0,
+        "charge_ticks": 450,
+        "effect_type": "heal",
+        "value": 90,
+        "duration_sec": 0.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char10_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char10_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 5,
+          "hp_pct": 5
+        },
+        {
+          "stage_id": "ps_char10_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char10_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 900,
+          "atk": 90,
+          "dps": 45.0,
+          "hp_per_cost": 3.0,
+          "dps_per_cost": 0.15,
+          "aura_heal_per_pulse": 90,
+          "aura_heal_per_sec": 45.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char10_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2268,
+          "atk": 226,
+          "dps": 113.0,
+          "hp_per_cost": 7.56,
+          "dps_per_cost": 0.38,
+          "aura_heal_per_pulse": 226,
+          "aura_heal_per_sec": 113.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char10_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2381,
+          "atk": 237,
+          "dps": 118.5,
+          "hp_per_cost": 7.94,
+          "dps_per_cost": 0.4,
+          "aura_heal_per_pulse": 237,
+          "aura_heal_per_sec": 118.5
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char10_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 5,
+          "portrait_hp_pct": 5,
+          "hp": 3850,
+          "atk": 384,
+          "dps": 192.0,
+          "hp_per_cost": 12.83,
+          "dps_per_cost": 0.64,
+          "aura_heal_per_pulse": 384,
+          "aura_heal_per_sec": 192.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char10_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5756,
+          "atk": 574,
+          "dps": 287.0,
+          "hp_per_cost": 19.19,
+          "dps_per_cost": 0.96,
+          "aura_heal_per_pulse": 574,
+          "aura_heal_per_sec": 287.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char10_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 8215,
+          "atk": 820,
+          "dps": 410.0,
+          "hp_per_cost": 27.38,
+          "dps_per_cost": 1.37,
+          "aura_heal_per_pulse": 820,
+          "aura_heal_per_sec": 410.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char10_mirai.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char10_beret_dress",
+        "story_route": "route_char10",
+        "default_seed": 1401
+      }
+    },
+    {
+      "id": "char18_sakura_miko",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "櫻",
+        "en": "Sakura",
+        "archetype_zh": "Sakura (櫻粉巫女)"
+      },
+      "rarity": "SSR",
+      "role": "ranged",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 280,
+        "cooldown_sec": 5.0,
+        "cooldown_ticks": 150,
+        "hp": 950,
+        "atk": 105,
+        "dps": 58.33,
+        "range": 300,
+        "range_milli": 300000,
+        "attack_interval_sec": 1.8,
+        "attack_interval_ticks": 54,
+        "move_speed": 9,
+        "speed_milli_per_tick": 300,
+        "knockbacks": 3,
+        "target": "single",
+        "hp_per_cost": 3.39,
+        "dps_per_cost": 0.21,
+        "traits": [
+          "anti_flying"
+        ]
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_crimson_purgatory",
+        "name": "紅蓮滅世祓除",
+        "charge_sec": 18.0,
+        "charge_ticks": 540,
+        "effect_type": "burn",
+        "value": 180,
+        "duration_sec": 5.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char18_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char18_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 5,
+          "hp_pct": 5
+        },
+        {
+          "stage_id": "ps_char18_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char18_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 950,
+          "atk": 105,
+          "dps": 58.33,
+          "hp_per_cost": 3.39,
+          "dps_per_cost": 0.21,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char18_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2394,
+          "atk": 264,
+          "dps": 146.67,
+          "hp_per_cost": 8.55,
+          "dps_per_cost": 0.52,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char18_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 2513,
+          "atk": 277,
+          "dps": 153.89,
+          "hp_per_cost": 8.97,
+          "dps_per_cost": 0.55,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char18_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 5,
+          "portrait_hp_pct": 5,
+          "hp": 4064,
+          "atk": 448,
+          "dps": 248.89,
+          "hp_per_cost": 14.51,
+          "dps_per_cost": 0.89,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char18_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 6076,
+          "atk": 670,
+          "dps": 372.22,
+          "hp_per_cost": 21.7,
+          "dps_per_cost": 1.33,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char18_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 8671,
+          "atk": 957,
+          "dps": 531.67,
+          "hp_per_cost": 30.97,
+          "dps_per_cost": 1.9,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char18_sakura_miko.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char18_default",
+        "story_route": "route_char18",
+        "default_seed": 3001
+      }
+    },
+    {
+      "id": "char26_ayame_ninja",
+      "side": "ally",
+      "status": "active",
+      "names": {
+        "zh_TW": "綾女",
+        "en": "Ayame",
+        "archetype_zh": "Ayame (活潑下忍)"
+      },
+      "rarity": "R",
+      "role": "melee",
+      "growth_curve": "curve_standard",
+      "per_level_pct": 8,
+      "obtainable_by": [
+        "gacha"
+      ],
+      "base_stats": {
+        "cost": 90,
+        "cooldown_sec": 2.0,
+        "cooldown_ticks": 60,
+        "hp": 550,
+        "atk": 75,
+        "dps": 93.75,
+        "range": 90,
+        "range_milli": 90000,
+        "attack_interval_sec": 0.8,
+        "attack_interval_ticks": 24,
+        "move_speed": 16,
+        "speed_milli_per_tick": 533,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_cost": 6.11,
+        "dps_per_cost": 1.04,
+        "traits": []
+      },
+      "healer_aura": {
+        "is_healer": false,
+        "aura_heal_base": 0,
+        "aura_heal_per_sec_base": 0.0,
+        "aura_interval_ticks": 0,
+        "aura_reach_units": 0
+      },
+      "skill": {
+        "id": "skill_shadow_toxin",
+        "name": "夜影劇毒暗湧",
+        "charge_sec": 12.0,
+        "charge_ticks": 360,
+        "effect_type": "poison",
+        "value": 40,
+        "duration_sec": 6.0,
+        "range": 0
+      },
+      "portrait_stage_bonuses": [
+        {
+          "stage_id": "ps_char26_s1",
+          "order": 1,
+          "req_level": 1,
+          "req_awaken": 0,
+          "atk_pct": 0,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char26_s2",
+          "order": 2,
+          "req_level": 30,
+          "req_awaken": 2,
+          "atk_pct": 10,
+          "hp_pct": 0
+        },
+        {
+          "stage_id": "ps_char26_s3",
+          "order": 3,
+          "req_level": 50,
+          "req_awaken": 4,
+          "atk_pct": 10,
+          "hp_pct": 10
+        }
+      ],
+      "scaling_snapshots": {
+        "lv01_aw0_base": {
+          "level": 1,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char26_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 550,
+          "atk": 75,
+          "dps": 93.75,
+          "hp_per_cost": 6.11,
+          "dps_per_cost": 1.04,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw0_cap": {
+          "level": 20,
+          "awaken": 0,
+          "awaken_bonus_pct": 0,
+          "portrait_stage_id": "ps_char26_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1386,
+          "atk": 189,
+          "dps": 236.25,
+          "hp_per_cost": 15.4,
+          "dps_per_cost": 2.62,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv20_aw1_balanced": {
+          "level": 20,
+          "awaken": 1,
+          "awaken_bonus_pct": 5,
+          "portrait_stage_id": "ps_char26_s1",
+          "portrait_stage_order": 1,
+          "portrait_atk_pct": 0,
+          "portrait_hp_pct": 0,
+          "hp": 1455,
+          "atk": 198,
+          "dps": 247.5,
+          "hp_per_cost": 16.17,
+          "dps_per_cost": 2.75,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv35_aw2_trained": {
+          "level": 35,
+          "awaken": 2,
+          "awaken_bonus_pct": 10,
+          "portrait_stage_id": "ps_char26_s2",
+          "portrait_stage_order": 2,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 0,
+          "hp": 2250,
+          "atk": 334,
+          "dps": 417.5,
+          "hp_per_cost": 25.0,
+          "dps_per_cost": 4.64,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv50_aw4_awakened": {
+          "level": 50,
+          "awaken": 4,
+          "awaken_bonus_pct": 20,
+          "portrait_stage_id": "ps_char26_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 3517,
+          "atk": 479,
+          "dps": 598.75,
+          "hp_per_cost": 39.08,
+          "dps_per_cost": 6.65,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        },
+        "lv70_aw5_max": {
+          "level": 70,
+          "awaken": 5,
+          "awaken_bonus_pct": 30,
+          "portrait_stage_id": "ps_char26_s3",
+          "portrait_stage_order": 3,
+          "portrait_atk_pct": 10,
+          "portrait_hp_pct": 10,
+          "hp": 5020,
+          "atk": 684,
+          "dps": 855.0,
+          "hp_per_cost": 55.78,
+          "dps_per_cost": 9.5,
+          "aura_heal_per_pulse": 0,
+          "aura_heal_per_sec": 0.0
+        }
+      },
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/char26_ayame_ninja.png",
+        "battle_sprite_exists": true,
+        "default_costume": "cos_char26_default",
+        "story_route": "route_char26",
+        "default_seed": 3009
+      }
+    }
+  ],
+  "enemies": [
+    {
+      "id": "en_slime",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "slime",
+      "unit_type": "normal",
+      "lane": "ground",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "深淵紫焰史萊姆",
+        "en": "Abyssal Void Slime"
+      },
+      "defeat_gold": 10,
+      "base_stats": {
+        "hp": 300,
+        "atk": 20,
+        "dps": 13.33,
+        "range": 100,
+        "range_milli": 100000,
+        "attack_interval_sec": 1.5,
+        "attack_interval_ticks": 45,
+        "move_speed": 8,
+        "speed_milli_per_tick": 266,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_gold": 30.0
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_1_01",
+          "chapter": 1,
+          "stage_name_zh": "第一關：學院正門",
+          "enemy_stat_pct": 100,
+          "wave_count": 3,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 300,
+          "scaled_atk": 20,
+          "scaled_dps": 13.33
+        },
+        {
+          "stage_id": "st_1_02",
+          "chapter": 1,
+          "stage_name_zh": "第二關：中央庭園",
+          "enemy_stat_pct": 120,
+          "wave_count": 2,
+          "wave_interval_sec": 3.0,
+          "scaled_hp": 360,
+          "scaled_atk": 24,
+          "scaled_dps": 16.0
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_slime.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_goblin_raider",
+      "side": "enemy",
+      "faction": "goblin",
+      "sub_category": "goblin_infantry",
+      "unit_type": "normal",
+      "lane": "ground",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "哥布林掠奪兵",
+        "en": "Goblin Raider"
+      },
+      "defeat_gold": 18,
+      "base_stats": {
+        "hp": 340,
+        "atk": 28,
+        "dps": 23.33,
+        "range": 95,
+        "range_milli": 95000,
+        "attack_interval_sec": 1.2,
+        "attack_interval_ticks": 36,
+        "move_speed": 11,
+        "speed_milli_per_tick": 366,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_gold": 18.89
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_1_02",
+          "chapter": 1,
+          "stage_name_zh": "第二關：中央庭園",
+          "enemy_stat_pct": 120,
+          "wave_count": 2,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 408,
+          "scaled_atk": 33,
+          "scaled_dps": 27.5
+        },
+        {
+          "stage_id": "st_1_03",
+          "chapter": 1,
+          "stage_name_zh": "第三關：廢棄舊校舍",
+          "enemy_stat_pct": 150,
+          "wave_count": 4,
+          "wave_interval_sec": 3.0,
+          "scaled_hp": 510,
+          "scaled_atk": 42,
+          "scaled_dps": 35.0
+        },
+        {
+          "stage_id": "st_2_01",
+          "chapter": 2,
+          "stage_name_zh": "第二章 01：低語森林",
+          "enemy_stat_pct": 115,
+          "wave_count": 3,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 391,
+          "scaled_atk": 32,
+          "scaled_dps": 26.67
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_goblin_raider.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_bat",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "flying_beast",
+      "unit_type": "flying",
+      "lane": "flying",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "猩紅暗翼魔蝠",
+        "en": "Crimson Bat"
+      },
+      "defeat_gold": 15,
+      "base_stats": {
+        "hp": 200,
+        "atk": 30,
+        "dps": 25.0,
+        "range": 120,
+        "range_milli": 120000,
+        "attack_interval_sec": 1.2,
+        "attack_interval_ticks": 36,
+        "move_speed": 14,
+        "speed_milli_per_tick": 466,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_gold": 13.33
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_1_02",
+          "chapter": 1,
+          "stage_name_zh": "第二關：中央庭園",
+          "enemy_stat_pct": 120,
+          "wave_count": 2,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 240,
+          "scaled_atk": 36,
+          "scaled_dps": 30.0
+        },
+        {
+          "stage_id": "st_2_02",
+          "chapter": 2,
+          "stage_name_zh": "第二章 02：古老遺跡",
+          "enemy_stat_pct": 125,
+          "wave_count": 2,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 250,
+          "scaled_atk": 37,
+          "scaled_dps": 30.83
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_bat.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_goblin_shaman",
+      "side": "enemy",
+      "faction": "goblin",
+      "sub_category": "goblin_caster",
+      "unit_type": "ranged",
+      "lane": "ground",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "哥布林毒火薩滿",
+        "en": "Goblin Shaman"
+      },
+      "defeat_gold": 32,
+      "base_stats": {
+        "hp": 310,
+        "atk": 40,
+        "dps": 19.05,
+        "range": 210,
+        "range_milli": 210000,
+        "attack_interval_sec": 2.1,
+        "attack_interval_ticks": 63,
+        "move_speed": 7,
+        "speed_milli_per_tick": 233,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_gold": 9.69
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_2_01",
+          "chapter": 2,
+          "stage_name_zh": "第二章 01：低語森林",
+          "enemy_stat_pct": 115,
+          "wave_count": 1,
+          "wave_interval_sec": 6.0,
+          "scaled_hp": 356,
+          "scaled_atk": 46,
+          "scaled_dps": 21.9
+        },
+        {
+          "stage_id": "st_2_02",
+          "chapter": 2,
+          "stage_name_zh": "第二章 02：古老遺跡",
+          "enemy_stat_pct": 125,
+          "wave_count": 2,
+          "wave_interval_sec": 6.0,
+          "scaled_hp": 387,
+          "scaled_atk": 50,
+          "scaled_dps": 23.81
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_goblin_shaman.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_harpy",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "flying_beast",
+      "unit_type": "flying",
+      "lane": "flying",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "魔翼妖精戰姬",
+        "en": "Abyssal Harpy Scout"
+      },
+      "defeat_gold": 25,
+      "base_stats": {
+        "hp": 320,
+        "atk": 35,
+        "dps": 26.92,
+        "range": 130,
+        "range_milli": 130000,
+        "attack_interval_sec": 1.3,
+        "attack_interval_ticks": 39,
+        "move_speed": 15,
+        "speed_milli_per_tick": 500,
+        "knockbacks": 2,
+        "target": "single",
+        "hp_per_gold": 12.8
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_2_01",
+          "chapter": 2,
+          "stage_name_zh": "第二章 01：低語森林",
+          "enemy_stat_pct": 115,
+          "wave_count": 2,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 368,
+          "scaled_atk": 40,
+          "scaled_dps": 30.77
+        },
+        {
+          "stage_id": "st_2_03",
+          "chapter": 2,
+          "stage_name_zh": "第二章 03：森之要塞",
+          "enemy_stat_pct": 135,
+          "wave_count": 2,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 432,
+          "scaled_atk": 47,
+          "scaled_dps": 36.15
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_harpy.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_mage_skeleton",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "undead_caster",
+      "unit_type": "ranged",
+      "lane": "ground",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "幽冥骸骨魔導",
+        "en": "Lich Mage Skeleton"
+      },
+      "defeat_gold": 40,
+      "base_stats": {
+        "hp": 380,
+        "atk": 45,
+        "dps": 18.75,
+        "range": 220,
+        "range_milli": 220000,
+        "attack_interval_sec": 2.4,
+        "attack_interval_ticks": 72,
+        "move_speed": 6,
+        "speed_milli_per_tick": 200,
+        "knockbacks": 1,
+        "target": "single",
+        "hp_per_gold": 9.5
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_2_02",
+          "chapter": 2,
+          "stage_name_zh": "第二章 02：古老遺跡",
+          "enemy_stat_pct": 125,
+          "wave_count": 1,
+          "wave_interval_sec": 6.0,
+          "scaled_hp": 475,
+          "scaled_atk": 56,
+          "scaled_dps": 23.33
+        },
+        {
+          "stage_id": "st_2_03",
+          "chapter": 2,
+          "stage_name_zh": "第二章 03：森之要塞",
+          "enemy_stat_pct": 135,
+          "wave_count": 2,
+          "wave_interval_sec": 6.0,
+          "scaled_hp": 513,
+          "scaled_atk": 60,
+          "scaled_dps": 25.0
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_mage_skeleton.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_dark_elf_blade",
+      "side": "enemy",
+      "faction": "dark_elf",
+      "sub_category": "dark_elf_melee",
+      "unit_type": "normal",
+      "lane": "ground",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "暗精靈夜刃劍士",
+        "en": "Dark Elf Nightblade"
+      },
+      "defeat_gold": 48,
+      "base_stats": {
+        "hp": 520,
+        "atk": 55,
+        "dps": 50.0,
+        "range": 115,
+        "range_milli": 115000,
+        "attack_interval_sec": 1.1,
+        "attack_interval_ticks": 33,
+        "move_speed": 13,
+        "speed_milli_per_tick": 433,
+        "knockbacks": 2,
+        "target": "single",
+        "hp_per_gold": 10.83
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_2_03",
+          "chapter": 2,
+          "stage_name_zh": "第二章 03：森之要塞",
+          "enemy_stat_pct": 135,
+          "wave_count": 2,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 702,
+          "scaled_atk": 74,
+          "scaled_dps": 67.27
+        },
+        {
+          "stage_id": "st_3_01",
+          "chapter": 3,
+          "stage_name_zh": "第三章 01：王城外圍",
+          "enemy_stat_pct": 138,
+          "wave_count": 2,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 717,
+          "scaled_atk": 75,
+          "scaled_dps": 68.18
+        },
+        {
+          "stage_id": "st_3_02",
+          "chapter": 3,
+          "stage_name_zh": "第三章 02：守護者長廊",
+          "enemy_stat_pct": 140,
+          "wave_count": 2,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 728,
+          "scaled_atk": 77,
+          "scaled_dps": 70.0
+        },
+        {
+          "stage_id": "st_3_03",
+          "chapter": 3,
+          "stage_name_zh": "第三章 03：決戰王座",
+          "enemy_stat_pct": 142,
+          "wave_count": 2,
+          "wave_interval_sec": 4.0,
+          "scaled_hp": 738,
+          "scaled_atk": 78,
+          "scaled_dps": 70.91
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_dark_elf_blade.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_dark_elf_archer",
+      "side": "enemy",
+      "faction": "dark_elf",
+      "sub_category": "dark_elf_ranged",
+      "unit_type": "ranged",
+      "lane": "ground",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "暗精靈魔弓射手",
+        "en": "Dark Elf Shadow Archer"
+      },
+      "defeat_gold": 55,
+      "base_stats": {
+        "hp": 420,
+        "atk": 62,
+        "dps": 34.44,
+        "range": 260,
+        "range_milli": 260000,
+        "attack_interval_sec": 1.8,
+        "attack_interval_ticks": 54,
+        "move_speed": 8,
+        "speed_milli_per_tick": 266,
+        "knockbacks": 2,
+        "target": "single",
+        "hp_per_gold": 7.64
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_3_02",
+          "chapter": 3,
+          "stage_name_zh": "第三章 02：守護者長廊",
+          "enemy_stat_pct": 140,
+          "wave_count": 2,
+          "wave_interval_sec": 6.0,
+          "scaled_hp": 588,
+          "scaled_atk": 86,
+          "scaled_dps": 47.78
+        },
+        {
+          "stage_id": "st_3_03",
+          "chapter": 3,
+          "stage_name_zh": "第三章 03：決戰王座",
+          "enemy_stat_pct": 142,
+          "wave_count": 1,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 596,
+          "scaled_atk": 88,
+          "scaled_dps": 48.89
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_dark_elf_archer.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_wraith_assassin",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "undead_flying",
+      "unit_type": "flying",
+      "lane": "flying",
+      "is_boss_tier": false,
+      "names": {
+        "zh_TW": "冥府幽魂影刺",
+        "en": "Wraith Assassin"
+      },
+      "defeat_gold": 45,
+      "base_stats": {
+        "hp": 360,
+        "atk": 45,
+        "dps": 37.5,
+        "range": 135,
+        "range_milli": 135000,
+        "attack_interval_sec": 1.2,
+        "attack_interval_ticks": 36,
+        "move_speed": 15,
+        "speed_milli_per_tick": 500,
+        "knockbacks": 2,
+        "target": "single",
+        "hp_per_gold": 8.0
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_3_01",
+          "chapter": 3,
+          "stage_name_zh": "第三章 01：王城外圍",
+          "enemy_stat_pct": 138,
+          "wave_count": 2,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 496,
+          "scaled_atk": 62,
+          "scaled_dps": 51.67
+        },
+        {
+          "stage_id": "st_3_02",
+          "chapter": 3,
+          "stage_name_zh": "第三章 02：守護者長廊",
+          "enemy_stat_pct": 140,
+          "wave_count": 1,
+          "wave_interval_sec": 6.0,
+          "scaled_hp": 504,
+          "scaled_atk": 63,
+          "scaled_dps": 52.5
+        },
+        {
+          "stage_id": "st_3_03",
+          "chapter": 3,
+          "stage_name_zh": "第三章 03：決戰王座",
+          "enemy_stat_pct": 142,
+          "wave_count": 1,
+          "wave_interval_sec": 5.0,
+          "scaled_hp": 511,
+          "scaled_atk": 63,
+          "scaled_dps": 52.5
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_wraith_assassin.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_golem",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "boss_golem",
+      "unit_type": "armored",
+      "lane": "ground",
+      "is_boss_tier": true,
+      "names": {
+        "zh_TW": "黑曜符文魔像",
+        "en": "Obsidian Rune Golem"
+      },
+      "defeat_gold": 200,
+      "base_stats": {
+        "hp": 6000,
+        "atk": 250,
+        "dps": 83.33,
+        "range": 150,
+        "range_milli": 150000,
+        "attack_interval_sec": 3.0,
+        "attack_interval_ticks": 90,
+        "move_speed": 5,
+        "speed_milli_per_tick": 166,
+        "knockbacks": 3,
+        "target": "area",
+        "hp_per_gold": 30.0
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_1_03",
+          "chapter": 1,
+          "stage_name_zh": "第三關：廢棄舊校舍",
+          "enemy_stat_pct": 150,
+          "wave_count": 1,
+          "wave_interval_sec": null,
+          "scaled_hp": 9000,
+          "scaled_atk": 375,
+          "scaled_dps": 125.0
+        },
+        {
+          "stage_id": "st_2_03",
+          "chapter": 2,
+          "stage_name_zh": "第二章 03：森之要塞",
+          "enemy_stat_pct": 135,
+          "wave_count": 1,
+          "wave_interval_sec": null,
+          "scaled_hp": 8100,
+          "scaled_atk": 337,
+          "scaled_dps": 112.33
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_golem.png",
+        "battle_sprite_exists": true
+      }
+    },
+    {
+      "id": "en_golem_colossus",
+      "side": "enemy",
+      "faction": "monster",
+      "sub_category": "boss_golem",
+      "unit_type": "armored",
+      "lane": "ground",
+      "is_boss_tier": true,
+      "names": {
+        "zh_TW": "煉獄巨像魔王",
+        "en": "Infernal Colossus Overlord"
+      },
+      "defeat_gold": 250,
+      "base_stats": {
+        "hp": 7500,
+        "atk": 280,
+        "dps": 93.33,
+        "range": 155,
+        "range_milli": 155000,
+        "attack_interval_sec": 3.0,
+        "attack_interval_ticks": 90,
+        "move_speed": 5,
+        "speed_milli_per_tick": 166,
+        "knockbacks": 3,
+        "target": "area",
+        "hp_per_gold": 30.0
+      },
+      "stage_appearances": [
+        {
+          "stage_id": "st_3_03",
+          "chapter": 3,
+          "stage_name_zh": "第三章 03：決戰王座",
+          "enemy_stat_pct": 142,
+          "wave_count": 1,
+          "wave_interval_sec": null,
+          "scaled_hp": 10650,
+          "scaled_atk": 397,
+          "scaled_dps": 132.33
+        }
+      ],
+      "assets": {
+        "battle_sprite_path": "client/Assets/StreamingAssets/Battle/Units/en_golem_colossus.png",
+        "battle_sprite_exists": true
+      }
+    }
+  ],
+  "bases": {
+    "ally_bastion": {
+      "default_hp": 20000,
+      "max_level": 20,
+      "hp_bonus_per_level": 2500,
+      "sprite_path": "client/Assets/StreamingAssets/Battle/Bases/ally_base.png",
+      "sprite_exists": true,
+      "levels": [
+        {
+          "level": 1,
+          "max_hp": 20000,
+          "upgrade_gold_cost_to_next": 500
+        },
+        {
+          "level": 2,
+          "max_hp": 22500,
+          "upgrade_gold_cost_to_next": 1000
+        },
+        {
+          "level": 3,
+          "max_hp": 25000,
+          "upgrade_gold_cost_to_next": 1500
+        },
+        {
+          "level": 4,
+          "max_hp": 27500,
+          "upgrade_gold_cost_to_next": 2000
+        },
+        {
+          "level": 5,
+          "max_hp": 30000,
+          "upgrade_gold_cost_to_next": 2500
+        },
+        {
+          "level": 6,
+          "max_hp": 32500,
+          "upgrade_gold_cost_to_next": 3000
+        },
+        {
+          "level": 7,
+          "max_hp": 35000,
+          "upgrade_gold_cost_to_next": 3500
+        },
+        {
+          "level": 8,
+          "max_hp": 37500,
+          "upgrade_gold_cost_to_next": 4000
+        },
+        {
+          "level": 9,
+          "max_hp": 40000,
+          "upgrade_gold_cost_to_next": 4500
+        },
+        {
+          "level": 10,
+          "max_hp": 42500,
+          "upgrade_gold_cost_to_next": 5000
+        },
+        {
+          "level": 11,
+          "max_hp": 45000,
+          "upgrade_gold_cost_to_next": 5500
+        },
+        {
+          "level": 12,
+          "max_hp": 47500,
+          "upgrade_gold_cost_to_next": 6000
+        },
+        {
+          "level": 13,
+          "max_hp": 50000,
+          "upgrade_gold_cost_to_next": 6500
+        },
+        {
+          "level": 14,
+          "max_hp": 52500,
+          "upgrade_gold_cost_to_next": 7000
+        },
+        {
+          "level": 15,
+          "max_hp": 55000,
+          "upgrade_gold_cost_to_next": 7500
+        },
+        {
+          "level": 16,
+          "max_hp": 57500,
+          "upgrade_gold_cost_to_next": 8000
+        },
+        {
+          "level": 17,
+          "max_hp": 60000,
+          "upgrade_gold_cost_to_next": 8500
+        },
+        {
+          "level": 18,
+          "max_hp": 62500,
+          "upgrade_gold_cost_to_next": 9000
+        },
+        {
+          "level": 19,
+          "max_hp": 65000,
+          "upgrade_gold_cost_to_next": 9500
+        },
+        {
+          "level": 20,
+          "max_hp": 67500,
+          "upgrade_gold_cost_to_next": null
+        }
+      ]
+    },
+    "enemy_core": {
+      "sprite_path": "client/Assets/StreamingAssets/Battle/Bases/enemy_base.png",
+      "sprite_exists": true,
+      "by_stage": [
+        {
+          "stage_id": "st_1_01",
+          "chapter": 1,
+          "stage_name_zh": "第一關：學院正門",
+          "enemy_base_hp": 5000,
+          "enemy_stat_pct": 100
+        },
+        {
+          "stage_id": "st_1_02",
+          "chapter": 1,
+          "stage_name_zh": "第二關：中央庭園",
+          "enemy_base_hp": 9000,
+          "enemy_stat_pct": 120
+        },
+        {
+          "stage_id": "st_1_03",
+          "chapter": 1,
+          "stage_name_zh": "第三關：廢棄舊校舍",
+          "enemy_base_hp": 15000,
+          "enemy_stat_pct": 150
+        },
+        {
+          "stage_id": "st_2_01",
+          "chapter": 2,
+          "stage_name_zh": "第二章 01：低語森林",
+          "enemy_base_hp": 11000,
+          "enemy_stat_pct": 115
+        },
+        {
+          "stage_id": "st_2_02",
+          "chapter": 2,
+          "stage_name_zh": "第二章 02：古老遺跡",
+          "enemy_base_hp": 13000,
+          "enemy_stat_pct": 125
+        },
+        {
+          "stage_id": "st_2_03",
+          "chapter": 2,
+          "stage_name_zh": "第二章 03：森之要塞",
+          "enemy_base_hp": 16000,
+          "enemy_stat_pct": 135
+        },
+        {
+          "stage_id": "st_3_01",
+          "chapter": 3,
+          "stage_name_zh": "第三章 01：王城外圍",
+          "enemy_base_hp": 16500,
+          "enemy_stat_pct": 138
+        },
+        {
+          "stage_id": "st_3_02",
+          "chapter": 3,
+          "stage_name_zh": "第三章 02：守護者長廊",
+          "enemy_base_hp": 17500,
+          "enemy_stat_pct": 140
+        },
+        {
+          "stage_id": "st_3_03",
+          "chapter": 3,
+          "stage_name_zh": "第三章 03：決戰王座",
+          "enemy_base_hp": 18500,
+          "enemy_stat_pct": 142
+        }
+      ]
+    }
+  },
+  "unimplemented_dna_roster": [
+    {
+      "id": "char11_freya",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Freya",
+      "name_zh": "Freya (金髮正義女騎士)",
+      "default_seed": 1501,
+      "ref_fn": "anime_char11_freya_knight_stand_fullbody.png"
+    },
+    {
+      "id": "char12_noel",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Noel",
+      "name_zh": "Noel (灰綠髮天然呆魔導士)",
+      "default_seed": 1601,
+      "ref_fn": "anime_char12_noel_mage_stand_fullbody.png"
+    },
+    {
+      "id": "char13_anya",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Anya",
+      "name_zh": "Anya (亮橘髮元氣機械師)",
+      "default_seed": 1701,
+      "ref_fn": "anime_char13_anya_mechanic_stand_fullbody.png"
+    },
+    {
+      "id": "char14_vesper",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Vesper",
+      "name_zh": "Vesper (黑長直哥德吸血鬼)",
+      "default_seed": 1801,
+      "ref_fn": "anime_char14_vesper_vampire_stand_fullbody.png"
+    },
+    {
+      "id": "char15_hina",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Hina",
+      "name_zh": "Hina (栗髮中華娘武道家)",
+      "default_seed": 1901,
+      "ref_fn": "anime_char15_hina_martial_stand_fullbody.png"
+    },
+    {
+      "id": "char16_nanami",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Nanami",
+      "name_zh": "Nanami (鄰家女孩)",
+      "default_seed": 2001,
+      "ref_fn": "anime_char16_nanami_neighbor_stand_fullbody.png"
+    },
+    {
+      "id": "char17_shiori",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Shiori",
+      "name_zh": "Shiori (初戀情人・白月光)",
+      "default_seed": 2101,
+      "ref_fn": "anime_char17_shiori_firstlove_stand_fullbody.png"
+    },
+    {
+      "id": "char19_reiko_gyaru",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Reiko",
+      "name_zh": "Reiko (時尚辣妹)",
+      "default_seed": 3002,
+      "ref_fn": "anime_char19_reiko_gyaru_stand_fullbody.png"
+    },
+    {
+      "id": "char20_karin_tsundere_drill",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Karin",
+      "name_zh": "Karin (雙螺旋捲傲嬌)",
+      "default_seed": 3003,
+      "ref_fn": "anime_char20_karin_tsundere_drill_stand_fullbody.png"
+    },
+    {
+      "id": "char21_shizuka_yamato",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Shizuka",
+      "name_zh": "Shizuka (古典大和撫子)",
+      "default_seed": 3004,
+      "ref_fn": "anime_char21_shizuka_yamato_stand_fullbody.png"
+    },
+    {
+      "id": "char22_elena_nun",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Elena",
+      "name_zh": "Elena (慈愛大修女)",
+      "default_seed": 3005,
+      "ref_fn": "anime_char22_elena_nun_stand_fullbody.png"
+    },
+    {
+      "id": "char23_maya_dancer",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Maya",
+      "name_zh": "Maya (異域舞孃)",
+      "default_seed": 3006,
+      "ref_fn": "anime_char23_maya_dancer_stand_fullbody.png"
+    },
+    {
+      "id": "char24_selena_assassin",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Selena",
+      "name_zh": "Selena (冷酷刺客)",
+      "default_seed": 3007,
+      "ref_fn": "anime_char24_selena_assassin_stand_fullbody.png"
+    },
+    {
+      "id": "char25_chiyo_maid",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Chiyo",
+      "name_zh": "Chiyo (冒失女僕)",
+      "default_seed": 3008,
+      "ref_fn": "anime_char25_chiyo_maid_stand_fullbody.png"
+    },
+    {
+      "id": "char27_iris_alchemist",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Iris",
+      "name_zh": "Iris (熱血鍊金術士)",
+      "default_seed": 3010,
+      "ref_fn": "anime_char27_iris_alchemist_stand_fullbody.png"
+    },
+    {
+      "id": "char28_beatrice_queen",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Beatrice",
+      "name_zh": "Beatrice (帝國皇女)",
+      "default_seed": 3011,
+      "ref_fn": "anime_char28_beatrice_queen_stand_fullbody.png"
+    },
+    {
+      "id": "char29_koharu_otaku",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Koharu",
+      "name_zh": "Koharu (遊戲宅少女)",
+      "default_seed": 3012,
+      "ref_fn": "anime_char29_koharu_otaku_stand_fullbody.png"
+    },
+    {
+      "id": "char30_valeria_valkyrie",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Valeria",
+      "name_zh": "Valeria (神聖女武神)",
+      "default_seed": 3013,
+      "ref_fn": "anime_char30_valeria_valkyrie_stand_fullbody.png"
+    },
+    {
+      "id": "char31_miyu_idol",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Miyu",
+      "name_zh": "Miyu (元氣偶像)",
+      "default_seed": 3014,
+      "ref_fn": "anime_char31_miyu_idol_stand_fullbody.png"
+    },
+    {
+      "id": "char32_tamamo_fox",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Tamamo",
+      "name_zh": "Tamamo (妖艷狐仙)",
+      "default_seed": 3015,
+      "ref_fn": "anime_char32_tamamo_fox_stand_fullbody.png"
+    },
+    {
+      "id": "char33_lapis_dragon",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Lapis",
+      "name_zh": "Lapis (傲氣龍女)",
+      "default_seed": 3016,
+      "ref_fn": "anime_char33_lapis_dragon_stand_fullbody.png"
+    },
+    {
+      "id": "char34_shion_teacher",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Shion",
+      "name_zh": "Shion (知性家教)",
+      "default_seed": 3017,
+      "ref_fn": "anime_char34_shion_teacher_stand_fullbody.png"
+    },
+    {
+      "id": "char35_nana_gal_gamer",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Nana",
+      "name_zh": "Nana (電競辣妹)",
+      "default_seed": 3018,
+      "ref_fn": "anime_char35_nana_gal_gamer_stand_fullbody.png"
+    },
+    {
+      "id": "char36_clara_healer",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Clara",
+      "name_zh": "Clara (神殿治癒師)",
+      "default_seed": 3019,
+      "ref_fn": "anime_char36_clara_healer_stand_fullbody.png"
+    },
+    {
+      "id": "char37_tomo_tomboy",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Tomo",
+      "name_zh": "Tomo (假小子青梅)",
+      "default_seed": 3020,
+      "ref_fn": "anime_char37_tomo_tomboy_stand_fullbody.png"
+    },
+    {
+      "id": "char38_kaguya_princess",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Kaguya",
+      "name_zh": "Kaguya (竹取公主)",
+      "default_seed": 3021,
+      "ref_fn": "anime_char38_kaguya_princess_stand_fullbody.png"
+    },
+    {
+      "id": "char39_mercy_doctor",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Mercy",
+      "name_zh": "Mercy (高冷軍醫)",
+      "default_seed": 3022,
+      "ref_fn": "anime_char39_mercy_doctor_stand_fullbody.png"
+    },
+    {
+      "id": "char40_sylvia_sniper",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Sylvia",
+      "name_zh": "Sylvia (精準狙擊手)",
+      "default_seed": 3023,
+      "ref_fn": "anime_char40_sylvia_sniper_stand_fullbody.png"
+    },
+    {
+      "id": "char41_minami_lifeguard",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Minami",
+      "name_zh": "Minami (陽光救生員)",
+      "default_seed": 3024,
+      "ref_fn": "anime_char41_minami_lifeguard_stand_fullbody.png"
+    },
+    {
+      "id": "char42_roxanne_pirate",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Roxanne",
+      "name_zh": "Roxanne (海盜女王)",
+      "default_seed": 3025,
+      "ref_fn": "anime_char42_roxanne_pirate_stand_fullbody.png"
+    },
+    {
+      "id": "char43_tsubaki_geisha",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Tsubaki",
+      "name_zh": "Tsubaki (優雅藝伎)",
+      "default_seed": 3026,
+      "ref_fn": "anime_char43_tsubaki_geisha_stand_fullbody.png"
+    },
+    {
+      "id": "char44_fiona_blacksmith",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Fiona",
+      "name_zh": "Fiona (健美女鐵匠)",
+      "default_seed": 3027,
+      "ref_fn": "anime_char44_fiona_blacksmith_stand_fullbody.png"
+    },
+    {
+      "id": "char45_lumi_snow",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Lumi",
+      "name_zh": "Lumi (清冷雪女)",
+      "default_seed": 3028,
+      "ref_fn": "anime_char45_lumi_snow_stand_fullbody.png"
+    },
+    {
+      "id": "char46_amber_adventurer",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Amber",
+      "name_zh": "Amber (新人冒險者)",
+      "default_seed": 3029,
+      "ref_fn": "anime_char46_amber_adventurer_stand_fullbody.png"
+    },
+    {
+      "id": "char47_penelope_puppeteer",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Penelope",
+      "name_zh": "Penelope (人偶師)",
+      "default_seed": 3030,
+      "ref_fn": "anime_char47_penelope_puppeteer_stand_fullbody.png"
+    },
+    {
+      "id": "char48_rinne_reaper",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Rinne",
+      "name_zh": "Rinne (俏皮小死神)",
+      "default_seed": 3031,
+      "ref_fn": "anime_char48_rinne_reaper_stand_fullbody.png"
+    },
+    {
+      "id": "char49_cynthia_astrologer",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Cynthia",
+      "name_zh": "Cynthia (神秘占星師)",
+      "default_seed": 3032,
+      "ref_fn": "anime_char49_cynthia_astrologer_stand_fullbody.png"
+    },
+    {
+      "id": "char50_aurora_goddess",
+      "side": "ally",
+      "status": "planned_unimplemented",
+      "name_en": "Aurora",
+      "name_zh": "Aurora (豐饒女神)",
+      "default_seed": 3033,
+      "ref_fn": "anime_char50_aurora_goddess_stand_fullbody.png"
+    }
+  ]
+}

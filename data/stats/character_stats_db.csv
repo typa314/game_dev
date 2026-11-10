@@ -1,0 +1,24 @@
+﻿side,id,faction_or_rarity,role_or_type,lane,name_zh,name_en,cost_or_defeat_gold,hp_base,atk_base,dps_base,range,attack_interval_sec,move_speed,knockbacks,target,is_healer,skill_or_stages,hp_mid_tier,atk_mid_tier,hp_peak_tier,atk_peak_tier,sprite_path
+ally,char01_claire,SSR,ranged,ground,克萊兒,Claire,450,1200,180,112.5,320,1.6,10,3,single,false,buff_atk:女武神戰歌,3175,475,10953,1642,client/Assets/StreamingAssets/Battle/Units/char01_claire.png
+ally,char02_luna,R,area,ground,露娜,Luna,300,900,90,45.0,200,2.0,9,3,area,false,slow:月影極寒霜爆,2381,237,8215,820,client/Assets/StreamingAssets/Battle/Units/char02_luna.png
+ally,char03_scarlet,SR,tank,ground,史卡蕾特,Scarlet,150,2000,20,16.67,110,1.2,8,2,single,false,cannon:猩紅殲滅巨砲,6090,60,22120,221,client/Assets/StreamingAssets/Battle/Units/char03_scarlet.png
+ally,char04_elysia,SR,melee,ground,愛麗西亞,Elysia,100,600,60,60.0,120,1.0,12,2,single,true,heal:聖靈之祈,1587,158,5476,547,client/Assets/StreamingAssets/Battle/Units/char04_elysia.png
+ally,char05_rin,R,tank,ground,凜,Rin,75,800,15,12.5,100,1.2,10,1,single,false,buff_atk:鬼神血氣激昂,2436,45,8848,165,client/Assets/StreamingAssets/Battle/Units/char05_rin.png
+ally,char06_seraphina,SSR,ranged,ground,塞拉菲娜,Seraphina,480,1100,210,95.45,360,2.2,8,4,area,true,heal:熾天使之庇佑,2910,555,10040,1916,client/Assets/StreamingAssets/Battle/Units/char06_seraphina.png
+ally,char08_yuki,SR,area,ground,雪,Yuki,320,850,110,45.83,240,2.4,8,2,area,false,stun:居合·一閃急凍,2249,290,7758,1003,client/Assets/StreamingAssets/Battle/Units/char08_yuki.png
+ally,char07_kagura,R,melee,ground,神樂,Kagura,90,550,75,93.75,90,0.8,16,1,single,false,poison:影縛,1455,198,5020,684,client/Assets/StreamingAssets/Battle/Units/char07_kagura.png
+ally,char09_chloe,R,area,ground,克蘿伊,Chloe,300,900,90,45.0,200,2.0,9,3,area,false,slow:暮色遲滯,2381,237,8215,820,client/Assets/StreamingAssets/Battle/Units/char09_chloe.png
+ally,char10_mirai,R,ranged,ground,未來,Mirai,300,900,90,45.0,200,2.0,9,3,single,true,heal:溫暖應援,2381,237,8215,820,client/Assets/StreamingAssets/Battle/Units/char10_mirai.png
+ally,char18_sakura_miko,SSR,ranged,ground,櫻,Sakura,280,950,105,58.33,300,1.8,9,3,single,false,burn:紅蓮滅世祓除,2513,277,8671,957,client/Assets/StreamingAssets/Battle/Units/char18_sakura_miko.png
+ally,char26_ayame_ninja,R,melee,ground,綾女,Ayame,90,550,75,93.75,90,0.8,16,1,single,false,poison:夜影劇毒暗湧,1455,198,5020,684,client/Assets/StreamingAssets/Battle/Units/char26_ayame_ninja.png
+enemy,en_slime,monster,normal,ground,深淵紫焰史萊姆,Abyssal Void Slime,10,300,20,13.33,100,1.5,8,1,single,false,st_1_01(100%);st_1_02(120%),300,20,360,24,client/Assets/StreamingAssets/Battle/Units/en_slime.png
+enemy,en_goblin_raider,goblin,normal,ground,哥布林掠奪兵,Goblin Raider,18,340,28,23.33,95,1.2,11,1,single,false,st_1_02(120%);st_1_03(150%);st_2_01(115%),391,32,510,42,client/Assets/StreamingAssets/Battle/Units/en_goblin_raider.png
+enemy,en_bat,monster,flying,flying,猩紅暗翼魔蝠,Crimson Bat,15,200,30,25.0,120,1.2,14,1,single,false,st_1_02(120%);st_2_02(125%),240,36,250,37,client/Assets/StreamingAssets/Battle/Units/en_bat.png
+enemy,en_goblin_shaman,goblin,ranged,ground,哥布林毒火薩滿,Goblin Shaman,32,310,40,19.05,210,2.1,7,1,single,false,st_2_01(115%);st_2_02(125%),356,46,387,50,client/Assets/StreamingAssets/Battle/Units/en_goblin_shaman.png
+enemy,en_harpy,monster,flying,flying,魔翼妖精戰姬,Abyssal Harpy Scout,25,320,35,26.92,130,1.3,15,2,single,false,st_2_01(115%);st_2_03(135%),368,40,432,47,client/Assets/StreamingAssets/Battle/Units/en_harpy.png
+enemy,en_mage_skeleton,monster,ranged,ground,幽冥骸骨魔導,Lich Mage Skeleton,40,380,45,18.75,220,2.4,6,1,single,false,st_2_02(125%);st_2_03(135%),475,56,513,60,client/Assets/StreamingAssets/Battle/Units/en_mage_skeleton.png
+enemy,en_dark_elf_blade,dark_elf,normal,ground,暗精靈夜刃劍士,Dark Elf Nightblade,48,520,55,50.0,115,1.1,13,2,single,false,st_2_03(135%);st_3_01(138%);st_3_02(140%);st_3_03(142%),702,74,738,78,client/Assets/StreamingAssets/Battle/Units/en_dark_elf_blade.png
+enemy,en_dark_elf_archer,dark_elf,ranged,ground,暗精靈魔弓射手,Dark Elf Shadow Archer,55,420,62,34.44,260,1.8,8,2,single,false,st_3_02(140%);st_3_03(142%),588,86,596,88,client/Assets/StreamingAssets/Battle/Units/en_dark_elf_archer.png
+enemy,en_wraith_assassin,monster,flying,flying,冥府幽魂影刺,Wraith Assassin,45,360,45,37.5,135,1.2,15,2,single,false,st_3_01(138%);st_3_02(140%);st_3_03(142%),496,62,511,63,client/Assets/StreamingAssets/Battle/Units/en_wraith_assassin.png
+enemy,en_golem,monster,armored,ground,黑曜符文魔像,Obsidian Rune Golem,200,6000,250,83.33,150,3.0,5,3,area,false,st_1_03(150%);st_2_03(135%),8100,337,9000,375,client/Assets/StreamingAssets/Battle/Units/en_golem.png
+enemy,en_golem_colossus,monster,armored,ground,煉獄巨像魔王,Infernal Colossus Overlord,250,7500,280,93.33,155,3.0,5,3,area,false,st_3_03(142%),10650,397,10650,397,client/Assets/StreamingAssets/Battle/Units/en_golem_colossus.png

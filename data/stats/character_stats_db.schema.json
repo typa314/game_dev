@@ -1,0 +1,554 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-tower.local/schemas/character_stats_db.schema.json",
+  "title": "Project Tower Unified Character Stats Database",
+  "description": "Schema for unified ally and enemy combat statistics, growth scaling tables, healer aura parameters, bastion upgrade curves, and stage appearances synchronized from MasterData.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "database_name",
+    "master_data_version",
+    "source_master_hashes",
+    "combat_rules_summary",
+    "summary",
+    "allies",
+    "enemies",
+    "bases",
+    "unimplemented_dna_roster"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "database_name": {
+      "type": "string",
+      "const": "project_tower_character_stats_db"
+    },
+    "master_data_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "source_master_hashes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "required": [
+        "data/master/characters.json",
+        "data/master/enemies.json",
+        "data/master/config.json",
+        "data/master/portrait_stages.json",
+        "data/master/stages.json",
+        "data/loc/zh-TW/strings.json",
+        "data/loc/en/strings.json",
+        "presets/characters_dna.json"
+      ]
+    },
+    "combat_rules_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ticks_per_second",
+        "default_ally_base_hp",
+        "max_units_per_side",
+        "max_battle_sec",
+        "knockback_distance",
+        "stat_curve_per_level_pct",
+        "level_cap_by_awaken",
+        "awaken_stat_bonus_pct",
+        "awaken_shard_cost",
+        "base_max_level",
+        "base_hp_bonus_per_level",
+        "base_upgrade_gold_base",
+        "base_upgrade_gold_step"
+      ],
+      "properties": {
+        "ticks_per_second": { "type": "integer", "minimum": 1 },
+        "default_ally_base_hp": { "type": "integer", "minimum": 1 },
+        "max_units_per_side": { "type": "integer", "minimum": 1 },
+        "max_battle_sec": { "type": "integer", "minimum": 1 },
+        "knockback_distance": { "type": "integer", "minimum": 0 },
+        "stat_curve_per_level_pct": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        },
+        "level_cap_by_awaken": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        },
+        "awaken_stat_bonus_pct": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "awaken_shard_cost": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "base_max_level": { "type": "integer", "minimum": 1 },
+        "base_hp_bonus_per_level": { "type": "integer", "minimum": 1 },
+        "base_upgrade_gold_base": { "type": "integer", "minimum": 0 },
+        "base_upgrade_gold_step": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "active_allies",
+        "healer_allies",
+        "planned_unimplemented_allies",
+        "total_dna_roster",
+        "enemies",
+        "enemies_by_faction",
+        "stages"
+      ],
+      "properties": {
+        "active_allies": { "type": "integer", "minimum": 1 },
+        "healer_allies": { "type": "integer", "minimum": 0 },
+        "planned_unimplemented_allies": { "type": "integer", "minimum": 0 },
+        "total_dna_roster": { "type": "integer", "minimum": 1 },
+        "enemies": { "type": "integer", "minimum": 1 },
+        "enemies_by_faction": {
+          "type": "object",
+          "required": ["dark_elf", "goblin", "monster"],
+          "additionalProperties": false,
+          "properties": {
+            "dark_elf": { "type": "integer", "minimum": 0 },
+            "goblin": { "type": "integer", "minimum": 0 },
+            "monster": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "stages": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "allies": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/allyEntry" }
+    },
+    "enemies": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/enemyEntry" }
+    },
+    "bases": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ally_bastion", "enemy_core"],
+      "properties": {
+        "ally_bastion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "default_hp",
+            "max_level",
+            "hp_bonus_per_level",
+            "sprite_path",
+            "sprite_exists",
+            "levels"
+          ],
+          "properties": {
+            "default_hp": { "type": "integer", "minimum": 1 },
+            "max_level": { "type": "integer", "minimum": 1 },
+            "hp_bonus_per_level": { "type": "integer", "minimum": 1 },
+            "sprite_path": { "type": "string" },
+            "sprite_exists": { "type": "boolean" },
+            "levels": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["level", "max_hp", "upgrade_gold_cost_to_next"],
+                "properties": {
+                  "level": { "type": "integer", "minimum": 1 },
+                  "max_hp": { "type": "integer", "minimum": 1 },
+                  "upgrade_gold_cost_to_next": { "type": ["integer", "null"], "minimum": 0 }
+                }
+              }
+            }
+          }
+        },
+        "enemy_core": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sprite_path", "sprite_exists", "by_stage"],
+          "properties": {
+            "sprite_path": { "type": "string" },
+            "sprite_exists": { "type": "boolean" },
+            "by_stage": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["stage_id", "chapter", "stage_name_zh", "enemy_base_hp", "enemy_stat_pct"],
+                "properties": {
+                  "stage_id": { "type": "string" },
+                  "chapter": { "type": "integer", "minimum": 1 },
+                  "stage_name_zh": { "type": "string" },
+                  "enemy_base_hp": { "type": "integer", "minimum": 1 },
+                  "enemy_stat_pct": { "type": "integer", "minimum": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "unimplemented_dna_roster": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "side", "status", "name_en", "name_zh", "default_seed", "ref_fn"],
+        "properties": {
+          "id": { "type": "string" },
+          "side": { "type": "string", "const": "ally" },
+          "status": { "type": "string", "const": "planned_unimplemented" },
+          "name_en": { "type": "string" },
+          "name_zh": { "type": "string" },
+          "default_seed": { "type": "integer", "minimum": 0 },
+          "ref_fn": { "type": "string" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "combatCommonMetrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hp",
+        "atk",
+        "dps",
+        "range",
+        "range_milli",
+        "attack_interval_sec",
+        "attack_interval_ticks",
+        "move_speed",
+        "speed_milli_per_tick",
+        "knockbacks",
+        "target"
+      ],
+      "properties": {
+        "hp": { "type": "integer", "minimum": 1 },
+        "atk": { "type": "integer", "minimum": 0 },
+        "dps": { "type": "number", "minimum": 0 },
+        "range": { "type": "integer", "minimum": 1 },
+        "range_milli": { "type": "integer", "minimum": 1 },
+        "attack_interval_sec": { "type": "number", "exclusiveMinimum": 0 },
+        "attack_interval_ticks": { "type": "integer", "minimum": 1 },
+        "move_speed": { "type": "integer", "minimum": 0 },
+        "speed_milli_per_tick": { "type": "integer", "minimum": 0 },
+        "knockbacks": { "type": "integer", "minimum": 0 },
+        "target": { "type": "string", "enum": ["single", "area"] }
+      }
+    },
+    "allyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "side",
+        "status",
+        "names",
+        "rarity",
+        "role",
+        "growth_curve",
+        "per_level_pct",
+        "obtainable_by",
+        "base_stats",
+        "healer_aura",
+        "skill",
+        "portrait_stage_bonuses",
+        "scaling_snapshots",
+        "assets"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^char[0-9]{2}_" },
+        "side": { "type": "string", "const": "ally" },
+        "status": { "type": "string", "const": "active" },
+        "names": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["zh_TW", "en", "archetype_zh"],
+          "properties": {
+            "zh_TW": { "type": "string" },
+            "en": { "type": "string" },
+            "archetype_zh": { "type": "string" }
+          }
+        },
+        "rarity": { "type": "string", "enum": ["N", "R", "SR", "SSR", "UR"] },
+        "role": { "type": "string", "enum": ["tank", "melee", "ranged", "area"] },
+        "growth_curve": { "type": "string" },
+        "per_level_pct": { "type": "integer", "minimum": 0 },
+        "obtainable_by": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "base_stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cost",
+            "cooldown_sec",
+            "cooldown_ticks",
+            "hp",
+            "atk",
+            "dps",
+            "hp_per_cost",
+            "dps_per_cost",
+            "range",
+            "range_milli",
+            "attack_interval_sec",
+            "attack_interval_ticks",
+            "move_speed",
+            "speed_milli_per_tick",
+            "knockbacks",
+            "target",
+            "traits"
+          ],
+          "properties": {
+            "cost": { "type": "integer", "minimum": 1 },
+            "cooldown_sec": { "type": "number", "exclusiveMinimum": 0 },
+            "cooldown_ticks": { "type": "integer", "minimum": 1 },
+            "hp": { "type": "integer", "minimum": 1 },
+            "atk": { "type": "integer", "minimum": 0 },
+            "dps": { "type": "number", "minimum": 0 },
+            "hp_per_cost": { "type": "number", "minimum": 0 },
+            "dps_per_cost": { "type": "number", "minimum": 0 },
+            "range": { "type": "integer", "minimum": 1 },
+            "range_milli": { "type": "integer", "minimum": 1 },
+            "attack_interval_sec": { "type": "number", "exclusiveMinimum": 0 },
+            "attack_interval_ticks": { "type": "integer", "minimum": 1 },
+            "move_speed": { "type": "integer", "minimum": 0 },
+            "speed_milli_per_tick": { "type": "integer", "minimum": 0 },
+            "knockbacks": { "type": "integer", "minimum": 0 },
+            "target": { "type": "string", "enum": ["single", "area"] },
+            "traits": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "healer_aura": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "is_healer",
+            "aura_heal_base",
+            "aura_heal_per_sec_base",
+            "aura_interval_ticks",
+            "aura_reach_units"
+          ],
+          "properties": {
+            "is_healer": { "type": "boolean" },
+            "aura_heal_base": { "type": "integer", "minimum": 0 },
+            "aura_heal_per_sec_base": { "type": "number", "minimum": 0 },
+            "aura_interval_ticks": { "type": "integer", "minimum": 0 },
+            "aura_reach_units": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "skill": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "name", "charge_sec", "charge_ticks", "effect_type", "value", "duration_sec", "range"],
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "charge_sec": { "type": "number", "minimum": 0 },
+            "charge_ticks": { "type": "integer", "minimum": 1 },
+            "effect_type": { "type": "string" },
+            "value": { "type": "integer" },
+            "duration_sec": { "type": "number", "minimum": 0 },
+            "range": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "portrait_stage_bonuses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["stage_id", "order", "req_level", "req_awaken", "atk_pct", "hp_pct"],
+            "properties": {
+              "stage_id": { "type": "string" },
+              "order": { "type": "integer", "minimum": 1 },
+              "req_level": { "type": "integer", "minimum": 1 },
+              "req_awaken": { "type": "integer", "minimum": 0 },
+              "atk_pct": { "type": "integer", "minimum": 0 },
+              "hp_pct": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "scaling_snapshots": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "level",
+              "awaken",
+              "awaken_bonus_pct",
+              "portrait_stage_id",
+              "portrait_stage_order",
+              "portrait_atk_pct",
+              "portrait_hp_pct",
+              "hp",
+              "atk",
+              "dps",
+              "hp_per_cost",
+              "dps_per_cost",
+              "aura_heal_per_pulse",
+              "aura_heal_per_sec"
+            ],
+            "properties": {
+              "level": { "type": "integer", "minimum": 1 },
+              "awaken": { "type": "integer", "minimum": 0 },
+              "awaken_bonus_pct": { "type": "integer", "minimum": 0 },
+              "portrait_stage_id": { "type": "string" },
+              "portrait_stage_order": { "type": "integer", "minimum": 1 },
+              "portrait_atk_pct": { "type": "integer", "minimum": 0 },
+              "portrait_hp_pct": { "type": "integer", "minimum": 0 },
+              "hp": { "type": "integer", "minimum": 1 },
+              "atk": { "type": "integer", "minimum": 0 },
+              "dps": { "type": "number", "minimum": 0 },
+              "hp_per_cost": { "type": "number", "minimum": 0 },
+              "dps_per_cost": { "type": "number", "minimum": 0 },
+              "aura_heal_per_pulse": { "type": "integer", "minimum": 0 },
+              "aura_heal_per_sec": { "type": "number", "minimum": 0 }
+            }
+          }
+        },
+        "assets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "battle_sprite_path",
+            "battle_sprite_exists",
+            "default_costume",
+            "story_route",
+            "default_seed"
+          ],
+          "properties": {
+            "battle_sprite_path": { "type": "string" },
+            "battle_sprite_exists": { "type": "boolean" },
+            "default_costume": { "type": "string" },
+            "story_route": { "type": "string" },
+            "default_seed": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "enemyEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "side",
+        "faction",
+        "sub_category",
+        "unit_type",
+        "lane",
+        "is_boss_tier",
+        "names",
+        "defeat_gold",
+        "base_stats",
+        "stage_appearances",
+        "assets"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^en_" },
+        "side": { "type": "string", "const": "enemy" },
+        "faction": { "type": "string", "enum": ["dark_elf", "goblin", "monster"] },
+        "sub_category": { "type": "string" },
+        "unit_type": { "type": "string", "enum": ["normal", "ranged", "flying", "armored"] },
+        "lane": { "type": "string", "enum": ["ground", "flying"] },
+        "is_boss_tier": { "type": "boolean" },
+        "names": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["zh_TW", "en"],
+          "properties": {
+            "zh_TW": { "type": "string" },
+            "en": { "type": "string" }
+          }
+        },
+        "defeat_gold": { "type": "integer", "minimum": 0 },
+        "base_stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "hp",
+            "atk",
+            "dps",
+            "hp_per_gold",
+            "range",
+            "range_milli",
+            "attack_interval_sec",
+            "attack_interval_ticks",
+            "move_speed",
+            "speed_milli_per_tick",
+            "knockbacks",
+            "target"
+          ],
+          "properties": {
+            "hp": { "type": "integer", "minimum": 1 },
+            "atk": { "type": "integer", "minimum": 0 },
+            "dps": { "type": "number", "minimum": 0 },
+            "hp_per_gold": { "type": "number", "minimum": 0 },
+            "range": { "type": "integer", "minimum": 1 },
+            "range_milli": { "type": "integer", "minimum": 1 },
+            "attack_interval_sec": { "type": "number", "exclusiveMinimum": 0 },
+            "attack_interval_ticks": { "type": "integer", "minimum": 1 },
+            "move_speed": { "type": "integer", "minimum": 0 },
+            "speed_milli_per_tick": { "type": "integer", "minimum": 0 },
+            "knockbacks": { "type": "integer", "minimum": 0 },
+            "target": { "type": "string", "enum": ["single", "area"] }
+          }
+        },
+        "stage_appearances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "stage_id",
+              "chapter",
+              "stage_name_zh",
+              "enemy_stat_pct",
+              "scaled_hp",
+              "scaled_atk",
+              "scaled_dps",
+              "wave_count",
+              "wave_interval_sec"
+            ],
+            "properties": {
+              "stage_id": { "type": "string" },
+              "chapter": { "type": "integer", "minimum": 1 },
+              "stage_name_zh": { "type": "string" },
+              "enemy_stat_pct": { "type": "integer", "minimum": 1 },
+              "scaled_hp": { "type": "integer", "minimum": 1 },
+              "scaled_atk": { "type": "integer", "minimum": 0 },
+              "scaled_dps": { "type": "number", "minimum": 0 },
+              "wave_count": { "type": "integer", "minimum": 1 },
+              "wave_interval_sec": { "type": ["number", "null"], "minimum": 0 }
+            }
+          }
+        },
+        "assets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["battle_sprite_path", "battle_sprite_exists"],
+          "properties": {
+            "battle_sprite_path": { "type": "string" },
+            "battle_sprite_exists": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}
