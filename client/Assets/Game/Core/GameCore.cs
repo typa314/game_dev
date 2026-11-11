@@ -580,7 +580,14 @@ namespace Game.Core
                 EnemyDef e = Master.Enemies[w.Enemy];
                 int hp = (int)((long)e.Battle.Hp * st.EnemyStatPct / 100);
                 int atk = (int)((long)e.Battle.Atk * st.EnemyStatPct / 100);
-                setup.EnemyTemplates[w.Enemy] = UnitTemplate.From(e.Id, e.Type, e.Battle, hp, atk, rules.TicksPerSecond);
+                setup.EnemyTemplates[w.Enemy] = UnitTemplate.From(
+                    e.Id,
+                    e.Type,
+                    e.Battle,
+                    hp,
+                    atk,
+                    rules.TicksPerSecond,
+                    e.ScaleCategory ?? "normal");
             }
             return setup;
         }

@@ -1,7 +1,11 @@
 [
   {
     "id": "en_slime",
+    "name": "loc:enemy/en_slime.name",
+    "faction": "monster",
+    "subCategory": "slime",
     "type": "normal",
+    "scaleCategory": "small",
     "defeatGold": 10,
     "battle": {
       "hp": 300,
@@ -15,7 +19,11 @@
   },
   {
     "id": "en_goblin_raider",
+    "name": "loc:enemy/en_goblin_raider.name",
+    "faction": "goblin",
+    "subCategory": "goblin_infantry",
     "type": "normal",
+    "scaleCategory": "normal",
     "defeatGold": 18,
     "battle": {
       "hp": 340,
@@ -29,7 +37,11 @@
   },
   {
     "id": "en_bat",
+    "name": "loc:enemy/en_bat.name",
+    "faction": "monster",
+    "subCategory": "flying_beast",
     "type": "flying",
+    "scaleCategory": "small",
     "defeatGold": 15,
     "battle": {
       "hp": 200,
@@ -43,7 +55,11 @@
   },
   {
     "id": "en_goblin_shaman",
+    "name": "loc:enemy/en_goblin_shaman.name",
+    "faction": "goblin",
+    "subCategory": "goblin_caster",
     "type": "ranged",
+    "scaleCategory": "normal",
     "defeatGold": 32,
     "battle": {
       "hp": 310,
@@ -57,7 +73,11 @@
   },
   {
     "id": "en_harpy",
+    "name": "loc:enemy/en_harpy.name",
+    "faction": "monster",
+    "subCategory": "flying_beast",
     "type": "flying",
+    "scaleCategory": "normal",
     "defeatGold": 25,
     "battle": {
       "hp": 320,
@@ -71,7 +91,11 @@
   },
   {
     "id": "en_mage_skeleton",
+    "name": "loc:enemy/en_mage_skeleton.name",
+    "faction": "monster",
+    "subCategory": "undead_caster",
     "type": "ranged",
+    "scaleCategory": "normal",
     "defeatGold": 40,
     "battle": {
       "hp": 380,
@@ -85,7 +109,11 @@
   },
   {
     "id": "en_dark_elf_blade",
+    "name": "loc:enemy/en_dark_elf_blade.name",
+    "faction": "dark_elf",
+    "subCategory": "dark_elf_melee",
     "type": "normal",
+    "scaleCategory": "normal",
     "defeatGold": 48,
     "battle": {
       "hp": 520,
@@ -99,7 +127,11 @@
   },
   {
     "id": "en_dark_elf_archer",
+    "name": "loc:enemy/en_dark_elf_archer.name",
+    "faction": "dark_elf",
+    "subCategory": "dark_elf_ranged",
     "type": "ranged",
+    "scaleCategory": "normal",
     "defeatGold": 55,
     "battle": {
       "hp": 420,
@@ -113,7 +145,11 @@
   },
   {
     "id": "en_wraith_assassin",
+    "name": "loc:enemy/en_wraith_assassin.name",
+    "faction": "monster",
+    "subCategory": "undead_flying",
     "type": "flying",
+    "scaleCategory": "normal",
     "defeatGold": 45,
     "battle": {
       "hp": 360,
@@ -127,7 +163,11 @@
   },
   {
     "id": "en_golem",
+    "name": "loc:enemy/en_golem.name",
+    "faction": "monster",
+    "subCategory": "boss_golem",
     "type": "armored",
+    "scaleCategory": "boss",
     "defeatGold": 200,
     "battle": {
       "hp": 6000,
@@ -141,7 +181,11 @@
   },
   {
     "id": "en_golem_colossus",
+    "name": "loc:enemy/en_golem_colossus.name",
+    "faction": "monster",
+    "subCategory": "boss_golem",
     "type": "armored",
+    "scaleCategory": "boss",
     "defeatGold": 250,
     "battle": {
       "hp": 7500,

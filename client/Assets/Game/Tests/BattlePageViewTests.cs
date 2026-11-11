@@ -548,6 +548,54 @@ namespace Game.Tests
             Assert.IsNotNull(deVisual);
             Assert.AreEqual(new Vector3(-1f, 1f, 1f), deVisual.localScale, "Enemy sprite must flip left (scale.x = -1)");
         }
+
+        [Test]
+        public void BattlePageView_UnitViewHolder_TracksStatusTransitions_AndScaleCategoryFromData()
+        {
+            // 使用有實際 Sprite 且特意設定不同 Type / 非預設 Id，驗證 ScaleCategory 直接驅動尺寸而非硬編碼 Id/Type
+            BattleSetup setup = CreateTestSetup(length: 1500);
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_golem", AtSec = 0, Count = 1 });
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_goblin_raider", AtSec = 0, Count = 1 });
+            setup.Stage.Waves.Add(new WaveDef { Enemy = "en_dark_elf_blade", AtSec = 0, Count = 1 });
+            setup.EnemyTemplates["en_golem"] = new UnitTemplate { Id = "en_golem", Type = "normal", ScaleCategory = "boss", Hp = 1200, Atk = 50 };
+            setup.EnemyTemplates["en_goblin_raider"] = new UnitTemplate { Id = "en_goblin_raider", Type = "normal", ScaleCategory = "small", Hp = 120, Atk = 10 };
+            setup.EnemyTemplates["en_dark_elf_blade"] = new UnitTemplate { Id = "en_dark_elf_blade", Type = "armored", ScaleCategory = "normal", Hp = 500, Atk = 30 };
+
+            var sim = new BattleSimulator(setup);
+            GameObject runnerGo = Track(new GameObject("TestBattleRunner_ScaleAndHolder"));
+            BattleRunner runner = runnerGo.AddComponent<BattleRunner>();
+            BattlePageView pageView = runnerGo.AddComponent<BattlePageView>();
+            runner.InitializeForTesting(sim, setup);
+            pageView.InitializeForTesting(runner);
+
+            runner.StepSim();
+            pageView.Refresh();
+
+            var bossUnit = sim.Units.First(u => u.T.Id == "en_golem");
+            var tinyUnit = sim.Units.First(u => u.T.Id == "en_goblin_raider");
+            var armoredNormalUnit = sim.Units.First(u => u.T.Id == "en_dark_elf_blade");
+            RectTransform bossRt = pageView.GetUnitTransform(bossUnit.Uid);
+            RectTransform tinyRt = pageView.GetUnitTransform(tinyUnit.Uid);
+            RectTransform armoredNormalRt = pageView.GetUnitTransform(armoredNormalUnit.Uid);
+
+            Assert.AreEqual(new Vector2(142, 162), bossRt.sizeDelta, "ScaleCategory=boss 應資料驅動放大尺寸（不依賴 Type==armored）");
+            Assert.AreEqual(new Vector2(74, 84), tinyRt.sizeDelta, "ScaleCategory=small 應資料驅動縮小尺寸（不依賴 Id==en_slime）");
+            Assert.AreEqual(new Vector2(96, 110), armoredNormalRt.sizeDelta, "顯式 ScaleCategory=normal 即使 Type==armored 也應使用標準尺寸");
+
+            // 狀態遮罩變更：新增後再清空，確認 UnitViewHolder 正確同步並不重複建置物件
+            bossUnit.AtkBuffTicks = 10;
+            bossUnit.StunTicks = 10;
+            bossUnit.Hp = 999;
+            pageView.Refresh();
+            Assert.AreSame(bossRt, pageView.GetUnitTransform(bossUnit.Uid), "重繪應重用同一個 RectTransform");
+            Assert.AreEqual("[ATK↑][STUN]", pageView.GetUnitStatusText(bossUnit.Uid));
+            Assert.AreEqual("999", bossRt.Find("Hp").GetComponent<Text>().text);
+
+            bossUnit.AtkBuffTicks = 0;
+            bossUnit.StunTicks = 0;
+            pageView.Refresh();
+            Assert.AreEqual(string.Empty, pageView.GetUnitStatusText(bossUnit.Uid), "狀態歸零後標籤應清空");
+        }
     }
 }
 #endif

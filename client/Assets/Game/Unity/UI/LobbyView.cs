@@ -1459,113 +1459,43 @@ namespace Game.Unity.UI
             return ProceduralUiKit.GetSilhouetteSprite(w, h);
         }
 
-        private static readonly System.Collections.Generic.Dictionary<string, Sprite> _iconCache = new System.Collections.Generic.Dictionary<string, Sprite>();
-        private static readonly System.Collections.Generic.Dictionary<string, Sprite> _characterSpriteCache = new System.Collections.Generic.Dictionary<string, Sprite>();
-        private static Sprite _backgroundSpriteCache;
-
         public static Sprite TryLoadIconSprite(string iconName)
         {
             if (string.IsNullOrEmpty(iconName)) return null;
-            if (_iconCache.TryGetValue(iconName, out var cached) && cached != null)
-                return cached;
-
-            try
-            {
-                string p = Path.Combine(Application.streamingAssetsPath, "UI", "Icons", iconName + ".png");
-                if (File.Exists(p))
-                {
-                    byte[] data = File.ReadAllBytes(p);
-                    Texture2D tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-                    if (tex.LoadImage(data))
-                    {
-                        var sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                        _iconCache[iconName] = sp;
-                        return sp;
-                    }
-                    DestroyImmediate(tex);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[LobbyView] 載入圖示失敗 ({iconName}): {ex.Message}");
-            }
-            return null;
+            return AssetService.ResolveStreamingSprite(
+                $"ui_icon_{iconName}",
+                new[] { $"UI/Icons/{iconName}.png" },
+                new Vector2(0.5f, 0.5f),
+                "[LobbyView]");
         }
 
         private static Sprite TryLoadCharacterSprite(string charId)
         {
             if (string.IsNullOrEmpty(charId)) return null;
-            if (_characterSpriteCache.TryGetValue(charId, out var cached) && cached != null)
-                return cached;
-
-            try
+            var candidates = new List<string>(2) { $"Portraits/{charId}.png" };
+            bool isBust = charId.Contains("bust");
+            if (charId.Contains("sakura") || charId.Contains("18"))
             {
-                string p = Path.Combine(Application.streamingAssetsPath, "Portraits", charId + ".png");
-                if (!File.Exists(p))
-                {
-                    bool isBust = charId.Contains("bust");
-                    if (charId.Contains("sakura") || charId.Contains("18"))
-                    {
-                        string fn = isBust ? "char18_sakura_bust.png" : "char18_sakura.png";
-                        p = Path.Combine(Application.streamingAssetsPath, "Portraits", fn);
-                    }
-                    else if (charId.Contains("claire") || charId.Contains("01"))
-                    {
-                        string fn = isBust ? "char01_claire_bust.png" : "char01_claire.png";
-                        p = Path.Combine(Application.streamingAssetsPath, "Portraits", fn);
-                    }
-                }
-                if (_characterSpriteCache.TryGetValue(p, out cached) && cached != null)
-                {
-                    _characterSpriteCache[charId] = cached;
-                    return cached;
-                }
-                if (File.Exists(p))
-                {
-                    byte[] data = File.ReadAllBytes(p);
-                    Texture2D tex = new Texture2D(2, 2);
-                    if (tex.LoadImage(data))
-                    {
-                        var sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0f));
-                        _characterSpriteCache[p] = sp;
-                        _characterSpriteCache[charId] = sp;
-                        return sp;
-                    }
-                    DestroyImmediate(tex);
-                }
+                candidates.Add($"Portraits/{(isBust ? "char18_sakura_bust.png" : "char18_sakura.png")}");
             }
-            catch (Exception ex)
+            else if (charId.Contains("claire") || charId.Contains("01"))
             {
-                Debug.LogWarning($"[LobbyView] 載入角色立繪失敗 ({charId}): {ex.Message}");
+                candidates.Add($"Portraits/{(isBust ? "char01_claire_bust.png" : "char01_claire.png")}");
             }
-            return null;
+            return AssetService.ResolveStreamingSprite(
+                $"portrait_{charId}",
+                candidates,
+                new Vector2(0.5f, 0f),
+                "[LobbyView]");
         }
 
         private static Sprite TryLoadBackgroundSprite()
         {
-            if (_backgroundSpriteCache != null)
-                return _backgroundSpriteCache;
-
-            try
-            {
-                string p = Path.Combine(Application.streamingAssetsPath, "Backgrounds", "lobby_default.png");
-                if (File.Exists(p))
-                {
-                    byte[] data = File.ReadAllBytes(p);
-                    Texture2D tex = new Texture2D(2, 2);
-                    if (tex.LoadImage(data))
-                    {
-                        _backgroundSpriteCache = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                        return _backgroundSpriteCache;
-                    }
-                    DestroyImmediate(tex);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[LobbyView] 載入背景圖失敗: {ex.Message}");
-            }
-            return null;
+            return AssetService.ResolveStreamingSprite(
+                "bg_lobby_default",
+                new[] { "Backgrounds/lobby_default.png" },
+                new Vector2(0.5f, 0.5f),
+                "[LobbyView]");
         }
 
         #endregion

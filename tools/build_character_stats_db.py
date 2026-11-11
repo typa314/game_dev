@@ -38,76 +38,6 @@ SOURCE_REL_PATHS = (
     "presets/characters_dna.json",
 )
 
-# Authoritative enemy faction/name metadata aligned with battle art & design reports.
-ENEMY_METADATA: dict[str, dict[str, str]] = {
-    "en_slime": {
-        "faction": "monster",
-        "sub_category": "slime",
-        "zh_TW": "深淵紫焰史萊姆",
-        "en": "Abyssal Void Slime",
-    },
-    "en_goblin_raider": {
-        "faction": "goblin",
-        "sub_category": "goblin_infantry",
-        "zh_TW": "哥布林掠奪兵",
-        "en": "Goblin Raider",
-    },
-    "en_bat": {
-        "faction": "monster",
-        "sub_category": "flying_beast",
-        "zh_TW": "猩紅暗翼魔蝠",
-        "en": "Crimson Bat",
-    },
-    "en_goblin_shaman": {
-        "faction": "goblin",
-        "sub_category": "goblin_caster",
-        "zh_TW": "哥布林毒火薩滿",
-        "en": "Goblin Shaman",
-    },
-    "en_harpy": {
-        "faction": "monster",
-        "sub_category": "flying_beast",
-        "zh_TW": "魔翼妖精戰姬",
-        "en": "Abyssal Harpy Scout",
-    },
-    "en_mage_skeleton": {
-        "faction": "monster",
-        "sub_category": "undead_caster",
-        "zh_TW": "幽冥骸骨魔導",
-        "en": "Lich Mage Skeleton",
-    },
-    "en_dark_elf_blade": {
-        "faction": "dark_elf",
-        "sub_category": "dark_elf_melee",
-        "zh_TW": "暗精靈夜刃劍士",
-        "en": "Dark Elf Nightblade",
-    },
-    "en_dark_elf_archer": {
-        "faction": "dark_elf",
-        "sub_category": "dark_elf_ranged",
-        "zh_TW": "暗精靈魔弓射手",
-        "en": "Dark Elf Shadow Archer",
-    },
-    "en_wraith_assassin": {
-        "faction": "monster",
-        "sub_category": "undead_flying",
-        "zh_TW": "冥府幽魂影刺",
-        "en": "Wraith Assassin",
-    },
-    "en_golem": {
-        "faction": "monster",
-        "sub_category": "boss_golem",
-        "zh_TW": "黑曜符文魔像",
-        "en": "Obsidian Rune Golem",
-    },
-    "en_golem_colossus": {
-        "faction": "monster",
-        "sub_category": "boss_golem",
-        "zh_TW": "煉獄巨像魔王",
-        "en": "Infernal Colossus Overlord",
-    },
-}
-
 ALLY_SNAPSHOT_TIERS: tuple[tuple[str, int, int], ...] = (
     ("lv01_aw0_base", 1, 0),
     ("lv20_aw0_cap", 20, 0),
@@ -174,9 +104,7 @@ def is_healer_ally(char_def: dict[str, Any]) -> bool:
         return True
     if "healer" in traits:
         return True
-    if cid == "char04_elysia" or "healer" in cid.lower():
-        return True
-    return False
+    return "healer" in cid.lower()
 
 
 def parse_unlock_requirements(unlock_node: dict[str, Any] | None) -> tuple[int, int]:
@@ -379,8 +307,9 @@ def build_enemies(
     stages: list[dict[str, Any]],
     config: dict[str, Any],
     loc_tw: dict[str, str],
+    loc_en: dict[str, str],
 ) -> list[dict[str, Any]]:
-    """Build complete structured records for all enemy faction units and stage scalings."""
+    """Build complete structured records for all enemy faction units from MasterData & Loc."""
     tps = int(config["battle"]["ticksPerSecond"])
 
     appearances_by_enemy: dict[str, list[dict[str, Any]]] = {}
@@ -407,9 +336,12 @@ def build_enemies(
     out: list[dict[str, Any]] = []
     for en in enemies:
         eid = str(en["id"])
-        if eid not in ENEMY_METADATA:
-            raise KeyError(f"Missing ENEMY_METADATA classification for enemy id '{eid}'")
-        meta = ENEMY_METADATA[eid]
+        faction = str(en.get("faction") or "")
+        if faction not in ("dark_elf", "goblin", "monster"):
+            raise ValueError(f"Enemy '{eid}' missing valid faction in enemies.json: {faction!r}")
+        sub_category = str(en.get("subCategory") or "standard")
+        scale_category = str(en.get("scaleCategory") or "normal")
+        raw_name = str(en.get("name") or f"loc:enemy/{eid}.name")
         battle = en["battle"]
         base_hp = int(battle["hp"])
         base_atk = int(battle["atk"])
@@ -442,12 +374,16 @@ def build_enemies(
             {
                 "id": eid,
                 "side": "enemy",
-                "faction": meta["faction"],
-                "sub_category": meta["sub_category"],
+                "faction": faction,
+                "sub_category": sub_category,
                 "unit_type": unit_type,
+                "scale_category": scale_category,
                 "lane": "flying" if unit_type == "flying" else "ground",
-                "is_boss_tier": unit_type == "armored",
-                "names": {"zh_TW": meta["zh_TW"], "en": meta["en"]},
+                "is_boss_tier": scale_category == "boss" or unit_type == "armored",
+                "names": {
+                    "zh_TW": resolve_loc_name(raw_name, loc_tw, eid),
+                    "en": resolve_loc_name(raw_name, loc_en, eid),
+                },
                 "defeat_gold": defeat_gold,
                 "base_stats": base_stats,
                 "stage_appearances": stage_entries,
@@ -525,7 +461,7 @@ def build_database_dict(repo_root: Path) -> dict[str, Any]:
 
     dna_by_id = {str(d["id"]): d for d in dna_list}
     allies = build_allies(repo_root, characters, portrait_stages, config, loc_tw, loc_en, dna_by_id)
-    enemy_entries = build_enemies(repo_root, enemies, stages, config, loc_tw)
+    enemy_entries = build_enemies(repo_root, enemies, stages, config, loc_tw, loc_en)
     active_ids = {a["id"] for a in allies}
 
     unimplemented = [
@@ -752,6 +688,7 @@ def write_sqlite_db(sqlite_path: Path, db: dict[str, Any]) -> None:
                 faction TEXT NOT NULL,
                 sub_category TEXT NOT NULL,
                 unit_type TEXT NOT NULL,
+                scale_category TEXT NOT NULL,
                 lane TEXT NOT NULL,
                 is_boss_tier INTEGER NOT NULL,
                 name_zh TEXT NOT NULL,
@@ -915,12 +852,13 @@ def write_sqlite_db(sqlite_path: Path, db: dict[str, Any]) -> None:
         for e in db["enemies"]:
             b = e["base_stats"]
             cur.execute(
-                "INSERT INTO enemies VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "INSERT INTO enemies VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     e["id"],
                     e["faction"],
                     e["sub_category"],
                     e["unit_type"],
+                    e["scale_category"],
                     e["lane"],
                     1 if e["is_boss_tier"] else 0,
                     e["names"]["zh_TW"],

@@ -68,5 +68,16 @@
   "ui.lobby.achievement": "🏆 基地成就",
   "ui.settings.title": "SYSTEM SETTINGS // 系统设置",
   "ui.stage.title": "OPERATION MAP // 作战星图",
-  "ui.stage.sortie": "⚔ 出击作战 (SORTIE)"
+  "ui.stage.sortie": "⚔ 出击作战 (SORTIE)",
+  "enemy/en_slime.name": "深渊紫焰史莱姆",
+  "enemy/en_goblin_raider.name": "哥布林掠夺兵",
+  "enemy/en_bat.name": "猩红暗翼魔蝠",
+  "enemy/en_goblin_shaman.name": "哥布林毒火萨满",
+  "enemy/en_harpy.name": "魔翼妖精战姬",
+  "enemy/en_mage_skeleton.name": "幽冥骸骨魔导",
+  "enemy/en_dark_elf_blade.name": "暗精灵夜刃剑士",
+  "enemy/en_dark_elf_archer.name": "暗精灵魔弓射手",
+  "enemy/en_wraith_assassin.name": "冥府幽魂影刺",
+  "enemy/en_golem.name": "黑曜符文魔像",
+  "enemy/en_golem_colossus.name": "炼狱巨像魔王"
 }

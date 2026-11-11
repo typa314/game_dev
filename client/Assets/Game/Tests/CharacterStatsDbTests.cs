@@ -131,7 +131,9 @@ namespace Game.Tests
                 factionCounts[faction]++;
 
                 Assert.AreEqual("enemy", entry["side"].ToString());
+                Assert.AreEqual(def.Faction, entry["faction"].ToString());
                 Assert.AreEqual(def.Type, entry["unit_type"].ToString());
+                Assert.AreEqual(def.ScaleCategory, entry["scale_category"].ToString());
                 Assert.AreEqual(def.DefeatGold, entry["defeat_gold"].Value<int>());
 
                 UnitTemplate baseUt = UnitTemplate.From(def.Id, def.Type, def.Battle, def.Battle.Hp, def.Battle.Atk, tps);

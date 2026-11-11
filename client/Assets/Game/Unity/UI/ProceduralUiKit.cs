@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Game.Core.Localization;
+using Game.Domain.MasterData;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Game.Unity.UI
 {
@@ -96,6 +100,7 @@ namespace Game.Unity.UI
                 }
             }
             _spriteCache.Clear();
+            AssetService.ClearSharedStreamingCache();
         }
 
         private static void DestroyObject(UnityEngine.Object obj)
@@ -416,6 +421,105 @@ namespace Game.Unity.UI
             Font f = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             if (f == null) f = Resources.GetBuiltinResource<Font>("Arial.ttf");
             return f;
+        }
+
+        /// <summary>
+        /// 建立以比例錨點定位且包含 RectTransform 與 Image 的面板節點。
+        /// </summary>
+        public static GameObject CreatePanel(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, Color color)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Image));
+            go.transform.SetParent(parent, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            go.GetComponent<Image>().color = color;
+            return go;
+        }
+
+        /// <summary>
+        /// 建立以比例錨點定位的文字標籤節點（統一套用內建字型與預設非射線遮擋）。
+        /// </summary>
+        public static Text CreateText(
+            Transform parent,
+            string name,
+            string value,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            int fontSize,
+            Color color,
+            TextAnchor alignment = TextAnchor.MiddleCenter,
+            HorizontalWrapMode horizontalOverflow = HorizontalWrapMode.Wrap,
+            bool raycastTarget = false)
+        {
+            var go = new GameObject(name, typeof(RectTransform), typeof(Text));
+            go.transform.SetParent(parent, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.offsetMin = rt.offsetMax = Vector2.zero;
+            var txt = go.GetComponent<Text>();
+            txt.font = GetDefaultFont();
+            txt.fontSize = fontSize;
+            txt.color = color;
+            txt.alignment = alignment;
+            txt.text = value;
+            txt.horizontalOverflow = horizontalOverflow;
+            txt.raycastTarget = raycastTarget;
+            return txt;
+        }
+
+        /// <summary>
+        /// 建立以比例錨點定位且附帶居中文字標籤的按鈕節點。
+        /// </summary>
+        public static Button CreateButton(
+            Transform parent,
+            string name,
+            string text,
+            Vector2 anchorMin,
+            Vector2 anchorMax,
+            UnityAction onClick,
+            Color bgColor,
+            int fontSize = 16,
+            float labelMargin = 0f,
+            HorizontalWrapMode labelOverflow = HorizontalWrapMode.Wrap)
+        {
+            GameObject go = CreatePanel(parent, name, anchorMin, anchorMax, bgColor);
+            var btn = go.AddComponent<Button>();
+            if (onClick != null) btn.onClick.AddListener(onClick);
+            Text txt = CreateText(go.transform, "Label", text, Vector2.zero, Vector2.one, fontSize, Color.white, TextAnchor.MiddleCenter, labelOverflow);
+            if (labelMargin > 0f) StretchFull(txt.rectTransform, labelMargin);
+            return btn;
+        }
+
+        /// <summary>
+        /// 透過目前安裝之 ILocalizationService（或磁碟字典備援）統一解析角色顯示名稱。
+        /// </summary>
+        public static string ResolveCharacterName(string charId, CharacterDef def = null)
+        {
+            if (def == null && !string.IsNullOrEmpty(charId))
+            {
+                var chars = GameServices.Core?.Master?.Characters;
+                if (chars != null) chars.TryGetValue(charId, out def);
+            }
+            return LocalizationResolver.ResolveCharacterName(GameServices.Localization, charId, def);
+        }
+
+        /// <summary>
+        /// 解析戰鬥單位（含我方與敵方）顯示名稱，無 hard-code switch。
+        /// </summary>
+        public static string ResolveUnitName(string unitId)
+        {
+            return LocalizationResolver.ResolveUnitShortName(GameServices.Localization, unitId, GameServices.Core?.Master);
+        }
+
+        /// <summary>
+        /// 統一解析任意 loc: 鍵值或原文顯示字串。
+        /// </summary>
+        public static string ResolveDisplayText(string rawOrKey, string fallback = null)
+        {
+            return LocalizationResolver.Resolve(GameServices.Localization, rawOrKey, fallback);
         }
     }
 }

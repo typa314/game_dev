@@ -205,5 +205,26 @@ namespace Game.Tests
             Assert.IsFalse(posMismatched.IsValid, "交錯標籤應觸發校驗失敗 (陽性對照)");
             Assert.IsTrue(posMismatched.Errors.Exists(e => e.Contains("ERR_UNCLOSED_TAG")));
         }
+
+        [Test]
+        public void LocalizationResolver_ResolvesAllHeroineAndEnemyNames_WithoutLocPrefixLeak()
+        {
+            var loc = new LocalizationService("zh-TW");
+            loc.LoadFromDirectory(Path.Combine(TestPaths.DataDir(), "loc"));
+
+            // 檢查所有角色（特別是原本在 StageSelectView / GachaView 被遺漏的 3 位與 loc: 格式）
+            Assert.AreEqual("克萊兒", LocalizationResolver.ResolveCharacterName(loc, "char01_claire", _master.Characters["char01_claire"]));
+            Assert.AreEqual("神樂", LocalizationResolver.ResolveCharacterName(loc, "char07_kagura", _master.Characters["char07_kagura"]));
+            Assert.AreEqual("克蘿伊", LocalizationResolver.ResolveCharacterName(loc, "char09_chloe", _master.Characters["char09_chloe"]));
+            Assert.AreEqual("未來", LocalizationResolver.ResolveCharacterName(loc, "char10_mirai", _master.Characters["char10_mirai"]));
+
+            // 檢查備援路徑（即使傳入 loc = null 也不應顯示 "LOC:/..." 或裁成 "char07"）
+            Assert.AreEqual("克萊兒", LocalizationResolver.ResolveCharacterName(null, "char01_claire", _master.Characters["char01_claire"]));
+            Assert.AreEqual("神樂", LocalizationResolver.ResolveCharacterName(null, "char07_kagura", _master.Characters["char07_kagura"]));
+
+            // 檢查敵方名稱由 MasterData loc key 解析
+            Assert.AreEqual("暗精靈夜刃劍士", LocalizationResolver.ResolveUnitShortName(loc, "en_dark_elf_blade", _master));
+            Assert.AreEqual("煉獄巨像魔王", LocalizationResolver.ResolveUnitShortName(loc, "en_golem_colossus", _master));
+        }
     }
 }

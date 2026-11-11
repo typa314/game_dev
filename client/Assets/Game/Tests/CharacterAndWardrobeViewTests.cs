@@ -262,6 +262,31 @@ namespace Game.Tests
             Assert.AreEqual("night", wardrobeView.SelectedTimeOfDay);
             Assert.AreEqual(new Color(0.78f, 0.82f, 1f, 1f), lobbyView.CurrentBackgroundTint, "切換至夜間應連動更新大廳冷藍色調");
         }
+
+        [Test]
+        public void CharacterRosterAndWardrobe_ShareStreamingSpriteCache_AndResolveLocalizedName()
+        {
+            var rosterGo = Track(new GameObject("TestRosterSharedCache"));
+            var rosterView = rosterGo.AddComponent<CharacterRosterView>();
+            rosterView.InitializeForTesting(_core);
+            rosterView.SelectCharacter("char01_claire");
+
+            var wardrobeGo = Track(new GameObject("TestWardrobeSharedCache"));
+            var wardrobeView = wardrobeGo.AddComponent<WardrobeView>();
+            wardrobeView.InitializeForTesting(_core);
+            wardrobeView.SelectCharacter("char01_claire");
+
+            Image rosterPortrait = rosterGo.transform.Find("CharacterRosterCanvas/CenterPanel/Portrait").GetComponent<Image>();
+            Image wardrobePortrait = wardrobeGo.transform.Find("WardrobeCanvas/CenterPanel/Portrait").GetComponent<Image>();
+            Assert.IsNotNull(rosterPortrait.sprite);
+            Assert.AreSame(rosterPortrait.sprite, wardrobePortrait.sprite, "名冊與更衣室應透過 AssetService 共用同一個 Sprite 快取實例");
+            Assert.AreSame(rosterPortrait.sprite.texture, wardrobePortrait.sprite.texture, "應共用同一個 Texture2D 原生紋理實例");
+
+            Text rosterTitle = rosterGo.transform.Find("CharacterRosterCanvas/CenterPanel/CharName").GetComponent<Text>();
+            Text wardrobeTitle = wardrobeGo.transform.Find("WardrobeCanvas/CenterPanel/CharTitle").GetComponent<Text>();
+            Assert.AreEqual("克萊兒", rosterTitle.text, "角色名稱應解析為中文譯名而非 LOC:/... 原文");
+            Assert.AreEqual("克萊兒", wardrobeTitle.text, "更衣室角色名稱應解析為中文譯名");
+        }
     }
 }
 #endif

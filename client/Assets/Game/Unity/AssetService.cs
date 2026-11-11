@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using Game.Core.Assets;
 using Game.Domain;
@@ -19,8 +20,12 @@ namespace Game.Unity
         private readonly RatingPolicy _rating;
         private readonly AssetCatalog _catalog;
         private readonly Dictionary<string, Sprite> _cache = new Dictionary<string, Sprite>();
+        private readonly Dictionary<string, Sprite> _streamingCache = new Dictionary<string, Sprite>();
         private readonly HashSet<string> _warned = new HashSet<string>();
         private Sprite _placeholder;
+
+        private static readonly Dictionary<string, Sprite> _sharedStreamingCache = new Dictionary<string, Sprite>();
+        private static readonly HashSet<string> _sharedWarned = new HashSet<string>();
 
         public AssetService(RatingPolicy rating, AssetCatalog catalog = null)
         {
@@ -69,49 +74,154 @@ namespace Game.Unity
         /// 從 StreamingAssets 載入圖片並建立 Sprite 快取（供 UI 統一存取，零重複 IO 負擔）。
         /// relativePath 例："Portraits/char01_claire.png" 或 "UI/Icons/icon_gem.png"
         /// </summary>
-        public Sprite LoadStreamingSprite(string relativePath, Vector2 pivot)
+        public Sprite LoadStreamingSprite(string relativePath, Vector2 pivot, string logPrefix = "[Asset]")
         {
             if (string.IsNullOrEmpty(relativePath)) return null;
-            if (_cache.TryGetValue(relativePath, out var cached) && cached != null)
+            return LoadStreamingSpriteFromPaths(relativePath, new[] { relativePath }, pivot, logPrefix);
+        }
+
+        /// <summary>
+        /// 依候選路徑清單載入第一個存在的 StreamingAssets 圖片並快取 (以 cacheKey + pivot 作為唯一鍵)。
+        /// </summary>
+        public Sprite LoadStreamingSpriteFromPaths(
+            string cacheKey,
+            IReadOnlyList<string> candidatePaths,
+            Vector2 pivot,
+            string logPrefix = "[Asset]")
+        {
+            return LoadStreamingFromPathsCore(_streamingCache, _warned, cacheKey, candidatePaths, pivot, logPrefix);
+        }
+
+        /// <summary>
+        /// 全域統一 StreamingAssets Sprite 入口：優先使用 GameServices.Assets 實例快取，
+        /// 若在獨立測試環境尚未安裝 GameServices.Assets，則自動共用靜態 _sharedStreamingCache。
+        /// </summary>
+        public static Sprite ResolveStreamingSprite(
+            string cacheKey,
+            IReadOnlyList<string> candidatePaths,
+            Vector2 pivot,
+            string logPrefix = "[Asset]")
+        {
+            if (GameServices.Assets != null)
+            {
+                return GameServices.Assets.LoadStreamingSpriteFromPaths(cacheKey, candidatePaths, pivot, logPrefix);
+            }
+            return LoadStreamingFromPathsCore(_sharedStreamingCache, _sharedWarned, cacheKey, candidatePaths, pivot, logPrefix);
+        }
+
+        public static void ClearSharedStreamingCache()
+        {
+            ClearSpriteDictionary(_sharedStreamingCache, _sharedWarned);
+        }
+
+        public void ClearCache()
+        {
+            // _cache 存放 Resources.Load<Sprite> 專案資產與 _placeholder 引用；專案資產不可使用 Destroy 銷毀，僅清除快取索引。
+            _cache.Clear();
+            ClearSpriteDictionary(_streamingCache, _warned);
+            if (_placeholder != null)
+            {
+                DestroySpriteAndTexture(_placeholder);
+                _placeholder = null;
+            }
+        }
+
+        private static Sprite LoadStreamingFromPathsCore(
+            Dictionary<string, Sprite> cache,
+            HashSet<string> warned,
+            string cacheKey,
+            IReadOnlyList<string> candidatePaths,
+            Vector2 pivot,
+            string logPrefix)
+        {
+            if (string.IsNullOrEmpty(cacheKey) || candidatePaths == null || candidatePaths.Count == 0) return null;
+            string scopedKey = $"{cacheKey}@{pivot.x.ToString("R", CultureInfo.InvariantCulture)},{pivot.y.ToString("R", CultureInfo.InvariantCulture)}";
+            if (cache.TryGetValue(scopedKey, out var cached) && cached != null)
+            {
                 return cached;
+            }
 
             try
             {
-                string fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
-                if (File.Exists(fullPath))
+                string streamingRoot = Application.streamingAssetsPath;
+                for (int i = 0; i < candidatePaths.Count; i++)
                 {
-                    byte[] data = File.ReadAllBytes(fullPath);
-                    var tex = new Texture2D(2, 2, TextureFormat.ARGB32, false);
-                    if (tex.LoadImage(data))
+                    string candidate = candidatePaths[i];
+                    if (string.IsNullOrEmpty(candidate)) continue;
+                    string fullPath = Path.IsPathRooted(candidate)
+                        ? candidate
+                        : Path.Combine(streamingRoot, candidate);
+
+                    if (File.Exists(fullPath))
                     {
-                        var sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot);
-                        _cache[relativePath] = sp;
-                        return sp;
+                        byte[] data = File.ReadAllBytes(fullPath);
+                        Texture2D tex = null;
+                        try
+                        {
+                            tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                            if (tex.LoadImage(data))
+                            {
+                                var sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100f);
+                                if (sp != null)
+                                {
+                                    cache[scopedKey] = sp;
+                                    tex = null;
+                                    return sp;
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            if (tex != null) DestroyUnityObject(tex);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                WarnOnce(relativePath, $"[Asset] 載入 StreamingAssets 失敗：{relativePath}：{ex.Message}");
+                string prefix = string.IsNullOrEmpty(logPrefix) ? "[Asset]" : logPrefix;
+                if (warned.Add(scopedKey))
+                {
+                    Debug.LogWarning($"{prefix} 載入 StreamingAssets 失敗 ({cacheKey})：{ex.Message}");
+                }
             }
             return null;
         }
 
-        public void ClearCache()
+        private static void ClearSpriteDictionary(
+            Dictionary<string, Sprite> cache,
+            HashSet<string> warned)
         {
-            foreach (var kvp in _cache)
+            foreach (var kvp in cache)
             {
-                if (kvp.Value != null && kvp.Value != _placeholder)
-                {
-                    if (kvp.Value.texture != null)
-                    {
-                        UnityEngine.Object.Destroy(kvp.Value.texture);
-                    }
-                    UnityEngine.Object.Destroy(kvp.Value);
-                }
+                DestroySpriteAndTexture(kvp.Value);
             }
-            _cache.Clear();
-            _warned.Clear();
+            cache.Clear();
+            warned.Clear();
+        }
+
+        private static void DestroySpriteAndTexture(Sprite sprite)
+        {
+            if (sprite == null) return;
+            Texture2D tex = sprite.texture;
+            DestroyUnityObject(sprite);
+            if (tex != null)
+            {
+                DestroyUnityObject(tex);
+            }
+        }
+
+        private static void DestroyUnityObject(UnityEngine.Object obj)
+        {
+            if (obj == null) return;
+            if (Application.isPlaying)
+            {
+                UnityEngine.Object.Destroy(obj);
+            }
+            else
+            {
+                UnityEngine.Object.DestroyImmediate(obj);
+            }
         }
 
         /// <summary>灰色剪影 placeholder（64x128，pivot 在腳底中央）。</summary>

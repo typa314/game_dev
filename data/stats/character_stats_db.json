@@ -3,13 +3,13 @@
   "database_name": "project_tower_character_stats_db",
   "master_data_version": 1,
   "source_master_hashes": {
-    "data/master/characters.json": "088cc664da84a66f54299f6daa49d84a37a5443dafea2dd7d1c8e07d001b6096",
-    "data/master/enemies.json": "c7813816f077e5da55daf18ab8da97437eaefc80e9f2ee9e09da251508933bd0",
+    "data/master/characters.json": "413e61b1690f74b3167bf6a3493842bd1b40c7cc0f97c4f5289df9d3b81c1842",
+    "data/master/enemies.json": "64e30ed1e78350346715ae512a3a27bcee19d0eca8436261e3cf1381ff7ebf27",
     "data/master/config.json": "1a82430b61365c41a7288aa99d256671990a97525473d962198668d6135e6e2a",
     "data/master/portrait_stages.json": "292bc96c2fc40740e1f0b502eac6c45710599da5fd903c26f5a514418a5093cd",
     "data/master/stages.json": "d57f5d6fea95ba4b1cc3e66379c612806230fc0d4b2d62e72cf581df73cdeb3e",
-    "data/loc/zh-TW/strings.json": "a1f9383f97db8164cae000094a0c0aa1db693c2cb9913840c36406a05d72c1e7",
-    "data/loc/en/strings.json": "ca77de861f328dec9c8a02fd465dafe74527d8e7df343f5f648d0005d18e28fa",
+    "data/loc/zh-TW/strings.json": "1e5b59f721d9e83b9e06a04a1a6142831ab65e79fc574a39e2c4b1807e854882",
+    "data/loc/en/strings.json": "3c8f06e08d89eb22dea8583f7a9661928c9528f2c6d676590fd86857458c4c76",
     "presets/characters_dna.json": "cb38c8a1f8833165b9ad4c110099cc7db53872d9de0f3d2051b4b6d9fe301a6e"
   },
   "combat_rules_summary": {
@@ -652,7 +652,9 @@
         "target": "single",
         "hp_per_cost": 6.0,
         "dps_per_cost": 0.6,
-        "traits": []
+        "traits": [
+          "healer"
+        ]
       },
       "healer_aura": {
         "is_healer": true,
@@ -1022,7 +1024,8 @@
         "hp_per_cost": 2.29,
         "dps_per_cost": 0.2,
         "traits": [
-          "anti_flying"
+          "anti_flying",
+          "healer"
         ]
       },
       "healer_aura": {
@@ -1759,7 +1762,9 @@
         "target": "single",
         "hp_per_cost": 3.0,
         "dps_per_cost": 0.15,
-        "traits": []
+        "traits": [
+          "healer"
+        ]
       },
       "healer_aura": {
         "is_healer": true,
@@ -2288,6 +2293,7 @@
       "faction": "monster",
       "sub_category": "slime",
       "unit_type": "normal",
+      "scale_category": "small",
       "lane": "ground",
       "is_boss_tier": false,
       "names": {
@@ -2344,6 +2350,7 @@
       "faction": "goblin",
       "sub_category": "goblin_infantry",
       "unit_type": "normal",
+      "scale_category": "normal",
       "lane": "ground",
       "is_boss_tier": false,
       "names": {
@@ -2411,6 +2418,7 @@
       "faction": "monster",
       "sub_category": "flying_beast",
       "unit_type": "flying",
+      "scale_category": "small",
       "lane": "flying",
       "is_boss_tier": false,
       "names": {
@@ -2467,6 +2475,7 @@
       "faction": "goblin",
       "sub_category": "goblin_caster",
       "unit_type": "ranged",
+      "scale_category": "normal",
       "lane": "ground",
       "is_boss_tier": false,
       "names": {
@@ -2523,6 +2532,7 @@
       "faction": "monster",
       "sub_category": "flying_beast",
       "unit_type": "flying",
+      "scale_category": "normal",
       "lane": "flying",
       "is_boss_tier": false,
       "names": {
@@ -2579,6 +2589,7 @@
       "faction": "monster",
       "sub_category": "undead_caster",
       "unit_type": "ranged",
+      "scale_category": "normal",
       "lane": "ground",
       "is_boss_tier": false,
       "names": {
@@ -2635,6 +2646,7 @@
       "faction": "dark_elf",
       "sub_category": "dark_elf_melee",
       "unit_type": "normal",
+      "scale_category": "normal",
       "lane": "ground",
       "is_boss_tier": false,
       "names": {
@@ -2713,6 +2725,7 @@
       "faction": "dark_elf",
       "sub_category": "dark_elf_ranged",
       "unit_type": "ranged",
+      "scale_category": "normal",
       "lane": "ground",
       "is_boss_tier": false,
       "names": {
@@ -2769,6 +2782,7 @@
       "faction": "monster",
       "sub_category": "undead_flying",
       "unit_type": "flying",
+      "scale_category": "normal",
       "lane": "flying",
       "is_boss_tier": false,
       "names": {
@@ -2836,6 +2850,7 @@
       "faction": "monster",
       "sub_category": "boss_golem",
       "unit_type": "armored",
+      "scale_category": "boss",
       "lane": "ground",
       "is_boss_tier": true,
       "names": {
@@ -2892,6 +2907,7 @@
       "faction": "monster",
       "sub_category": "boss_golem",
       "unit_type": "armored",
+      "scale_category": "boss",
       "lane": "ground",
       "is_boss_tier": true,
       "names": {

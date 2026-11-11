@@ -1,8 +1,10 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 using Game.Core.UI;
 using Game.Domain.Battle;
+using Game.Unity.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,14 +24,27 @@ namespace Game.Unity
         private Button _upgradeButton, _pauseButton, _speedButton, _retreatButton;
         private Button _replayButton, _nextStageButton, _lobbyButton;
         private string _testNextStageId;
+        private sealed class UnitViewHolder
+        {
+            public RectTransform Root;
+            public Image RootImage;
+            public Transform VisualTransform;
+            public Text HpLabel;
+            public Text StatusLabel;
+            public int LastHp = int.MinValue;
+            public bool LastHealPulse;
+            public int LastStatusMask = int.MinValue;
+            public float LastScaleX;
+        }
+
         private readonly List<Button> _slots = new List<Button>();
         private readonly List<Text> _slotLabels = new List<Text>();
-        private readonly Dictionary<int, RectTransform> _units = new Dictionary<int, RectTransform>();
-        private readonly Dictionary<int, Text> _unitHpLabels = new Dictionary<int, Text>();
-        private readonly Dictionary<int, Text> _unitStatusLabels = new Dictionary<int, Text>();
-
+        private readonly Dictionary<int, UnitViewHolder> _unitViews = new Dictionary<int, UnitViewHolder>();
         private readonly Dictionary<int, float> _unitHealPulseTimers = new Dictionary<int, float>();
-        private static readonly Dictionary<string, Sprite> _battleSpriteCache = new Dictionary<string, Sprite>();
+        private readonly HashSet<int> _livingUids = new HashSet<int>();
+        private readonly List<int> _removedUids = new List<int>();
+        private readonly List<int> _pulseKeys = new List<int>();
+        private readonly StringBuilder _statusSb = new StringBuilder(48);
         private readonly List<BattleEvent> _eventBuffer = new List<BattleEvent>();
         private GameObject _skillCutInPanel;
         private Text _skillCutInTitle;
@@ -88,16 +103,13 @@ namespace Game.Unity
 
         public RectTransform GetUnitTransform(int uid)
         {
-            RectTransform rt;
-            _units.TryGetValue(uid, out rt);
-            return rt;
+            return _unitViews.TryGetValue(uid, out UnitViewHolder holder) ? holder.Root : null;
         }
 
         public string GetUnitStatusText(int uid)
         {
-            Text label;
-            if (_unitStatusLabels.TryGetValue(uid, out label) && label != null)
-                return label.text;
+            if (_unitViews.TryGetValue(uid, out UnitViewHolder holder) && holder.StatusLabel != null)
+                return holder.StatusLabel.text;
             return string.Empty;
         }
 
@@ -192,11 +204,14 @@ namespace Game.Unity
             }
             if (_unitHealPulseTimers.Count > 0)
             {
-                var keys = new List<int>(_unitHealPulseTimers.Keys);
-                foreach (int k in keys)
+                _pulseKeys.Clear();
+                foreach (int k in _unitHealPulseTimers.Keys) _pulseKeys.Add(k);
+                for (int i = 0; i < _pulseKeys.Count; i++)
                 {
-                    _unitHealPulseTimers[k] -= dt;
-                    if (_unitHealPulseTimers[k] <= 0f) _unitHealPulseTimers.Remove(k);
+                    int k = _pulseKeys[i];
+                    float remaining = _unitHealPulseTimers[k] - dt;
+                    if (remaining <= 0f) _unitHealPulseTimers.Remove(k);
+                    else _unitHealPulseTimers[k] = remaining;
                 }
             }
             if (_allyBaseHitTimer > 0f) _allyBaseHitTimer -= dt;
@@ -254,72 +269,96 @@ namespace Game.Unity
                 _slots[i].image.color = ready ? new Color(0.82f, 0.49f, 0.16f) : exists ? new Color(0.12f, 0.18f, 0.25f) : new Color(0.08f, 0.10f, 0.14f);
             }
 
-            HashSet<int> living = new HashSet<int>();
-            foreach (BattleUnit unit in sim.Units)
+            _livingUids.Clear();
+            for (int i = 0; i < sim.Units.Count; i++)
             {
-                living.Add(unit.Uid);
-                RectTransform rt;
-                if (!_units.TryGetValue(unit.Uid, out rt)) rt = CreateUnit(unit);
+                BattleUnit unit = sim.Units[i];
+                _livingUids.Add(unit.Uid);
+                UnitViewHolder holder;
+                if (!_unitViews.TryGetValue(unit.Uid, out holder)) holder = CreateUnit(unit);
                 float p = sim.LengthMilli > 0 ? Mathf.Clamp01((float)unit.X / sim.LengthMilli) : 0.5f;
                 float laneY = (unit.T != null && unit.T.Type == "flying")
                     ? .28f
                     : (unit.Side == Side.Ally ? .22f : .25f);
-                rt.anchorMin = rt.anchorMax = new Vector2(Mathf.Lerp(.04f, .96f, p), laneY);
-                rt.anchoredPosition = Vector2.zero;
-                Image icon = rt.GetComponent<Image>();
-                Transform visualTransform = rt.Find("Visual");
-                if (visualTransform != null)
+                holder.Root.anchorMin = holder.Root.anchorMax = new Vector2(Mathf.Lerp(.04f, .96f, p), laneY);
+                holder.Root.anchoredPosition = Vector2.zero;
+
+                if (holder.VisualTransform != null)
                 {
-                    icon.color = Color.clear;
-                    visualTransform.localScale = new Vector3(unit.Side == Side.Enemy ? -1f : 1f, 1f, 1f);
-                }
-                else
-                {
-                    icon.color = unit.Side == Side.Ally ? new Color(0.28f, 0.71f, 0.88f) : new Color(0.91f, 0.36f, 0.37f);
-                }
-                Text hpLabel;
-                if (_unitHpLabels.TryGetValue(unit.Uid, out hpLabel))
-                {
-                    hpLabel.text = unit.Hp.ToString();
-                    float pulseTimer;
-                    if (_unitHealPulseTimers.TryGetValue(unit.Uid, out pulseTimer) && pulseTimer > 0f)
+                    if (holder.RootImage != null && holder.RootImage.color != Color.clear)
                     {
-                        hpLabel.color = new Color(0.35f, 1f, 0.55f);
+                        holder.RootImage.color = Color.clear;
                     }
-                    else
+                    float targetScaleX = unit.Side == Side.Enemy ? -1f : 1f;
+                    if (Mathf.Abs(targetScaleX - holder.LastScaleX) > 0.01f)
                     {
-                        hpLabel.color = Color.white;
+                        holder.VisualTransform.localScale = new Vector3(targetScaleX, 1f, 1f);
+                        holder.LastScaleX = targetScaleX;
+                    }
+                }
+                else if (holder.RootImage != null)
+                {
+                    Color sideColor = unit.Side == Side.Ally ? new Color(0.28f, 0.71f, 0.88f) : new Color(0.91f, 0.36f, 0.37f);
+                    if (holder.RootImage.color != sideColor) holder.RootImage.color = sideColor;
+                }
+
+                if (holder.HpLabel != null)
+                {
+                    if (unit.Hp != holder.LastHp)
+                    {
+                        holder.HpLabel.text = unit.Hp.ToString();
+                        holder.LastHp = unit.Hp;
+                    }
+                    bool isHealing = _unitHealPulseTimers.TryGetValue(unit.Uid, out float pulseTimer) && pulseTimer > 0f;
+                    if (isHealing != holder.LastHealPulse)
+                    {
+                        holder.HpLabel.color = isHealing ? new Color(0.35f, 1f, 0.55f) : Color.white;
+                        holder.LastHealPulse = isHealing;
                     }
                 }
 
-                // 狀態視覺化標籤
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                if (unit.AtkBuffTicks > 0) sb.Append("[ATK↑]");
-                if (unit.SlowTicks > 0) sb.Append("[SLOW]");
-                if (unit.PoisonTicks > 0) sb.Append("[PSN]");
-                if (unit.BurnTicks > 0) sb.Append("[BRN]");
-                if (unit.StunTicks > 0) sb.Append("[STUN]");
-                Text statusLabel;
-                if (_unitStatusLabels.TryGetValue(unit.Uid, out statusLabel))
+                // 狀態視覺化標籤 (位元遮罩比對，僅狀態變更時才組字串)
+                if (holder.StatusLabel != null)
                 {
-                    statusLabel.text = sb.ToString();
+                    int mask = (unit.AtkBuffTicks > 0 ? 1 : 0)
+                        | (unit.SlowTicks > 0 ? 2 : 0)
+                        | (unit.PoisonTicks > 0 ? 4 : 0)
+                        | (unit.BurnTicks > 0 ? 8 : 0)
+                        | (unit.StunTicks > 0 ? 16 : 0);
+                    if (mask != holder.LastStatusMask)
+                    {
+                        holder.LastStatusMask = mask;
+                        if (mask == 0)
+                        {
+                            holder.StatusLabel.text = string.Empty;
+                        }
+                        else
+                        {
+                            _statusSb.Clear();
+                            if ((mask & 1) != 0) _statusSb.Append("[ATK↑]");
+                            if ((mask & 2) != 0) _statusSb.Append("[SLOW]");
+                            if ((mask & 4) != 0) _statusSb.Append("[PSN]");
+                            if ((mask & 8) != 0) _statusSb.Append("[BRN]");
+                            if ((mask & 16) != 0) _statusSb.Append("[STUN]");
+                            holder.StatusLabel.text = _statusSb.ToString();
+                        }
+                    }
                 }
             }
 
-            List<int> removed = new List<int>();
-            foreach (KeyValuePair<int, RectTransform> entry in _units)
+            _removedUids.Clear();
+            foreach (KeyValuePair<int, UnitViewHolder> entry in _unitViews)
             {
-                if (!living.Contains(entry.Key))
+                if (!_livingUids.Contains(entry.Key))
                 {
-                    SafeDestroy(entry.Value.gameObject);
-                    removed.Add(entry.Key);
+                    SafeDestroy(entry.Value.Root.gameObject);
+                    _removedUids.Add(entry.Key);
                 }
             }
-            foreach (int uid in removed)
+            for (int i = 0; i < _removedUids.Count; i++)
             {
-                _units.Remove(uid);
-                _unitHpLabels.Remove(uid);
-                _unitStatusLabels.Remove(uid);
+                int uid = _removedUids[i];
+                _unitViews.Remove(uid);
                 _unitHealPulseTimers.Remove(uid);
             }
 
@@ -477,45 +516,18 @@ namespace Game.Unity
 
         private static Sprite TryLoadCachedSprite(string cacheKey, string[] candidatePaths, Vector2 pivot)
         {
-            if (string.IsNullOrEmpty(cacheKey) || candidatePaths == null) return null;
-            if (_battleSpriteCache.TryGetValue(cacheKey, out var cached) && cached != null)
-                return cached;
-
-            try
-            {
-                foreach (string p in candidatePaths)
-                {
-                    if (File.Exists(p))
-                    {
-                        byte[] bytes = File.ReadAllBytes(p);
-                        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                        if (tex.LoadImage(bytes))
-                        {
-                            Sprite sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), pivot, 100f);
-                            _battleSpriteCache[cacheKey] = sp;
-                            return sp;
-                        }
-                        DestroyImmediate(tex);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[BattlePageView] Failed to load sprite for {cacheKey}: {ex.Message}");
-            }
-            return null;
+            return AssetService.ResolveStreamingSprite(cacheKey, candidatePaths, pivot, "[BattlePageView]");
         }
 
         public static Sprite TryLoadBattleUnitSprite(string charId)
         {
             if (string.IsNullOrEmpty(charId)) return null;
-            string streaming = Application.streamingAssetsPath;
             return TryLoadCachedSprite(
-                charId,
+                $"battle_unit_{charId}",
                 new[]
                 {
-                    Path.Combine(streaming, "Battle", "Units", charId + ".png"),
-                    Path.Combine(streaming, "Portraits", charId + ".png")
+                    $"Battle/Units/{charId}.png",
+                    $"Portraits/{charId}.png"
                 },
                 new Vector2(0.5f, 0f));
         }
@@ -523,20 +535,18 @@ namespace Game.Unity
         public static Sprite TryLoadAuraSprite(string auraKey)
         {
             if (string.IsNullOrEmpty(auraKey)) return null;
-            string streaming = Application.streamingAssetsPath;
             return TryLoadCachedSprite(
-                "aura_" + auraKey,
-                new[] { Path.Combine(streaming, "Battle", "Auras", auraKey + ".png") },
+                $"aura_{auraKey}",
+                new[] { $"Battle/Auras/{auraKey}.png" },
                 new Vector2(0.5f, 0.5f));
         }
 
         public static Sprite TryLoadBaseSprite(string baseKey)
         {
             if (string.IsNullOrEmpty(baseKey)) return null;
-            string streaming = Application.streamingAssetsPath;
             return TryLoadCachedSprite(
-                "base_" + baseKey,
-                new[] { Path.Combine(streaming, "Battle", "Bases", baseKey + ".png") },
+                $"base_{baseKey}",
+                new[] { $"Battle/Bases/{baseKey}.png" },
                 new Vector2(0.5f, 0f));
         }
 
@@ -550,13 +560,19 @@ namespace Game.Unity
             if (!hasSprite) return new Vector2(62, 76);
             if (unit?.T != null)
             {
+                if (!string.IsNullOrEmpty(unit.T.ScaleCategory))
+                {
+                    if (unit.T.ScaleCategory == "boss") return new Vector2(142, 162);
+                    if (unit.T.ScaleCategory == "small") return new Vector2(74, 84);
+                    return new Vector2(96, 110);
+                }
                 if (unit.T.Type == "armored") return new Vector2(142, 162);
                 if (unit.T.Id == "en_slime" || unit.T.Id == "en_bat") return new Vector2(74, 84);
             }
             return new Vector2(96, 110);
         }
 
-        private RectTransform CreateUnit(BattleUnit unit)
+        private UnitViewHolder CreateUnit(BattleUnit unit)
         {
             Sprite battleSprite = TryLoadBattleUnitSprite(unit.T.Id);
             bool hasSprite = battleSprite != null;
@@ -598,49 +614,56 @@ namespace Game.Unity
                 auraGo.transform.SetAsFirstSibling();
             }
 
+            Transform visualTransform = null;
+            float initialScaleX = unit.Side == Side.Enemy ? -1f : 1f;
             if (hasSprite)
             {
                 GameObject visualGo = new GameObject("Visual", typeof(RectTransform), typeof(Image));
                 visualGo.transform.SetParent(go.transform, false);
                 RectTransform vRt = visualGo.GetComponent<RectTransform>();
-                Stretch(vRt, 0);
+                ProceduralUiKit.StretchFull(vRt, 0f);
                 vRt.pivot = new Vector2(0.5f, 0f);
-                vRt.localScale = new Vector3(unit.Side == Side.Enemy ? -1f : 1f, 1f, 1f);
+                vRt.localScale = new Vector3(initialScaleX, 1f, 1f);
                 Image vImg = visualGo.GetComponent<Image>();
                 vImg.sprite = battleSprite;
                 vImg.color = Color.white;
                 vImg.preserveAspect = true;
+                visualTransform = visualGo.transform;
             }
             else
             {
                 string code = ShortName(unit.T.Id).Replace(" ", "");
-                Text label = Label(go.transform, code.Substring(0, Mathf.Min(2, code.Length)), 18, Color.white, TextAnchor.MiddleCenter);
-                Stretch(label.rectTransform, 2);
+                ProceduralUiKit.CreateText(go.transform, "FallbackCode", code.Substring(0, Mathf.Min(2, code.Length)), Vector2.zero, Vector2.one, 18, Color.white, TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
             }
 
-            Text hp = Label(go.transform, "", 11, Color.white, TextAnchor.LowerCenter);
-            hp.name = "Hp";
+            Text hp = ProceduralUiKit.CreateText(go.transform, "Hp", "", Vector2.zero, Vector2.one, 11, Color.white, TextAnchor.LowerCenter, HorizontalWrapMode.Overflow);
             RectTransform hpRt = hp.rectTransform;
             hpRt.anchorMin = new Vector2(0f, 0f);
             hpRt.anchorMax = new Vector2(1f, 0f);
             hpRt.pivot = new Vector2(0.5f, 1f);
             hpRt.anchoredPosition = new Vector2(0f, -2f);
             hpRt.sizeDelta = new Vector2(80f, 16f);
-            _unitHpLabels[unit.Uid] = hp;
 
             // 狀態標籤
-            Text status = Label(go.transform, "", 10, new Color(1f, 0.88f, 0.25f), TextAnchor.MiddleCenter);
-            status.name = "Status";
+            Text status = ProceduralUiKit.CreateText(go.transform, "Status", "", Vector2.zero, Vector2.one, 10, new Color(1f, 0.88f, 0.25f), TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
             RectTransform sRt = status.rectTransform;
             sRt.anchorMin = new Vector2(0f, 1f);
             sRt.anchorMax = new Vector2(1f, 1f);
             sRt.pivot = new Vector2(0.5f, 0f);
             sRt.anchoredPosition = new Vector2(0f, 2f);
             sRt.sizeDelta = new Vector2(80f, 16f);
-            _unitStatusLabels[unit.Uid] = status;
 
-            _units.Add(unit.Uid, rt);
-            return rt;
+            var holder = new UnitViewHolder
+            {
+                Root = rt,
+                RootImage = image,
+                VisualTransform = visualTransform,
+                HpLabel = hp,
+                StatusLabel = status,
+                LastScaleX = initialScaleX
+            };
+            _unitViews.Add(unit.Uid, holder);
+            return holder;
         }
 
         private void BuildUi()
@@ -655,13 +678,13 @@ namespace Game.Unity
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 0.5f;
 
-            Panel(root.transform, "Backdrop", new Vector2(0, 0), new Vector2(1, 1), new Color(0.035f, 0.055f, 0.085f));
-            Panel(root.transform, "TopBar", new Vector2(0, .86f), new Vector2(1, 1), new Color(.055f, .085f, .12f));
-            _title = AnchoredLabel(root.transform, "FIELD OPERATION", new Vector2(.04f, .91f), new Vector2(.55f, .98f), 26, new Color(.86f, .91f, .96f), TextAnchor.MiddleLeft);
-            _clock = AnchoredLabel(root.transform, "00:00", new Vector2(.84f, .91f), new Vector2(.96f, .98f), 30, new Color(1f, .8f, .42f), TextAnchor.MiddleRight);
+            ProceduralUiKit.CreatePanel(root.transform, "Backdrop", new Vector2(0, 0), new Vector2(1, 1), new Color(0.035f, 0.055f, 0.085f));
+            ProceduralUiKit.CreatePanel(root.transform, "TopBar", new Vector2(0, .86f), new Vector2(1, 1), new Color(.055f, .085f, .12f));
+            _title = ProceduralUiKit.CreateText(root.transform, "Title", "FIELD OPERATION", new Vector2(.04f, .91f), new Vector2(.55f, .98f), 26, new Color(.86f, .91f, .96f), TextAnchor.MiddleLeft, HorizontalWrapMode.Overflow);
+            _clock = ProceduralUiKit.CreateText(root.transform, "Clock", "00:00", new Vector2(.84f, .91f), new Vector2(.96f, .98f), 30, new Color(1f, .8f, .42f), TextAnchor.MiddleRight, HorizontalWrapMode.Overflow);
 
-            _board = Panel(root.transform, "Board", new Vector2(.035f, .29f), new Vector2(.965f, .83f), new Color(.08f, .12f, .16f)).GetComponent<RectTransform>();
-            Panel(_board, "Ground", new Vector2(.032f, .18f), new Vector2(.968f, .28f), new Color(.24f, .29f, .29f));
+            _board = ProceduralUiKit.CreatePanel(root.transform, "Board", new Vector2(.035f, .29f), new Vector2(.965f, .83f), new Color(.08f, .12f, .16f)).GetComponent<RectTransform>();
+            ProceduralUiKit.CreatePanel(_board, "Ground", new Vector2(.032f, .18f), new Vector2(.968f, .28f), new Color(.24f, .29f, .29f));
 
             // 我方主堡視覺建築節點
             Sprite allyBaseSp = TryLoadBaseSprite("ally_base");
@@ -682,7 +705,7 @@ namespace Game.Unity
             {
                 _allyBaseImage.color = new Color(0.20f, 0.45f, 0.68f, 0.92f);
             }
-            _allyBaseBoardLabel = Label(allyBaseGo.transform, "ALLY BASTION LV.1", 12, new Color(.55f, .88f, 1f), TextAnchor.MiddleCenter);
+            _allyBaseBoardLabel = ProceduralUiKit.CreateText(allyBaseGo.transform, "Label", "ALLY BASTION LV.1", Vector2.zero, Vector2.one, 12, new Color(.55f, .88f, 1f), TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
             RectTransform abLblRt = _allyBaseBoardLabel.rectTransform;
             abLblRt.anchorMin = new Vector2(0f, 0f);
             abLblRt.anchorMax = new Vector2(1f, 0f);
@@ -709,55 +732,54 @@ namespace Game.Unity
             {
                 _enemyBaseImage.color = new Color(0.52f, 0.16f, 0.22f, 0.92f);
             }
-            _enemyBaseBoardLabel = Label(enemyBaseGo.transform, "ENEMY CORE", 12, new Color(1f, .52f, .46f), TextAnchor.MiddleCenter);
+            _enemyBaseBoardLabel = ProceduralUiKit.CreateText(enemyBaseGo.transform, "Label", "ENEMY CORE", Vector2.zero, Vector2.one, 12, new Color(1f, .52f, .46f), TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
             RectTransform ebLblRt = _enemyBaseBoardLabel.rectTransform;
             ebLblRt.anchorMin = new Vector2(0f, 0f);
             ebLblRt.anchorMax = new Vector2(1f, 0f);
             ebLblRt.pivot = new Vector2(0.5f, 1f);
             ebLblRt.anchoredPosition = new Vector2(0f, -6f);
             ebLblRt.sizeDelta = new Vector2(40f, 20f);
-            _allyHp = AnchoredLabel(root.transform, "ALLY BASE", new Vector2(.05f, .82f), new Vector2(.46f, .86f), 16, Color.white, TextAnchor.MiddleLeft);
-            _enemyHp = AnchoredLabel(root.transform, "ENEMY CORE", new Vector2(.54f, .82f), new Vector2(.95f, .86f), 16, Color.white, TextAnchor.MiddleRight);
+            _allyHp = ProceduralUiKit.CreateText(root.transform, "AllyHp", "ALLY BASE", new Vector2(.05f, .82f), new Vector2(.46f, .86f), 16, Color.white, TextAnchor.MiddleLeft, HorizontalWrapMode.Overflow);
+            _enemyHp = ProceduralUiKit.CreateText(root.transform, "EnemyHp", "ENEMY CORE", new Vector2(.54f, .82f), new Vector2(.95f, .86f), 16, Color.white, TextAnchor.MiddleRight, HorizontalWrapMode.Overflow);
             _allyBar = Bar(root.transform, new Vector2(.05f, .79f), new Vector2(.46f, .81f), new Color(.23f, .67f, .82f));
             _enemyBar = Bar(root.transform, new Vector2(.54f, .79f), new Vector2(.95f, .81f), new Color(.83f, .29f, .31f));
 
             // 主堡特性警示橫幅
-            _baseAlertText = AnchoredLabel(root.transform, "", new Vector2(0.20f, 0.70f), new Vector2(0.80f, 0.78f), 22, new Color(1f, 0.35f, 0.35f), TextAnchor.MiddleCenter);
+            _baseAlertText = ProceduralUiKit.CreateText(root.transform, "BaseAlert", "", new Vector2(0.20f, 0.70f), new Vector2(0.80f, 0.78f), 22, new Color(1f, 0.35f, 0.35f), TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
             _baseAlertText.gameObject.SetActive(false);
 
             // 大招 Cut-in 面板
-            _skillCutInPanel = Panel(root.transform, "SkillCutInPanel", new Vector2(0f, 0.40f), new Vector2(1f, 0.60f), new Color(0.04f, 0.08f, 0.14f, 0.94f));
-            Panel(_skillCutInPanel.transform, "GoldBorderTop", new Vector2(0f, 0.96f), new Vector2(1f, 1f), new Color(1f, 0.82f, 0.35f, 0.9f));
-            Panel(_skillCutInPanel.transform, "GoldBorderBottom", new Vector2(0f, 0f), new Vector2(1f, 0.04f), new Color(1f, 0.82f, 0.35f, 0.9f));
-            GameObject avatar = Panel(_skillCutInPanel.transform, "AvatarPlaceholder", new Vector2(0.05f, 0.10f), new Vector2(0.18f, 0.90f), new Color(0.2f, 0.35f, 0.5f, 0.8f));
-            Text avatarTxt = Label(avatar.transform, "PORTRAIT", 14, Color.white, TextAnchor.MiddleCenter);
-            Stretch(avatarTxt.rectTransform, 0);
+            _skillCutInPanel = ProceduralUiKit.CreatePanel(root.transform, "SkillCutInPanel", new Vector2(0f, 0.40f), new Vector2(1f, 0.60f), new Color(0.04f, 0.08f, 0.14f, 0.94f));
+            ProceduralUiKit.CreatePanel(_skillCutInPanel.transform, "GoldBorderTop", new Vector2(0f, 0.96f), new Vector2(1f, 1f), new Color(1f, 0.82f, 0.35f, 0.9f));
+            ProceduralUiKit.CreatePanel(_skillCutInPanel.transform, "GoldBorderBottom", new Vector2(0f, 0f), new Vector2(1f, 0.04f), new Color(1f, 0.82f, 0.35f, 0.9f));
+            GameObject avatar = ProceduralUiKit.CreatePanel(_skillCutInPanel.transform, "AvatarPlaceholder", new Vector2(0.05f, 0.10f), new Vector2(0.18f, 0.90f), new Color(0.2f, 0.35f, 0.5f, 0.8f));
+            ProceduralUiKit.CreateText(avatar.transform, "Label", "PORTRAIT", Vector2.zero, Vector2.one, 14, Color.white, TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
 
-            _skillCutInTitle = AnchoredLabel(_skillCutInPanel.transform, "", new Vector2(0.20f, 0.48f), new Vector2(0.95f, 0.90f), 28, new Color(1f, 0.85f, 0.3f), TextAnchor.MiddleLeft);
-            _skillCutInSubtitle = AnchoredLabel(_skillCutInPanel.transform, "", new Vector2(0.20f, 0.12f), new Vector2(0.95f, 0.48f), 16, new Color(0.82f, 0.90f, 0.98f), TextAnchor.MiddleLeft);
+            _skillCutInTitle = ProceduralUiKit.CreateText(_skillCutInPanel.transform, "CutInTitle", "", new Vector2(0.20f, 0.48f), new Vector2(0.95f, 0.90f), 28, new Color(1f, 0.85f, 0.3f), TextAnchor.MiddleLeft, HorizontalWrapMode.Overflow);
+            _skillCutInSubtitle = ProceduralUiKit.CreateText(_skillCutInPanel.transform, "CutInSubtitle", "", new Vector2(0.20f, 0.12f), new Vector2(0.95f, 0.48f), 16, new Color(0.82f, 0.90f, 0.98f), TextAnchor.MiddleLeft, HorizontalWrapMode.Overflow);
             _skillCutInPanel.SetActive(false);
 
-            Panel(root.transform, "Bottom", new Vector2(0, 0), new Vector2(1, .27f), new Color(.055f, .08f, .11f));
-            _energy = AnchoredLabel(root.transform, "ENERGY", new Vector2(.04f, .215f), new Vector2(.38f, .255f), 18, new Color(1f, .83f, .48f), TextAnchor.MiddleLeft);
+            ProceduralUiKit.CreatePanel(root.transform, "Bottom", new Vector2(0, 0), new Vector2(1, .27f), new Color(.055f, .08f, .11f));
+            _energy = ProceduralUiKit.CreateText(root.transform, "Energy", "ENERGY", new Vector2(.04f, .215f), new Vector2(.38f, .255f), 18, new Color(1f, .83f, .48f), TextAnchor.MiddleLeft, HorizontalWrapMode.Overflow);
             _energyBar = Bar(root.transform, new Vector2(.04f, .19f), new Vector2(.42f, .205f), new Color(.91f, .59f, .22f));
-            _status = AnchoredLabel(root.transform, "", new Vector2(.67f, .215f), new Vector2(.96f, .255f), 15, new Color(.7f, .78f, .83f), TextAnchor.MiddleRight);
-            _upgradeButton = ButtonAt(root.transform, "UPGRADE ENERGY", new Vector2(.46f, .19f), new Vector2(.62f, .25f), Upgrade, new Color(.16f, .34f, .39f), 13);
-            _pauseButton = ButtonAt(root.transform, "PAUSE", new Vector2(.72f, .12f), new Vector2(.80f, .18f), TogglePause, new Color(.16f, .23f, .29f), 14);
+            _status = ProceduralUiKit.CreateText(root.transform, "Status", "", new Vector2(.67f, .215f), new Vector2(.96f, .255f), 15, new Color(.7f, .78f, .83f), TextAnchor.MiddleRight, HorizontalWrapMode.Overflow);
+            _upgradeButton = ProceduralUiKit.CreateButton(root.transform, "UpgradeBtn", "UPGRADE ENERGY", new Vector2(.46f, .19f), new Vector2(.62f, .25f), Upgrade, new Color(.16f, .34f, .39f), 13, 3f, HorizontalWrapMode.Overflow);
+            _pauseButton = ProceduralUiKit.CreateButton(root.transform, "PauseBtn", "PAUSE", new Vector2(.72f, .12f), new Vector2(.80f, .18f), TogglePause, new Color(.16f, .23f, .29f), 14, 3f, HorizontalWrapMode.Overflow);
             _pauseLabel = _pauseButton.GetComponentInChildren<Text>();
-            _speedButton = ButtonAt(root.transform, "SPEED  x1", new Vector2(.81f, .12f), new Vector2(.89f, .18f), ToggleSpeed, new Color(.16f, .23f, .29f), 14);
+            _speedButton = ProceduralUiKit.CreateButton(root.transform, "SpeedBtn", "SPEED  x1", new Vector2(.81f, .12f), new Vector2(.89f, .18f), ToggleSpeed, new Color(.16f, .23f, .29f), 14, 3f, HorizontalWrapMode.Overflow);
             _speedLabel = _speedButton.GetComponentInChildren<Text>();
-            _retreatButton = ButtonAt(root.transform, "RETREAT", new Vector2(.90f, .12f), new Vector2(.97f, .18f), Retreat, new Color(.38f, .17f, .18f), 13);
+            _retreatButton = ProceduralUiKit.CreateButton(root.transform, "RetreatBtn", "RETREAT", new Vector2(.90f, .12f), new Vector2(.97f, .18f), Retreat, new Color(.38f, .17f, .18f), 13, 3f, HorizontalWrapMode.Overflow);
             for (int i = 0; i < 10; i++)
             {
                 int slot = i;
                 float x0 = .04f + i * .092f;
-                Button b = ButtonAt(root.transform, "", new Vector2(x0, .025f), new Vector2(x0 + .084f, .11f), delegate { _runner.TapSlot(slot); }, new Color(.12f, .18f, .25f), 13);
+                Button b = ProceduralUiKit.CreateButton(root.transform, "SlotBtn_" + i, "", new Vector2(x0, .025f), new Vector2(x0 + .084f, .11f), delegate { _runner.TapSlot(slot); }, new Color(.12f, .18f, .25f), 13, 3f, HorizontalWrapMode.Overflow);
                 _slots.Add(b);
                 _slotLabels.Add(b.GetComponentInChildren<Text>());
             }
 
-            _resultPanel = Panel(root.transform, "Result", new Vector2(.20f, .19f), new Vector2(.80f, .81f), new Color(.035f, .055f, .085f, .98f));
-            _resultTitle = AnchoredLabel(_resultPanel.transform, "BATTLE REPORT", new Vector2(.06f, .84f), new Vector2(.94f, .97f), 30, new Color(1f, .82f, .4f), TextAnchor.MiddleCenter);
+            _resultPanel = ProceduralUiKit.CreatePanel(root.transform, "Result", new Vector2(.20f, .19f), new Vector2(.80f, .81f), new Color(.035f, .055f, .085f, .98f));
+            _resultTitle = ProceduralUiKit.CreateText(_resultPanel.transform, "ResultTitle", "BATTLE REPORT", new Vector2(.06f, .84f), new Vector2(.94f, .97f), 30, new Color(1f, .82f, .4f), TextAnchor.MiddleCenter, HorizontalWrapMode.Overflow);
             GameObject viewport = new GameObject("ResultViewport", typeof(RectTransform), typeof(Image), typeof(RectMask2D));
             viewport.transform.SetParent(_resultPanel.transform, false);
             Image viewportImage = viewport.GetComponent<Image>();
@@ -774,7 +796,7 @@ namespace Game.Unity
             _resultContent.anchorMax = new Vector2(1f, 1f);
             _resultContent.pivot = new Vector2(.5f, 1f);
             _resultContent.sizeDelta = new Vector2(0f, _resultViewport.rect.height);
-            _resultLabel = AnchoredLabel(content.transform, "", Vector2.zero, Vector2.one, 18, Color.white, TextAnchor.UpperLeft);
+            _resultLabel = ProceduralUiKit.CreateText(content.transform, "ResultBody", "", Vector2.zero, Vector2.one, 18, Color.white, TextAnchor.UpperLeft, HorizontalWrapMode.Overflow);
             _resultLabel.rectTransform.anchorMin = new Vector2(0f, 1f);
             _resultLabel.rectTransform.anchorMax = new Vector2(1f, 1f);
             _resultLabel.rectTransform.pivot = new Vector2(.5f, 1f);
@@ -788,10 +810,10 @@ namespace Game.Unity
             _resultScroll.vertical = true;
             _resultScroll.movementType = ScrollRect.MovementType.Clamped;
             _resultScroll.inertia = false;
-            _replayButton = ButtonAt(_resultPanel.transform, "REPLAY", new Vector2(.10f, .06f), new Vector2(.44f, .19f), Replay, new Color(.48f, .31f, .13f), 16);
-            _nextStageButton = ButtonAt(_resultPanel.transform, "▶ NEXT STAGE", new Vector2(.36f, .06f), new Vector2(.64f, .19f), OnClickNextStage, new Color(.85f, .45f, .12f), 16);
+            _replayButton = ProceduralUiKit.CreateButton(_resultPanel.transform, "ReplayBtn", "REPLAY", new Vector2(.10f, .06f), new Vector2(.44f, .19f), Replay, new Color(.48f, .31f, .13f), 16, 3f, HorizontalWrapMode.Overflow);
+            _nextStageButton = ProceduralUiKit.CreateButton(_resultPanel.transform, "NextStageBtn", "▶ NEXT STAGE", new Vector2(.36f, .06f), new Vector2(.64f, .19f), OnClickNextStage, new Color(.85f, .45f, .12f), 16, 3f, HorizontalWrapMode.Overflow);
             _nextStageButton.gameObject.SetActive(false);
-            _lobbyButton = ButtonAt(_resultPanel.transform, "RETURN TO LOBBY", new Vector2(.56f, .06f), new Vector2(.90f, .19f), Retreat, new Color(.18f, .44f, .48f), 16);
+            _lobbyButton = ProceduralUiKit.CreateButton(_resultPanel.transform, "LobbyBtn", "RETURN TO LOBBY", new Vector2(.56f, .06f), new Vector2(.90f, .19f), Retreat, new Color(.18f, .44f, .48f), 16, 3f, HorizontalWrapMode.Overflow);
         }
 
         private void Upgrade() { if (_runner.Sim != null && _runner.Sim.EnergyUpgradeCost.HasValue) _runner.UpgradeEnergy(); }
@@ -827,9 +849,7 @@ namespace Game.Unity
             if (_board != null)
                 foreach (Transform child in _board)
                     if (child.name.StartsWith("BattleUnit_")) SafeDestroy(child.gameObject);
-            _units.Clear();
-            _unitHpLabels.Clear();
-            _unitStatusLabels.Clear();
+            _unitViews.Clear();
             _unitHealPulseTimers.Clear();
             _allyBaseHitTimer = 0f;
             _enemyBaseHitTimer = 0f;
@@ -843,44 +863,19 @@ namespace Game.Unity
             rt.anchorMax = max;
             rt.offsetMax = new Vector2(0, rt.offsetMax.y);
         }
-        private static string ShortName(string id) { return id == null ? "UNIT" : id.Replace("char", "").Replace("_", " ").ToUpperInvariant(); }
+        private static string ShortName(string id) { return ProceduralUiKit.ResolveUnitName(id); }
 
-        private static GameObject Panel(Transform parent, string name, Vector2 min, Vector2 max, Color color)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image)); go.transform.SetParent(parent, false);
-            RectTransform rt = go.GetComponent<RectTransform>(); rt.anchorMin = min; rt.anchorMax = max; rt.offsetMin = rt.offsetMax = Vector2.zero;
-            go.GetComponent<Image>().color = color; return go;
-        }
         private static Image Bar(Transform parent, Vector2 min, Vector2 max, Color color)
         {
-            GameObject back = Panel(parent, "Bar", min, max, new Color(.12f, .16f, .19f));
-            GameObject fill = Panel(back.transform, "Fill", Vector2.zero, Vector2.one, color);
+            GameObject back = ProceduralUiKit.CreatePanel(parent, "Bar", min, max, new Color(.12f, .16f, .19f));
+            GameObject fill = ProceduralUiKit.CreatePanel(back.transform, "Fill", Vector2.zero, Vector2.one, color);
             return fill.GetComponent<Image>();
-        }
-        private static Text AnchoredLabel(Transform parent, string value, Vector2 min, Vector2 max, int size, Color color, TextAnchor align)
-        {
-            GameObject go = new GameObject("Label", typeof(RectTransform), typeof(Text)); go.transform.SetParent(parent, false);
-            RectTransform rt = go.GetComponent<RectTransform>(); rt.anchorMin = min; rt.anchorMax = max; rt.offsetMin = rt.offsetMax = Vector2.zero;
-            Text t = go.GetComponent<Text>(); t.font = DefaultFont(); t.fontSize = size; t.color = color; t.alignment = align; t.text = value; t.horizontalOverflow = HorizontalWrapMode.Overflow; t.raycastTarget = false; return t;
-        }
-        private static Text Label(Transform parent, string value, int size, Color color, TextAnchor align)
-        {
-            Text t = AnchoredLabel(parent, value, Vector2.zero, Vector2.one, size, color, align); return t;
-        }
-        private static Button ButtonAt(Transform parent, string value, Vector2 min, Vector2 max, UnityEngine.Events.UnityAction action, Color color, int size)
-        {
-            GameObject go = Panel(parent, "Button", min, max, color); Button b = go.AddComponent<Button>(); b.onClick.AddListener(action);
-            Text t = Label(go.transform, value, size, Color.white, TextAnchor.MiddleCenter); Stretch(t.rectTransform, 3); return b;
         }
         private static GameObject Make(string name, Transform parent, Vector2 size, Vector2 pos)
         {
             GameObject go = new GameObject(name, typeof(RectTransform)); go.transform.SetParent(parent, false); RectTransform rt = go.GetComponent<RectTransform>();
             rt.anchorMin = rt.anchorMax = new Vector2(0, 0); rt.pivot = new Vector2(.5f, 0); rt.sizeDelta = size; rt.anchoredPosition = pos; return go;
         }
-        private static void Stretch(RectTransform rt, float margin)
-        { rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one; rt.offsetMin = new Vector2(margin, margin); rt.offsetMax = new Vector2(-margin, -margin); }
-        private static Font DefaultFont()
-        { Font f = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); return f != null ? f : Resources.GetBuiltinResource<Font>("Arial.ttf"); }
         private static void SafeDestroy(GameObject go)
         {
             if (go == null) return;

@@ -68,5 +68,16 @@
   "ui.lobby.achievement": "🏆 基地実績",
   "ui.settings.title": "SYSTEM SETTINGS // システム設定",
   "ui.stage.title": "OPERATION MAP // 作戦星図",
-  "ui.stage.sortie": "⚔ 作戦出撃 (SORTIE)"
+  "ui.stage.sortie": "⚔ 作戦出撃 (SORTIE)",
+  "enemy/en_slime.name": "深淵の紫炎スライム",
+  "enemy/en_goblin_raider.name": "ゴブリン・レイダー",
+  "enemy/en_bat.name": "クリムゾンバット",
+  "enemy/en_goblin_shaman.name": "ゴブリンシャーマン",
+  "enemy/en_harpy.name": "アビスハーピー",
+  "enemy/en_mage_skeleton.name": "リッチスケルトン",
+  "enemy/en_dark_elf_blade.name": "ダークエルフ剣士",
+  "enemy/en_dark_elf_archer.name": "ダークエルフ弓手",
+  "enemy/en_wraith_assassin.name": "レイスアサシン",
+  "enemy/en_golem.name": "黒曜ルーンゴーレム",
+  "enemy/en_golem_colossus.name": "煉獄コロッサス魔王"
 }

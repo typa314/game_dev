@@ -68,5 +68,16 @@
   "char/char26_ayame_ninja.name": "Ayame",
   "char/char07_kagura.name": "Kagura",
   "char/char09_chloe.name": "Chloe",
-  "char/char10_mirai.name": "Mirai"
+  "char/char10_mirai.name": "Mirai",
+  "enemy/en_slime.name": "Abyssal Void Slime",
+  "enemy/en_goblin_raider.name": "Goblin Raider",
+  "enemy/en_bat.name": "Crimson Bat",
+  "enemy/en_goblin_shaman.name": "Goblin Shaman",
+  "enemy/en_harpy.name": "Abyssal Harpy Scout",
+  "enemy/en_mage_skeleton.name": "Lich Mage Skeleton",
+  "enemy/en_dark_elf_blade.name": "Dark Elf Nightblade",
+  "enemy/en_dark_elf_archer.name": "Dark Elf Shadow Archer",
+  "enemy/en_wraith_assassin.name": "Wraith Assassin",
+  "enemy/en_golem.name": "Obsidian Rune Golem",
+  "enemy/en_golem_colossus.name": "Infernal Colossus Overlord"
 }

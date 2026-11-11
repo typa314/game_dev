@@ -833,5 +833,31 @@ namespace Game.Tests
             Assert.AreEqual(360, tankFast.Hp, "高攻速補師 (間隔5 ticks) 在 20 ticks 內應治療 4 次共 +160 HP");
             Assert.AreEqual(240, tankSlow.Hp, "低攻速補師 (間隔20 ticks) 在 20 ticks 內應治療 1 次共 +40 HP");
         }
+
+        [Test]
+        public void A7_23_IsHealer_DrivenByTraitsAndHealSkill_NotHardcodedId()
+        {
+            var customHealerByTrait = new BattleUnit
+            {
+                T = new UnitTemplate
+                {
+                    Id = "char_custom_support",
+                    Traits = new List<string> { "healer" },
+                    Skill = new CharacterSkillDef { EffectType = "buff_atk" }
+                }
+            };
+            Assert.IsTrue(BattleSimulator.IsHealer(customHealerByTrait), "具備 healer trait 的任何單位應自動視為補師");
+
+            var strippedElysia = new BattleUnit
+            {
+                T = new UnitTemplate
+                {
+                    Id = "char04_elysia",
+                    Traits = new List<string>(),
+                    Skill = new CharacterSkillDef { EffectType = "damage" }
+                }
+            };
+            Assert.IsFalse(BattleSimulator.IsHealer(strippedElysia), "移除 heal 技能與 healer trait 後不應因硬編碼 ID 被誤判為補師");
+        }
     }
 }

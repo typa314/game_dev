@@ -656,7 +656,7 @@ namespace Game.Tests
             List<string> errors = MasterDataValidator.Validate(m);
             Assert.That(errors, Is.Not.Empty, "套用改動後必須產生錯誤訊息");
 
-            Regex entityRegex = new Regex(@"^(character|portraitStage|costume|scene|spot|stage|banner|encounter|encounter series|achievement) [^\s:]+: \S.*$");
+            Regex entityRegex = new Regex(@"^(character|portraitStage|costume|scene|spot|stage|enemy|banner|encounter|encounter series|achievement) [^\s:]+: \S.*$");
             Regex configRegex = new Regex(@"^config\.initial: \S.*$");
 
             List<string> invalidMessages = new List<string>();
@@ -670,6 +670,18 @@ namespace Game.Tests
 
             Assert.That(invalidMessages, Is.Empty,
                 "以下錯誤訊息不符合規範格式:\n" + string.Join("\n", invalidMessages));
+        }
+
+        [Test]
+        public void EnemyFactionAndScaleCategory_RejectsInvalidValues()
+        {
+            MasterDatabase m = LoadCleanMaster();
+            m.Enemies["en_slime"].Faction = "alien_faction";
+            m.Enemies["en_golem"].ScaleCategory = "giant_mega";
+
+            List<string> errors = MasterDataValidator.Validate(m);
+            AssertHasError(errors, "enemy en_slime:", "unknown faction alien_faction");
+            AssertHasError(errors, "enemy en_golem:", "unknown scaleCategory giant_mega");
         }
     }
 }

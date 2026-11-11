@@ -800,22 +800,7 @@ namespace Game.Unity.UI
 
         private string GetCharacterDisplayName(string charId)
         {
-            switch (charId)
-            {
-                case "char01_claire": return "克萊兒";
-                case "char02_luna": return "露娜";
-                case "char03_scarlet": return "史卡蕾特";
-                case "char04_elysia": return "愛麗西亞";
-                case "char05_rin": return "凜";
-                case "char06_seraphina": return "塞拉菲娜";
-                case "char07_ayame": return "綾女";
-                case "char08_sakura":
-                case "char18_sakura_miko": return "櫻";
-                case "char26_ayame_ninja": return "綾女";
-                case "char08_yuki": return "雪";
-                case "char09_yuki": return "雪";
-                default: return charId;
-            }
+            return ProceduralUiKit.ResolveCharacterName(charId);
         }
 
         private string GetRoleDisplayTitle(string charId)
@@ -893,24 +878,11 @@ namespace Game.Unity.UI
         private Sprite TryLoadCharacterSprite(string artKey)
         {
             if (string.IsNullOrEmpty(artKey)) return null;
-            string basePath = Application.streamingAssetsPath;
-            string portraitPath = Path.Combine(basePath, "Portraits", artKey + ".png");
-            if (!File.Exists(portraitPath)) return null;
-
-            try
-            {
-                byte[] bytes = File.ReadAllBytes(portraitPath);
-                var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                if (tex.LoadImage(bytes))
-                {
-                    return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[GachaView] Load sprite failed: {artKey}, err: {ex.Message}");
-            }
-            return null;
+            return AssetService.ResolveStreamingSprite(
+                $"portrait_{artKey}",
+                new[] { $"Portraits/{artKey}.png" },
+                new Vector2(0.5f, 0.5f),
+                "[GachaView]");
         }
 
         #endregion

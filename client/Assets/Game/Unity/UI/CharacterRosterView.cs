@@ -185,7 +185,7 @@ namespace Game.Unity.UI
                 {
                     string grade = owned ? state.DisplayGrade : def.Rarity;
                     string lvStr = owned ? $"Lv.{state.Level}" : "未招募";
-                    infoTxt.text = $"[{grade}] {ShortName(def.Name ?? def.Id)}\n{lvStr}";
+                    infoTxt.text = $"[{grade}] {ProceduralUiKit.ResolveCharacterName(def.Id, def)}\n{lvStr}";
                     infoTxt.color = owned ? Color.white : new Color(0.6f, 0.65f, 0.7f, 0.8f);
                 }
 
@@ -210,7 +210,7 @@ namespace Game.Unity.UI
             CurrentMaxLevel = maxLevel;
 
             CharacterDef def = _presenter.GetCharacterDef(SelectedCharId);
-            string charName = def != null ? (def.Name ?? def.Id) : SelectedCharId;
+            string charName = ProceduralUiKit.ResolveCharacterName(SelectedCharId, def);
             _charNameTitle.text = charName.ToUpperInvariant();
             _rarityBadge.text = $"★ {character.DisplayGrade} // CLASS";
             _levelLabel.text = $"LV. {character.Level} / {maxLevel}";
@@ -248,7 +248,7 @@ namespace Game.Unity.UI
         {
             CurrentCharacterState = null;
             CurrentMaxLevel = 0;
-            string name = def != null ? (def.Name ?? def.Id) : SelectedCharId;
+            string name = ProceduralUiKit.ResolveCharacterName(SelectedCharId, def);
             _charNameTitle.text = $"{name.ToUpperInvariant()} (未持有)";
             _rarityBadge.text = $"★ {def?.Rarity ?? "R"} // LOCKED";
             _levelLabel.text = "LV. 0 / 0";
@@ -325,16 +325,16 @@ namespace Game.Unity.UI
             scaler.matchWidthOrHeight = 0.5f;
 
             // 1. 背景底板
-            CreatePanel(_canvasRoot.transform, "Backdrop", Vector2.zero, Vector2.one, new Color(0.04f, 0.06f, 0.09f, 0.98f));
+            ProceduralUiKit.CreatePanel(_canvasRoot.transform, "Backdrop", Vector2.zero, Vector2.one, new Color(0.04f, 0.06f, 0.09f, 0.98f));
 
             // 2. 頂部導航列
-            GameObject topBar = CreatePanel(_canvasRoot.transform, "TopBar", new Vector2(0f, 0.92f), new Vector2(1f, 1f), new Color(0.06f, 0.09f, 0.14f, 0.95f));
-            _backButton = CreateButton(topBar.transform, "BackButton", "◀ 返回大廳", new Vector2(0.02f, 0.15f), new Vector2(0.12f, 0.85f), Close, new Color(0.18f, 0.28f, 0.38f));
-            CreateLabel(topBar.transform, "Title", "◆ 部隊名冊與角色養成 // CHARACTER ROSTER", new Vector2(0.15f, 0.15f), new Vector2(0.60f, 0.85f), 24, new Color(0.9f, 0.94f, 1f), TextAnchor.MiddleLeft);
+            GameObject topBar = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "TopBar", new Vector2(0f, 0.92f), new Vector2(1f, 1f), new Color(0.06f, 0.09f, 0.14f, 0.95f));
+            _backButton = ProceduralUiKit.CreateButton(topBar.transform, "BackButton", "◀ 返回大廳", new Vector2(0.02f, 0.15f), new Vector2(0.12f, 0.85f), Close, new Color(0.18f, 0.28f, 0.38f));
+            ProceduralUiKit.CreateText(topBar.transform, "Title", "◆ 部隊名冊與角色養成 // CHARACTER ROSTER", new Vector2(0.15f, 0.15f), new Vector2(0.60f, 0.85f), 24, new Color(0.9f, 0.94f, 1f), TextAnchor.MiddleLeft);
 
             // 3. 左側名冊滾動清單 (ScrollView)
-            GameObject rosterPanel = CreatePanel(_canvasRoot.transform, "RosterPanel", new Vector2(0.02f, 0.04f), new Vector2(0.26f, 0.90f), new Color(0.05f, 0.08f, 0.12f, 0.85f));
-            CreateLabel(rosterPanel.transform, "Header", "ROSTER LIST", new Vector2(0.05f, 0.93f), new Vector2(0.95f, 0.99f), 16, new Color(0.6f, 0.75f, 0.9f), TextAnchor.MiddleLeft);
+            GameObject rosterPanel = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "RosterPanel", new Vector2(0.02f, 0.04f), new Vector2(0.26f, 0.90f), new Color(0.05f, 0.08f, 0.12f, 0.85f));
+            ProceduralUiKit.CreateText(rosterPanel.transform, "Header", "ROSTER LIST", new Vector2(0.05f, 0.93f), new Vector2(0.95f, 0.99f), 16, new Color(0.6f, 0.75f, 0.9f), TextAnchor.MiddleLeft);
 
             GameObject scrollGo = new GameObject("Scroll", typeof(RectTransform), typeof(ScrollRect), typeof(RectMask2D));
             scrollGo.transform.SetParent(rosterPanel.transform, false);
@@ -369,40 +369,40 @@ namespace Game.Unity.UI
             _rosterContent = contentGo.transform;
 
             // 4. 中央立繪展示區
-            GameObject centerPanel = CreatePanel(_canvasRoot.transform, "CenterPanel", new Vector2(0.28f, 0.04f), new Vector2(0.62f, 0.90f), new Color(0.05f, 0.07f, 0.11f, 0.6f));
-            GameObject portraitGo = CreatePanel(centerPanel.transform, "Portrait", new Vector2(0.05f, 0.15f), new Vector2(0.95f, 0.95f), new Color(0.1f, 0.15f, 0.22f, 0.5f));
+            GameObject centerPanel = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "CenterPanel", new Vector2(0.28f, 0.04f), new Vector2(0.62f, 0.90f), new Color(0.05f, 0.07f, 0.11f, 0.6f));
+            GameObject portraitGo = ProceduralUiKit.CreatePanel(centerPanel.transform, "Portrait", new Vector2(0.05f, 0.15f), new Vector2(0.95f, 0.95f), new Color(0.1f, 0.15f, 0.22f, 0.5f));
             _portraitImage = portraitGo.GetComponent<Image>();
 
-            _charNameTitle = CreateLabel(centerPanel.transform, "CharName", "CLAIRE", new Vector2(0.05f, 0.08f), new Vector2(0.70f, 0.15f), 30, Color.white, TextAnchor.MiddleLeft);
-            _rarityBadge = CreateLabel(centerPanel.transform, "RarityBadge", "★ SSR // CLASS", new Vector2(0.05f, 0.02f), new Vector2(0.70f, 0.08f), 18, new Color(1f, 0.82f, 0.35f), TextAnchor.MiddleLeft);
+            _charNameTitle = ProceduralUiKit.CreateText(centerPanel.transform, "CharName", "CLAIRE", new Vector2(0.05f, 0.08f), new Vector2(0.70f, 0.15f), 30, Color.white, TextAnchor.MiddleLeft);
+            _rarityBadge = ProceduralUiKit.CreateText(centerPanel.transform, "RarityBadge", "★ SSR // CLASS", new Vector2(0.05f, 0.02f), new Vector2(0.70f, 0.08f), 18, new Color(1f, 0.82f, 0.35f), TextAnchor.MiddleLeft);
 
             // 5. 右側養成與屬性面板
-            GameObject rightPanel = CreatePanel(_canvasRoot.transform, "RightPanel", new Vector2(0.64f, 0.04f), new Vector2(0.98f, 0.90f), new Color(0.05f, 0.08f, 0.13f, 0.95f));
+            GameObject rightPanel = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "RightPanel", new Vector2(0.64f, 0.04f), new Vector2(0.98f, 0.90f), new Color(0.05f, 0.08f, 0.13f, 0.95f));
 
-            _levelLabel = CreateLabel(rightPanel.transform, "LevelLabel", "LV. 1 / 30", new Vector2(0.05f, 0.91f), new Vector2(0.95f, 0.97f), 22, new Color(0.35f, 0.85f, 1f), TextAnchor.MiddleLeft);
-            _awakenStarsLabel = CreateLabel(rightPanel.transform, "AwakenLabel", "AWAKEN: ★☆☆☆☆", new Vector2(0.05f, 0.85f), new Vector2(0.95f, 0.91f), 18, new Color(1f, 0.82f, 0.35f), TextAnchor.MiddleLeft);
-            _affectionLabel = CreateLabel(rightPanel.transform, "AffectionLabel", "AFFECTION: 0 pts", new Vector2(0.05f, 0.79f), new Vector2(0.95f, 0.85f), 16, new Color(1f, 0.6f, 0.8f), TextAnchor.MiddleLeft);
+            _levelLabel = ProceduralUiKit.CreateText(rightPanel.transform, "LevelLabel", "LV. 1 / 30", new Vector2(0.05f, 0.91f), new Vector2(0.95f, 0.97f), 22, new Color(0.35f, 0.85f, 1f), TextAnchor.MiddleLeft);
+            _awakenStarsLabel = ProceduralUiKit.CreateText(rightPanel.transform, "AwakenLabel", "AWAKEN: ★☆☆☆☆", new Vector2(0.05f, 0.85f), new Vector2(0.95f, 0.91f), 18, new Color(1f, 0.82f, 0.35f), TextAnchor.MiddleLeft);
+            _affectionLabel = ProceduralUiKit.CreateText(rightPanel.transform, "AffectionLabel", "AFFECTION: 0 pts", new Vector2(0.05f, 0.79f), new Vector2(0.95f, 0.85f), 16, new Color(1f, 0.6f, 0.8f), TextAnchor.MiddleLeft);
 
             // 戰鬥屬性
-            GameObject statsBox = CreatePanel(rightPanel.transform, "StatsBox", new Vector2(0.05f, 0.52f), new Vector2(0.95f, 0.77f), new Color(0.08f, 0.12f, 0.18f, 0.9f));
-            _hpStatLabel = CreateLabel(statsBox.transform, "Hp", "HP  1000", new Vector2(0.05f, 0.68f), new Vector2(0.48f, 0.95f), 18, Color.white, TextAnchor.MiddleLeft);
-            _atkStatLabel = CreateLabel(statsBox.transform, "Atk", "ATK  150", new Vector2(0.52f, 0.68f), new Vector2(0.95f, 0.95f), 18, Color.white, TextAnchor.MiddleLeft);
-            _rangeStatLabel = CreateLabel(statsBox.transform, "Range", "RANGE  150", new Vector2(0.05f, 0.36f), new Vector2(0.48f, 0.64f), 18, Color.white, TextAnchor.MiddleLeft);
-            _costStatLabel = CreateLabel(statsBox.transform, "Cost", "COST  200", new Vector2(0.52f, 0.36f), new Vector2(0.95f, 0.64f), 18, Color.white, TextAnchor.MiddleLeft);
-            _roleStatLabel = CreateLabel(statsBox.transform, "Role", "ROLE  ASSAULT", new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.32f), 16, new Color(0.7f, 0.82f, 0.95f), TextAnchor.MiddleLeft);
+            GameObject statsBox = ProceduralUiKit.CreatePanel(rightPanel.transform, "StatsBox", new Vector2(0.05f, 0.52f), new Vector2(0.95f, 0.77f), new Color(0.08f, 0.12f, 0.18f, 0.9f));
+            _hpStatLabel = ProceduralUiKit.CreateText(statsBox.transform, "Hp", "HP  1000", new Vector2(0.05f, 0.68f), new Vector2(0.48f, 0.95f), 18, Color.white, TextAnchor.MiddleLeft);
+            _atkStatLabel = ProceduralUiKit.CreateText(statsBox.transform, "Atk", "ATK  150", new Vector2(0.52f, 0.68f), new Vector2(0.95f, 0.95f), 18, Color.white, TextAnchor.MiddleLeft);
+            _rangeStatLabel = ProceduralUiKit.CreateText(statsBox.transform, "Range", "RANGE  150", new Vector2(0.05f, 0.36f), new Vector2(0.48f, 0.64f), 18, Color.white, TextAnchor.MiddleLeft);
+            _costStatLabel = ProceduralUiKit.CreateText(statsBox.transform, "Cost", "COST  200", new Vector2(0.52f, 0.36f), new Vector2(0.95f, 0.64f), 18, Color.white, TextAnchor.MiddleLeft);
+            _roleStatLabel = ProceduralUiKit.CreateText(statsBox.transform, "Role", "ROLE  ASSAULT", new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.32f), 16, new Color(0.7f, 0.82f, 0.95f), TextAnchor.MiddleLeft);
 
             // 技能面板
-            GameObject skillBox = CreatePanel(rightPanel.transform, "SkillBox", new Vector2(0.05f, 0.32f), new Vector2(0.95f, 0.50f), new Color(0.08f, 0.12f, 0.18f, 0.9f));
-            _skillNameLabel = CreateLabel(skillBox.transform, "SkillName", "★ SKILL", new Vector2(0.05f, 0.55f), new Vector2(0.95f, 0.92f), 18, new Color(1f, 0.85f, 0.3f), TextAnchor.MiddleLeft);
-            _skillDescLabel = CreateLabel(skillBox.transform, "SkillDesc", "Skill description text", new Vector2(0.05f, 0.08f), new Vector2(0.95f, 0.52f), 14, new Color(0.8f, 0.85f, 0.9f), TextAnchor.UpperLeft);
+            GameObject skillBox = ProceduralUiKit.CreatePanel(rightPanel.transform, "SkillBox", new Vector2(0.05f, 0.32f), new Vector2(0.95f, 0.50f), new Color(0.08f, 0.12f, 0.18f, 0.9f));
+            _skillNameLabel = ProceduralUiKit.CreateText(skillBox.transform, "SkillName", "★ SKILL", new Vector2(0.05f, 0.55f), new Vector2(0.95f, 0.92f), 18, new Color(1f, 0.85f, 0.3f), TextAnchor.MiddleLeft);
+            _skillDescLabel = ProceduralUiKit.CreateText(skillBox.transform, "SkillDesc", "Skill description text", new Vector2(0.05f, 0.08f), new Vector2(0.95f, 0.52f), 14, new Color(0.8f, 0.85f, 0.9f), TextAnchor.UpperLeft);
 
             // 養成操作大按鈕 (LevelUp, Awaken, Advance)
-            _levelUpButton = CreateButton(rightPanel.transform, "BtnLevelUp", "⬆️ 升級 (Level Up)", new Vector2(0.05f, 0.21f), new Vector2(0.95f, 0.29f), OnClickLevelUp, new Color(0.18f, 0.44f, 0.60f), 18);
-            _awakenButton = CreateButton(rightPanel.transform, "BtnAwaken", "⭐ 覺醒突破 (Awaken)", new Vector2(0.05f, 0.12f), new Vector2(0.95f, 0.20f), OnClickAwaken, new Color(0.55f, 0.36f, 0.14f), 18);
-            _advanceButton = CreateButton(rightPanel.transform, "BtnAdvance", "👑 同卡進階 (Advance)", new Vector2(0.05f, 0.03f), new Vector2(0.95f, 0.11f), OnClickAdvance, new Color(0.48f, 0.20f, 0.52f), 18);
+            _levelUpButton = ProceduralUiKit.CreateButton(rightPanel.transform, "BtnLevelUp", "⬆️ 升級 (Level Up)", new Vector2(0.05f, 0.21f), new Vector2(0.95f, 0.29f), OnClickLevelUp, new Color(0.18f, 0.44f, 0.60f), 18);
+            _awakenButton = ProceduralUiKit.CreateButton(rightPanel.transform, "BtnAwaken", "⭐ 覺醒突破 (Awaken)", new Vector2(0.05f, 0.12f), new Vector2(0.95f, 0.20f), OnClickAwaken, new Color(0.55f, 0.36f, 0.14f), 18);
+            _advanceButton = ProceduralUiKit.CreateButton(rightPanel.transform, "BtnAdvance", "👑 同卡進階 (Advance)", new Vector2(0.05f, 0.03f), new Vector2(0.95f, 0.11f), OnClickAdvance, new Color(0.48f, 0.20f, 0.52f), 18);
 
             // 狀態與錯誤提示訊息
-            _messageLabel = CreateLabel(rightPanel.transform, "MessageLabel", "", new Vector2(0.05f, 0.00f), new Vector2(0.95f, 0.03f), 14, Color.green, TextAnchor.MiddleCenter);
+            _messageLabel = ProceduralUiKit.CreateText(rightPanel.transform, "MessageLabel", "", new Vector2(0.05f, 0.00f), new Vector2(0.95f, 0.03f), 14, Color.green, TextAnchor.MiddleCenter);
         }
 
         private Button CreateCharacterCard(CharacterDef def)
@@ -420,7 +420,7 @@ namespace Game.Unity.UI
             string charId = def.Id;
             btn.onClick.AddListener(() => SelectCharacter(charId));
 
-            Text txt = CreateLabel(card.transform, "Info", $"[{def.Rarity}] {ShortName(def.Name ?? def.Id)}", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.92f), 15, Color.white, TextAnchor.MiddleLeft);
+            Text txt = ProceduralUiKit.CreateText(card.transform, "Info", $"[{def.Rarity}] {ProceduralUiKit.ResolveCharacterName(def.Id, def)}", new Vector2(0.08f, 0.08f), new Vector2(0.92f, 0.92f), 15, Color.white, TextAnchor.MiddleLeft);
             _cardInfoTexts[def.Id] = txt;
 
             return btn;
@@ -429,65 +429,13 @@ namespace Game.Unity.UI
         private void TryLoadPortrait(string charId, string artKey)
         {
             if (_portraitImage == null) return;
-            string path = Path.Combine(Application.streamingAssetsPath, "Portraits", $"{charId}.png");
-            if (File.Exists(path))
-            {
-                byte[] data = File.ReadAllBytes(path);
-                Texture2D tex = new Texture2D(2, 2);
-                if (tex.LoadImage(data))
-                {
-                    _portraitImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                    _portraitImage.color = Color.white;
-                    return;
-                }
-            }
-            _portraitImage.sprite = ProceduralUiKit.GetSilhouetteSprite(360, 500);
+            Sprite sp = AssetService.ResolveStreamingSprite(
+                $"portrait_{charId}",
+                new[] { $"Portraits/{charId}.png" },
+                new Vector2(0.5f, 0.5f),
+                "[CharacterRosterView]");
+            _portraitImage.sprite = sp != null ? sp : ProceduralUiKit.GetSilhouetteSprite(360, 500);
             _portraitImage.color = Color.white;
-        }
-
-        private static string ShortName(string id)
-        {
-            if (string.IsNullOrEmpty(id)) return "HERO";
-            return id.Replace("char", "").Replace("_", " ").Trim().ToUpperInvariant();
-        }
-
-        private static GameObject CreatePanel(Transform parent, string name, Vector2 min, Vector2 max, Color color)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image));
-            go.transform.SetParent(parent, false);
-            RectTransform rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = min;
-            rt.anchorMax = max;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            go.GetComponent<Image>().color = color;
-            return go;
-        }
-
-        private static Text CreateLabel(Transform parent, string name, string value, Vector2 min, Vector2 max, int size, Color color, TextAnchor align)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
-            go.transform.SetParent(parent, false);
-            RectTransform rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = min;
-            rt.anchorMax = max;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            Text t = go.GetComponent<Text>();
-            t.font = ProceduralUiKit.GetDefaultFont();
-            t.fontSize = size;
-            t.color = color;
-            t.alignment = align;
-            t.text = value;
-            t.raycastTarget = false;
-            return t;
-        }
-
-        private static Button CreateButton(Transform parent, string name, string text, Vector2 min, Vector2 max, UnityEngine.Events.UnityAction action, Color color, int size = 16)
-        {
-            GameObject go = CreatePanel(parent, name, min, max, color);
-            Button b = go.AddComponent<Button>();
-            if (action != null) b.onClick.AddListener(action);
-            CreateLabel(go.transform, "Label", text, Vector2.zero, Vector2.one, size, Color.white, TextAnchor.MiddleCenter);
-            return b;
         }
     }
 }

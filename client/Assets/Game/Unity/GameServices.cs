@@ -84,6 +84,8 @@ namespace Game.Unity
             {
                 disposablePlatform.Dispose();
             }
+            Assets?.ClearCache();
+            AssetService.ClearSharedStreamingCache();
             Platform = null;
             Core = null;
             SaveStore = null;

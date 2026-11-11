@@ -20,6 +20,9 @@ namespace Game.Domain.Battle
         private readonly long _lengthMilli;
         private readonly List<BattleUnit> _units = new List<BattleUnit>();
         private readonly List<BattleCommand> _pending = new List<BattleCommand>();
+        private readonly List<BattleCommand> _commandBuffer = new List<BattleCommand>();
+        private readonly List<BattleUnit> _targetBuffer = new List<BattleUnit>();
+        private readonly List<BattleEvent> _tickEvents = new List<BattleEvent>();
         private List<BattleCommand> _replay;                 // 回放模式：預先排定的指令（已依 tick 穩定排序）
         private int _replayIndex;
         private readonly List<WaveState> _waves = new List<WaveState>();
@@ -59,7 +62,7 @@ namespace Game.Domain.Battle
             _lengthMilli = (long)setup.Stage.Length * 1000;
             _cooldowns = new int[setup.Team.Count];
             _skillCharges = new int[setup.Team.Count];
-            TickEvents = new List<BattleEvent>();
+            TickEvents = _tickEvents;
             Recorded = new List<BattleCommand>();
 
             AllyBaseLevel = Math.Max(1, setup.AllyBaseLevel);
@@ -119,7 +122,7 @@ namespace Game.Domain.Battle
         public void Step()
         {
             if (Outcome != BattleOutcome.Ongoing) return;
-            TickEvents = new List<BattleEvent>();
+            _tickEvents.Clear();
 
             ApplyCommands();
             Regen();
@@ -162,20 +165,21 @@ namespace Game.Domain.Battle
 
         private void ApplyCommands()
         {
-            var toApply = new List<BattleCommand>();
+            _commandBuffer.Clear();
             if (_replay != null)
             {
                 while (_replayIndex < _replay.Count && _replay[_replayIndex].Tick <= Tick)
                 {
-                    if (_replay[_replayIndex].Tick == Tick) toApply.Add(_replay[_replayIndex]);
+                    if (_replay[_replayIndex].Tick == Tick) _commandBuffer.Add(_replay[_replayIndex]);
                     _replayIndex++;
                 }
             }
-            toApply.AddRange(_pending);
+            _commandBuffer.AddRange(_pending);
             _pending.Clear();
 
-            foreach (BattleCommand c in toApply)
+            for (int i = 0; i < _commandBuffer.Count; i++)
             {
+                BattleCommand c = _commandBuffer[i];
                 // 不合法的指令（例如回放資料被竄改）直接忽略，不記錄
                 if (TryApply(c)) Recorded.Add(new BattleCommand(Tick, c.Type, c.Slot));
             }
@@ -318,11 +322,10 @@ namespace Game.Domain.Battle
                     UpdateHealerAura(u);
                 }
 
-                List<BattleUnit> targets;
                 bool baseInRange;
-                FindTargets(u, out targets, out baseInRange);
+                FindTargets(u, _targetBuffer, out baseInRange);
 
-                if (targets.Count == 0 && !baseInRange)
+                if (_targetBuffer.Count == 0 && !baseInRange)
                 {
                     Move(u);
                     continue;
@@ -330,10 +333,17 @@ namespace Game.Domain.Battle
                 if (u.AttackTimer > 0) continue;
 
                 u.AttackTimer = u.T.AttackIntervalTicks;
-                if (targets.Count > 0)
+                if (_targetBuffer.Count > 0)
                 {
-                    if (u.T.Area) foreach (BattleUnit t in targets) Damage(t, DamageAgainst(u, t), false);
-                    else Damage(targets[0], DamageAgainst(u, targets[0]), false);
+                    if (u.T.Area)
+                    {
+                        for (int tIdx = 0; tIdx < _targetBuffer.Count; tIdx++)
+                            Damage(_targetBuffer[tIdx], DamageAgainst(u, _targetBuffer[tIdx]), false);
+                    }
+                    else
+                    {
+                        Damage(_targetBuffer[0], DamageAgainst(u, _targetBuffer[0]), false);
+                    }
                 }
                 else
                 {
@@ -342,22 +352,22 @@ namespace Game.Domain.Battle
             }
         }
 
-        private void FindTargets(BattleUnit u, out List<BattleUnit> targets, out bool baseInRange)
+        private void FindTargets(BattleUnit u, List<BattleUnit> targets, out bool baseInRange)
         {
-            targets = new List<BattleUnit>();
+            targets.Clear();
             BattleUnit nearest = null;
             long nearestDist = long.MaxValue;
-            foreach (BattleUnit o in _units)
+            for (int i = 0; i < _units.Count; i++)
             {
+                BattleUnit o = _units[i];
                 if (!o.Alive || o.Side == u.Side) continue;
                 long dist = u.Side == Side.Ally ? o.X - u.X : u.X - o.X;   // 往前方向的距離
                 if (dist < -ContactSlackMilli || dist > u.T.RangeMilli) continue;
-                targets.Add(o);
+                if (u.T.Area) targets.Add(o);
                 if (dist < nearestDist) { nearestDist = dist; nearest = o; }
             }
             if (!u.T.Area && nearest != null)
             {
-                targets.Clear();
                 targets.Add(nearest);
             }
             long toBase = u.Side == Side.Ally ? _lengthMilli - u.X : u.X;
@@ -382,8 +392,23 @@ namespace Game.Domain.Battle
             {
                 dmg = dmg * (100 + attacker.AtkBuffPct) / 100;
             }
-            if (attacker.T.Traits.Contains("anti_" + target.T.Type)) dmg = dmg * 3 / 2;
+            if (HasAntiTrait(attacker.T.Traits, target.T.Type)) dmg = dmg * 3 / 2;
             return dmg;
+        }
+
+        private static bool HasAntiTrait(List<string> traits, string targetType)
+        {
+            if (traits == null || traits.Count == 0 || string.IsNullOrEmpty(targetType)) return false;
+            string needle;
+            switch (targetType)
+            {
+                case "normal": needle = "anti_normal"; break;
+                case "flying": needle = "anti_flying"; break;
+                case "armored": needle = "anti_armored"; break;
+                case "ranged": needle = "anti_ranged"; break;
+                default: needle = "anti_" + targetType; break;
+            }
+            return traits.Contains(needle);
         }
 
         private void Damage(BattleUnit t, int dmg, bool forceKnockback)
@@ -621,9 +646,7 @@ namespace Game.Domain.Battle
                 return true;
             if (u.T.Traits != null && u.T.Traits.Contains("healer"))
                 return true;
-            if (!string.IsNullOrEmpty(u.T.Id) && (u.T.Id == "char04_elysia" || u.T.Id.IndexOf("healer", StringComparison.OrdinalIgnoreCase) >= 0))
-                return true;
-            return false;
+            return !string.IsNullOrEmpty(u.T.Id) && u.T.Id.IndexOf("healer", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void UpdateHealerAura(BattleUnit u)

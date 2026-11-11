@@ -215,7 +215,7 @@ namespace Game.Unity.UI
 
             CharacterDef def = null;
             if (_core?.Master?.Characters != null) _core.Master.Characters.TryGetValue(charId, out def);
-            string charName = def != null ? (def.Name ?? def.Id) : charId;
+            string charName = ProceduralUiKit.ResolveCharacterName(charId, def);
             _charTitleLabel.text = charName.ToUpperInvariant();
 
             // 構建立繪階段按鈕 (S1, S2, S3)
@@ -263,16 +263,16 @@ namespace Game.Unity.UI
             scaler.matchWidthOrHeight = 0.5f;
 
             // 1. 背景底板
-            CreatePanel(_canvasRoot.transform, "Backdrop", Vector2.zero, Vector2.one, new Color(0.04f, 0.06f, 0.09f, 0.98f));
+            ProceduralUiKit.CreatePanel(_canvasRoot.transform, "Backdrop", Vector2.zero, Vector2.one, new Color(0.04f, 0.06f, 0.09f, 0.98f));
 
             // 2. 頂部導航列
-            GameObject topBar = CreatePanel(_canvasRoot.transform, "TopBar", new Vector2(0f, 0.92f), new Vector2(1f, 1f), new Color(0.06f, 0.09f, 0.14f, 0.95f));
-            _backButton = CreateButton(topBar.transform, "BackButton", "◀ 返回大廳", new Vector2(0.02f, 0.15f), new Vector2(0.12f, 0.85f), Close, new Color(0.18f, 0.28f, 0.38f));
-            CreateLabel(topBar.transform, "Title", "◆ 戰術更衣室與秘書官設定 // WARDROBE & SUITE", new Vector2(0.15f, 0.15f), new Vector2(0.60f, 0.85f), 24, new Color(0.9f, 0.94f, 1f), TextAnchor.MiddleLeft);
+            GameObject topBar = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "TopBar", new Vector2(0f, 0.92f), new Vector2(1f, 1f), new Color(0.06f, 0.09f, 0.14f, 0.95f));
+            _backButton = ProceduralUiKit.CreateButton(topBar.transform, "BackButton", "◀ 返回大廳", new Vector2(0.02f, 0.15f), new Vector2(0.12f, 0.85f), Close, new Color(0.18f, 0.28f, 0.38f));
+            ProceduralUiKit.CreateText(topBar.transform, "Title", "◆ 戰術更衣室與秘書官設定 // WARDROBE & SUITE", new Vector2(0.15f, 0.15f), new Vector2(0.60f, 0.85f), 24, new Color(0.9f, 0.94f, 1f), TextAnchor.MiddleLeft);
 
             // 3. 左側角色清單 (ScrollView)
-            GameObject rosterPanel = CreatePanel(_canvasRoot.transform, "RosterPanel", new Vector2(0.02f, 0.04f), new Vector2(0.24f, 0.90f), new Color(0.05f, 0.08f, 0.12f, 0.85f));
-            CreateLabel(rosterPanel.transform, "Header", "SELECT HERO", new Vector2(0.05f, 0.93f), new Vector2(0.95f, 0.99f), 16, new Color(0.6f, 0.75f, 0.9f), TextAnchor.MiddleLeft);
+            GameObject rosterPanel = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "RosterPanel", new Vector2(0.02f, 0.04f), new Vector2(0.24f, 0.90f), new Color(0.05f, 0.08f, 0.12f, 0.85f));
+            ProceduralUiKit.CreateText(rosterPanel.transform, "Header", "SELECT HERO", new Vector2(0.05f, 0.93f), new Vector2(0.95f, 0.99f), 16, new Color(0.6f, 0.75f, 0.9f), TextAnchor.MiddleLeft);
 
             GameObject scrollGo = new GameObject("Scroll", typeof(RectTransform), typeof(ScrollRect), typeof(RectMask2D));
             scrollGo.transform.SetParent(rosterPanel.transform, false);
@@ -306,15 +306,15 @@ namespace Game.Unity.UI
             _charListContent = contentGo.transform;
 
             // 4. 中央大立繪展示區
-            GameObject centerPanel = CreatePanel(_canvasRoot.transform, "CenterPanel", new Vector2(0.26f, 0.04f), new Vector2(0.64f, 0.90f), new Color(0.05f, 0.07f, 0.11f, 0.6f));
-            GameObject portraitGo = CreatePanel(centerPanel.transform, "Portrait", new Vector2(0.05f, 0.10f), new Vector2(0.95f, 0.95f), new Color(0.1f, 0.15f, 0.22f, 0.5f));
+            GameObject centerPanel = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "CenterPanel", new Vector2(0.26f, 0.04f), new Vector2(0.64f, 0.90f), new Color(0.05f, 0.07f, 0.11f, 0.6f));
+            GameObject portraitGo = ProceduralUiKit.CreatePanel(centerPanel.transform, "Portrait", new Vector2(0.05f, 0.10f), new Vector2(0.95f, 0.95f), new Color(0.1f, 0.15f, 0.22f, 0.5f));
             _portraitImage = portraitGo.GetComponent<Image>();
-            _charTitleLabel = CreateLabel(centerPanel.transform, "CharTitle", "CLAIRE", new Vector2(0.05f, 0.02f), new Vector2(0.95f, 0.08f), 28, Color.white, TextAnchor.MiddleCenter);
+            _charTitleLabel = ProceduralUiKit.CreateText(centerPanel.transform, "CharTitle", "CLAIRE", new Vector2(0.05f, 0.02f), new Vector2(0.95f, 0.08f), 28, Color.white, TextAnchor.MiddleCenter);
 
             // 5. 右側控制面板 (立繪階段、背景、設為秘書官)
-            GameObject rightPanel = CreatePanel(_canvasRoot.transform, "RightPanel", new Vector2(0.66f, 0.04f), new Vector2(0.98f, 0.90f), new Color(0.05f, 0.08f, 0.13f, 0.95f));
+            GameObject rightPanel = ProceduralUiKit.CreatePanel(_canvasRoot.transform, "RightPanel", new Vector2(0.66f, 0.04f), new Vector2(0.98f, 0.90f), new Color(0.05f, 0.08f, 0.13f, 0.95f));
 
-            CreateLabel(rightPanel.transform, "StageHeader", "◆ 立繪階段切換 (PORTRAIT STAGES)", new Vector2(0.05f, 0.92f), new Vector2(0.95f, 0.98f), 18, new Color(0.4f, 0.85f, 1f), TextAnchor.MiddleLeft);
+            ProceduralUiKit.CreateText(rightPanel.transform, "StageHeader", "◆ 立繪階段切換 (PORTRAIT STAGES)", new Vector2(0.05f, 0.92f), new Vector2(0.95f, 0.98f), 18, new Color(0.4f, 0.85f, 1f), TextAnchor.MiddleLeft);
             GameObject stagesContainer = new GameObject("StagesContainer", typeof(RectTransform), typeof(VerticalLayoutGroup));
             stagesContainer.transform.SetParent(rightPanel.transform, false);
             RectTransform stRt = stagesContainer.GetComponent<RectTransform>();
@@ -330,10 +330,10 @@ namespace Game.Unity.UI
             _stageButtonsContainer = stagesContainer.transform;
 
             // 大廳場景選擇
-            CreateLabel(rightPanel.transform, "SceneHeader", "◆ 大廳場景選擇 (LOBBY SCENE)", new Vector2(0.05f, 0.57f), new Vector2(0.95f, 0.63f), 18, new Color(0.4f, 0.85f, 1f), TextAnchor.MiddleLeft);
-            CreateButton(rightPanel.transform, "BtnScene1", "🌌 天文台大廳 (Observatory)", new Vector2(0.05f, 0.49f), new Vector2(0.95f, 0.56f), () => SelectScene("scene_lobby_default"), new Color(0.16f, 0.28f, 0.38f));
-            CreateButton(rightPanel.transform, "BtnScene2", "☕ 午後咖啡館 (Afternoon Cafe)", new Vector2(0.05f, 0.40f), new Vector2(0.95f, 0.47f), () => SelectScene("scene_cafe"), new Color(0.24f, 0.28f, 0.22f));
-            _sceneStatusLabel = CreateLabel(rightPanel.transform, "SceneStatus", "SCENE: 天文台大廳", new Vector2(0.05f, 0.35f), new Vector2(0.95f, 0.39f), 14, new Color(0.8f, 0.85f, 0.9f), TextAnchor.MiddleLeft);
+            ProceduralUiKit.CreateText(rightPanel.transform, "SceneHeader", "◆ 大廳場景選擇 (LOBBY SCENE)", new Vector2(0.05f, 0.57f), new Vector2(0.95f, 0.63f), 18, new Color(0.4f, 0.85f, 1f), TextAnchor.MiddleLeft);
+            ProceduralUiKit.CreateButton(rightPanel.transform, "BtnScene1", "🌌 天文台大廳 (Observatory)", new Vector2(0.05f, 0.49f), new Vector2(0.95f, 0.56f), () => SelectScene("scene_lobby_default"), new Color(0.16f, 0.28f, 0.38f));
+            ProceduralUiKit.CreateButton(rightPanel.transform, "BtnScene2", "☕ 午後咖啡館 (Afternoon Cafe)", new Vector2(0.05f, 0.40f), new Vector2(0.95f, 0.47f), () => SelectScene("scene_cafe"), new Color(0.24f, 0.28f, 0.22f));
+            _sceneStatusLabel = ProceduralUiKit.CreateText(rightPanel.transform, "SceneStatus", "SCENE: 天文台大廳", new Vector2(0.05f, 0.35f), new Vector2(0.95f, 0.39f), 14, new Color(0.8f, 0.85f, 0.9f), TextAnchor.MiddleLeft);
 
             // M2-4: 服裝穿戴選擇區与時段切換按鈕
             GameObject costumesContainer = new GameObject("CostumesContainer", typeof(RectTransform), typeof(VerticalLayoutGroup));
@@ -350,16 +350,16 @@ namespace Game.Unity.UI
             cosVlg.childControlWidth = true;
             _costumeButtonsContainer = costumesContainer.transform;
 
-            CreateButton(rightPanel.transform, "BtnTodMorning", "晨", new Vector2(0.05f, 0.21f), new Vector2(0.26f, 0.25f), () => SelectTimeOfDay("morning"), new Color(0.35f, 0.30f, 0.15f), 13);
-            CreateButton(rightPanel.transform, "BtnTodNoon", "晝", new Vector2(0.28f, 0.21f), new Vector2(0.49f, 0.25f), () => SelectTimeOfDay("noon"), new Color(0.20f, 0.35f, 0.45f), 13);
-            CreateButton(rightPanel.transform, "BtnTodEvening", "夕", new Vector2(0.51f, 0.21f), new Vector2(0.72f, 0.25f), () => SelectTimeOfDay("evening"), new Color(0.45f, 0.22f, 0.15f), 13);
-            CreateButton(rightPanel.transform, "BtnTodNight", "夜", new Vector2(0.74f, 0.21f), new Vector2(0.95f, 0.25f), () => SelectTimeOfDay("night"), new Color(0.12f, 0.16f, 0.35f), 13);
+            ProceduralUiKit.CreateButton(rightPanel.transform, "BtnTodMorning", "晨", new Vector2(0.05f, 0.21f), new Vector2(0.26f, 0.25f), () => SelectTimeOfDay("morning"), new Color(0.35f, 0.30f, 0.15f), 13);
+            ProceduralUiKit.CreateButton(rightPanel.transform, "BtnTodNoon", "晝", new Vector2(0.28f, 0.21f), new Vector2(0.49f, 0.25f), () => SelectTimeOfDay("noon"), new Color(0.20f, 0.35f, 0.45f), 13);
+            ProceduralUiKit.CreateButton(rightPanel.transform, "BtnTodEvening", "夕", new Vector2(0.51f, 0.21f), new Vector2(0.72f, 0.25f), () => SelectTimeOfDay("evening"), new Color(0.45f, 0.22f, 0.15f), 13);
+            ProceduralUiKit.CreateButton(rightPanel.transform, "BtnTodNight", "夜", new Vector2(0.74f, 0.21f), new Vector2(0.95f, 0.25f), () => SelectTimeOfDay("night"), new Color(0.12f, 0.16f, 0.35f), 13);
 
             // 核心操作：設為大廳秘書官
-            _setLobbyButton = CreateButton(rightPanel.transform, "BtnSetLobby", "📌 設為大廳秘書官 (APPLY SECRETARY)", new Vector2(0.05f, 0.11f), new Vector2(0.95f, 0.19f), OnClickSetAsLobby, new Color(0.82f, 0.49f, 0.16f), 18);
+            _setLobbyButton = ProceduralUiKit.CreateButton(rightPanel.transform, "BtnSetLobby", "📌 設為大廳秘書官 (APPLY SECRETARY)", new Vector2(0.05f, 0.11f), new Vector2(0.95f, 0.19f), OnClickSetAsLobby, new Color(0.82f, 0.49f, 0.16f), 18);
 
             // 提示訊息
-            _messageLabel = CreateLabel(rightPanel.transform, "MessageLabel", "", new Vector2(0.05f, 0.04f), new Vector2(0.95f, 0.10f), 15, Color.green, TextAnchor.MiddleCenter);
+            _messageLabel = ProceduralUiKit.CreateText(rightPanel.transform, "MessageLabel", "", new Vector2(0.05f, 0.04f), new Vector2(0.95f, 0.10f), 15, Color.green, TextAnchor.MiddleCenter);
         }
 
         public void RefreshCharacterList()
@@ -397,7 +397,7 @@ namespace Game.Unity.UI
             string charId = def.Id;
             btn.onClick.AddListener(() => SelectCharacter(charId));
 
-            CreateLabel(card.transform, "Label", ShortName(def.Name ?? def.Id), new Vector2(0.08f, 0.1f), new Vector2(0.92f, 0.9f), 16, Color.white, TextAnchor.MiddleLeft);
+            ProceduralUiKit.CreateText(card.transform, "Label", ProceduralUiKit.ResolveCharacterName(def.Id, def), new Vector2(0.08f, 0.1f), new Vector2(0.92f, 0.9f), 16, Color.white, TextAnchor.MiddleLeft);
             return btn;
         }
 
@@ -450,7 +450,7 @@ namespace Game.Unity.UI
                 if (index == 2) stageName = "STAGE 2 (覺醒突破 Lv30 ★2)" + (unlocked ? " [已解鎖]" : " [🔒 鎖定]");
                 else if (index == 3) stageName = "STAGE 3 (誓約花嫁)" + (unlocked ? " [已解鎖]" : " [🔒 鎖定]");
 
-                CreateLabel(btnGo.transform, "Label", stageName, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f), 14, unlocked ? Color.white : new Color(0.5f, 0.55f, 0.6f), TextAnchor.MiddleLeft);
+                ProceduralUiKit.CreateText(btnGo.transform, "Label", stageName, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f), 14, unlocked ? Color.white : new Color(0.5f, 0.55f, 0.6f), TextAnchor.MiddleLeft);
 
                 _stageButtons[stageId] = btn;
                 index++;
@@ -488,7 +488,7 @@ namespace Game.Unity.UI
                 btn.onClick.AddListener(() => EquipCostume(cid));
 
                 string label = $"👗 {cid}" + (unlocked ? " [可穿戴]" : " [🔒 未持有]");
-                CreateLabel(btnGo.transform, "Label", label, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f), 13, unlocked ? Color.white : Color.gray, TextAnchor.MiddleLeft);
+                ProceduralUiKit.CreateText(btnGo.transform, "Label", label, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f), 13, unlocked ? Color.white : Color.gray, TextAnchor.MiddleLeft);
 
                 _costumeButtons[cid] = btn;
             }
@@ -497,65 +497,13 @@ namespace Game.Unity.UI
         private void TryLoadPortrait(string charId, string artKey)
         {
             if (_portraitImage == null) return;
-            string path = Path.Combine(Application.streamingAssetsPath, "Portraits", $"{charId}.png");
-            if (File.Exists(path))
-            {
-                byte[] data = File.ReadAllBytes(path);
-                Texture2D tex = new Texture2D(2, 2);
-                if (tex.LoadImage(data))
-                {
-                    _portraitImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                    _portraitImage.color = Color.white;
-                    return;
-                }
-            }
-            _portraitImage.sprite = ProceduralUiKit.GetSilhouetteSprite(360, 500);
+            Sprite sp = AssetService.ResolveStreamingSprite(
+                $"portrait_{charId}",
+                new[] { $"Portraits/{charId}.png" },
+                new Vector2(0.5f, 0.5f),
+                "[WardrobeView]");
+            _portraitImage.sprite = sp != null ? sp : ProceduralUiKit.GetSilhouetteSprite(360, 500);
             _portraitImage.color = Color.white;
-        }
-
-        private static string ShortName(string id)
-        {
-            if (string.IsNullOrEmpty(id)) return "HERO";
-            return id.Replace("char", "").Replace("_", " ").Trim().ToUpperInvariant();
-        }
-
-        private static GameObject CreatePanel(Transform parent, string name, Vector2 min, Vector2 max, Color color)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Image));
-            go.transform.SetParent(parent, false);
-            RectTransform rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = min;
-            rt.anchorMax = max;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            go.GetComponent<Image>().color = color;
-            return go;
-        }
-
-        private static Text CreateLabel(Transform parent, string name, string value, Vector2 min, Vector2 max, int size, Color color, TextAnchor align)
-        {
-            GameObject go = new GameObject(name, typeof(RectTransform), typeof(Text));
-            go.transform.SetParent(parent, false);
-            RectTransform rt = go.GetComponent<RectTransform>();
-            rt.anchorMin = min;
-            rt.anchorMax = max;
-            rt.offsetMin = rt.offsetMax = Vector2.zero;
-            Text t = go.GetComponent<Text>();
-            t.font = ProceduralUiKit.GetDefaultFont();
-            t.fontSize = size;
-            t.color = color;
-            t.alignment = align;
-            t.text = value;
-            t.raycastTarget = false;
-            return t;
-        }
-
-        private static Button CreateButton(Transform parent, string name, string text, Vector2 min, Vector2 max, UnityEngine.Events.UnityAction action, Color color, int size = 16)
-        {
-            GameObject go = CreatePanel(parent, name, min, max, color);
-            Button b = go.AddComponent<Button>();
-            if (action != null) b.onClick.AddListener(action);
-            CreateLabel(go.transform, "Label", text, Vector2.zero, Vector2.one, size, Color.white, TextAnchor.MiddleCenter);
-            return b;
         }
     }
 }

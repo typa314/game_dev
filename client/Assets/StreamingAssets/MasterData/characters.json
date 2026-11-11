@@ -128,7 +128,9 @@
       "moveSpeed": 12,
       "knockbacks": 2,
       "target": "single",
-      "traits": [],
+      "traits": [
+        "healer"
+      ],
       "growthCurve": "curve_standard",
       "skill": {
         "id": "skill_holy_blessing",
@@ -205,7 +207,8 @@
       "knockbacks": 4,
       "target": "area",
       "traits": [
-        "anti_flying"
+        "anti_flying",
+        "healer"
       ],
       "growthCurve": "curve_standard",
       "skill": {
@@ -354,7 +357,9 @@
       "moveSpeed": 9,
       "knockbacks": 3,
       "target": "single",
-      "traits": [],
+      "traits": [
+        "healer"
+      ],
       "growthCurve": "curve_standard",
       "skill": {
         "id": "skill_mirai_warm_cheer",

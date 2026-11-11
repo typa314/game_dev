@@ -452,6 +452,7 @@
         "faction",
         "sub_category",
         "unit_type",
+        "scale_category",
         "lane",
         "is_boss_tier",
         "names",
@@ -466,6 +467,7 @@
         "faction": { "type": "string", "enum": ["dark_elf", "goblin", "monster"] },
         "sub_category": { "type": "string" },
         "unit_type": { "type": "string", "enum": ["normal", "ranged", "flying", "armored"] },
+        "scale_category": { "type": "string", "enum": ["small", "normal", "boss"] },
         "lane": { "type": "string", "enum": ["ground", "flying"] },
         "is_boss_tier": { "type": "boolean" },
         "names": {

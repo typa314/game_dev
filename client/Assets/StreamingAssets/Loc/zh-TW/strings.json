@@ -68,5 +68,16 @@
   "char/char26_ayame_ninja.name": "綾女",
   "char/char07_kagura.name": "神樂",
   "char/char09_chloe.name": "克蘿伊",
-  "char/char10_mirai.name": "未來"
+  "char/char10_mirai.name": "未來",
+  "enemy/en_slime.name": "深淵紫焰史萊姆",
+  "enemy/en_goblin_raider.name": "哥布林掠奪兵",
+  "enemy/en_bat.name": "猩紅暗翼魔蝠",
+  "enemy/en_goblin_shaman.name": "哥布林毒火薩滿",
+  "enemy/en_harpy.name": "魔翼妖精戰姬",
+  "enemy/en_mage_skeleton.name": "幽冥骸骨魔導",
+  "enemy/en_dark_elf_blade.name": "暗精靈夜刃劍士",
+  "enemy/en_dark_elf_archer.name": "暗精靈魔弓射手",
+  "enemy/en_wraith_assassin.name": "冥府幽魂影刺",
+  "enemy/en_golem.name": "黑曜符文魔像",
+  "enemy/en_golem_colossus.name": "煉獄巨像魔王"
 }

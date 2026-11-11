@@ -175,4 +175,172 @@ namespace Game.Core.Localization
             return new Dictionary<string, string>();
         }
     }
+
+    /// <summary>
+    /// 統一顯示名稱與多語系鍵值解析器，避免各 UI View 硬編碼角色名單或將 loc: 鍵值原樣輸出。
+    /// 當外部尚未安裝 ILocalizationService 時，自動惰性載入磁碟語系表作為備援。
+    /// </summary>
+    public static class LocalizationResolver
+    {
+        private static readonly object FallbackLock = new object();
+        private static LocalizationService _fallbackService;
+        private static bool _fallbackSearched;
+
+        public static LocalizationService GetFallbackService()
+        {
+            lock (FallbackLock)
+            {
+                if (_fallbackSearched) return _fallbackService;
+                _fallbackSearched = true;
+                string dir = FindLocaleDirectory();
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    var svc = new LocalizationService("zh-TW", "zh-TW");
+                    svc.LoadFromDirectory(dir);
+                    _fallbackService = svc;
+                }
+                return _fallbackService;
+            }
+        }
+
+        public static bool TryResolveKey(ILocalizationService loc, string rawOrKey, out string resolved)
+        {
+            resolved = null;
+            if (string.IsNullOrEmpty(rawOrKey)) return false;
+            ILocalizationService active = loc ?? GetFallbackService();
+            if (active == null) return false;
+
+            string norm = LocalizationService.NormalizeKey(rawOrKey);
+            if (active.Has(norm) || active.Has(norm, active.FallbackLocale))
+            {
+                resolved = active.Get(norm);
+                return true;
+            }
+            return false;
+        }
+
+        public static string Resolve(ILocalizationService loc, string rawOrKey, string fallbackText = null)
+        {
+            if (TryResolveKey(loc, rawOrKey, out string resolved)) return resolved;
+            if (!string.IsNullOrEmpty(rawOrKey) && !rawOrKey.StartsWith("loc:", StringComparison.OrdinalIgnoreCase))
+            {
+                return rawOrKey;
+            }
+            return !string.IsNullOrEmpty(fallbackText) ? fallbackText : FormatIdFallback(rawOrKey);
+        }
+
+        public static string ResolveCharacterName(
+            ILocalizationService loc,
+            string charId,
+            Game.Domain.MasterData.CharacterDef def = null)
+        {
+            if (def != null && !string.IsNullOrEmpty(def.Name))
+            {
+                if (TryResolveKey(loc, def.Name, out string defResolved)) return defResolved;
+                if (!def.Name.StartsWith("loc:", StringComparison.OrdinalIgnoreCase)) return def.Name;
+            }
+
+            if (!string.IsNullOrEmpty(charId))
+            {
+                if (TryResolveKey(loc, $"char/{charId}.name", out string idResolved)) return idResolved;
+                string aliasKey = MapLegacyCharacterLocKey(charId);
+                if (aliasKey != null && TryResolveKey(loc, aliasKey, out string aliasResolved)) return aliasResolved;
+                return FormatIdFallback(charId);
+            }
+
+            return "HERO";
+        }
+
+        public static string ResolveEnemyName(
+            ILocalizationService loc,
+            string enemyId,
+            Game.Domain.MasterData.EnemyDef def = null)
+        {
+            if (def != null && !string.IsNullOrEmpty(def.Name))
+            {
+                if (TryResolveKey(loc, def.Name, out string defResolved)) return defResolved;
+                if (!def.Name.StartsWith("loc:", StringComparison.OrdinalIgnoreCase)) return def.Name;
+            }
+
+            if (!string.IsNullOrEmpty(enemyId))
+            {
+                if (TryResolveKey(loc, $"enemy/{enemyId}.name", out string idResolved)) return idResolved;
+                return FormatIdFallback(enemyId);
+            }
+
+            return "ENEMY";
+        }
+
+        public static string ResolveUnitShortName(
+            ILocalizationService loc,
+            string unitId,
+            Game.Domain.MasterData.MasterDatabase master = null)
+        {
+            if (string.IsNullOrEmpty(unitId)) return "UNIT";
+            if (master != null)
+            {
+                if (master.Characters != null && master.Characters.TryGetValue(unitId, out var cDef))
+                    return ResolveCharacterName(loc, unitId, cDef);
+                if (master.Enemies != null && master.Enemies.TryGetValue(unitId, out var eDef))
+                    return ResolveEnemyName(loc, unitId, eDef);
+            }
+            if (unitId.StartsWith("en_", StringComparison.OrdinalIgnoreCase))
+                return ResolveEnemyName(loc, unitId, null);
+            return ResolveCharacterName(loc, unitId, null);
+        }
+
+        public static string FormatIdFallback(string idOrKey)
+        {
+            if (string.IsNullOrEmpty(idOrKey)) return "UNIT";
+            string s = LocalizationService.NormalizeKey(idOrKey);
+            if (s.StartsWith("char/", StringComparison.OrdinalIgnoreCase)) s = s.Substring(5);
+            if (s.StartsWith("enemy/", StringComparison.OrdinalIgnoreCase)) s = s.Substring(6);
+            if (s.EndsWith(".name", StringComparison.OrdinalIgnoreCase)) s = s.Substring(0, s.Length - 5);
+            if (s.StartsWith("char", StringComparison.OrdinalIgnoreCase) &&
+                s.Length > 7 &&
+                char.IsDigit(s[4]) &&
+                char.IsDigit(s[5]) &&
+                s[6] == '_')
+            {
+                s = s.Substring(7);
+            }
+            else if (s.StartsWith("en_", StringComparison.OrdinalIgnoreCase))
+            {
+                s = s.Substring(3);
+            }
+            return s.Replace("_", " ").Trim();
+        }
+
+        private static string MapLegacyCharacterLocKey(string charId)
+        {
+            switch (charId)
+            {
+                case "char07_ayame": return "char/char26_ayame_ninja.name";
+                case "char08_sakura":
+                case "char18_sakura": return "char/char18_sakura_miko.name";
+                case "char09_yuki": return "char/char08_yuki.name";
+                default: return null;
+            }
+        }
+
+        private static string FindLocaleDirectory()
+        {
+            foreach (string start in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
+            {
+                if (string.IsNullOrEmpty(start)) continue;
+                var dir = new DirectoryInfo(start);
+                while (dir != null)
+                {
+                    string saLoc = Path.Combine(dir.FullName, "Assets", "StreamingAssets", "Loc");
+                    if (Directory.Exists(saLoc)) return saLoc;
+                    string clientSaLoc = Path.Combine(dir.FullName, "client", "Assets", "StreamingAssets", "Loc");
+                    if (Directory.Exists(clientSaLoc)) return clientSaLoc;
+                    string dataLoc = Path.Combine(dir.FullName, "data", "loc");
+                    if (Directory.Exists(dataLoc)) return dataLoc;
+                    dir = dir.Parent;
+                }
+            }
+            return null;
+        }
+    }
 }

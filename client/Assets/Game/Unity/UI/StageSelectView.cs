@@ -729,19 +729,7 @@ namespace Game.Unity.UI
 
         private string GetCharacterShortName(string charId)
         {
-            return charId switch
-            {
-                "char01_claire" => "克萊兒",
-                "char02_luna" => "露娜",
-                "char03_scarlet" => "史卡蕾特",
-                "char04_elysia" => "愛麗西亞",
-                "char05_rin" => "凜",
-                "char06_seraphina" => "塞拉菲娜",
-                "char07_ayame" or "char26_ayame_ninja" => "綾女",
-                "char08_sakura" or "char18_sakura" or "char18_sakura_miko" => "櫻",
-                "char09_yuki" or "char08_yuki" => "雪",
-                _ => charId.Length > 6 ? charId.Substring(0, 6) : charId
-            };
+            return ProceduralUiKit.ResolveCharacterName(charId);
         }
 
         #endregion

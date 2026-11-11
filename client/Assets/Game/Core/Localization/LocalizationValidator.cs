@@ -111,6 +111,7 @@ namespace Game.Core.Localization
             }
 
             foreach (var c in master.Characters.Values) AddIfLoc(c.Name);
+            foreach (var e in master.Enemies.Values) AddIfLoc(e.Name);
             foreach (var s in master.Stages.Values) AddIfLoc(s.Name);
             foreach (var sp in master.Spots.Values) AddIfLoc(sp.Name);
             foreach (var sc in master.Scenes.Values) AddIfLoc(sc.Name);

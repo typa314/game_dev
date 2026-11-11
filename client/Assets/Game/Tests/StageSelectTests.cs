@@ -450,6 +450,31 @@ namespace Game.Tests
                 UnityEngine.Object.DestroyImmediate(stageGo);
             }
         }
+
+        [Test]
+        public void StageSelectView_DisplaysLocalizedNamesForAllCharacters_IncludingKaguraChloeMirai()
+        {
+            _core.Player.Characters["char07_kagura"] = new CharacterState { CurrentRarity = "R", Level = 1 };
+            _core.Player.Characters["char09_chloe"] = new CharacterState { CurrentRarity = "R", Level = 1 };
+            _core.Player.Characters["char10_mirai"] = new CharacterState { CurrentRarity = "R", Level = 1 };
+
+            var stageGo = new GameObject("Test_StageSelectLocalizedNames");
+            var stageView = stageGo.AddComponent<StageSelectView>();
+            try
+            {
+                stageView.EnsureUIHierarchy();
+                stageView.Initialize(_core);
+
+                var cardTexts = stageGo.GetComponentsInChildren<Text>(true).Select(t => t.text).ToList();
+                CollectionAssert.Contains(cardTexts, "神樂", "char07_kagura 應正確顯示為神樂而非 char07");
+                CollectionAssert.Contains(cardTexts, "克蘿伊", "char09_chloe 應正確顯示為克蘿伊而非 char09");
+                CollectionAssert.Contains(cardTexts, "未來", "char10_mirai 應正確顯示為未來而非 char10");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(stageGo);
+            }
+        }
 #endif
     }
 }

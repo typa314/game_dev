@@ -79,6 +79,16 @@ namespace Game.Domain.MasterData
             foreach (SceneDef s in m.Scenes.Values) CheckCondition(s.Unlock, "scene " + s.Id, m, err);
             foreach (SpotDef s in m.Spots.Values) CheckCondition(s.Unlock, "spot " + s.Id, m, err);
 
+            foreach (EnemyDef e in m.Enemies.Values)
+            {
+                string at = "enemy " + e.Id;
+                if (e.Battle == null) err.Add(at + ": battle stats missing");
+                if (!string.IsNullOrEmpty(e.Faction) && e.Faction != "dark_elf" && e.Faction != "goblin" && e.Faction != "monster")
+                    err.Add(at + ": unknown faction " + e.Faction);
+                if (!string.IsNullOrEmpty(e.ScaleCategory) && e.ScaleCategory != "small" && e.ScaleCategory != "normal" && e.ScaleCategory != "boss")
+                    err.Add(at + ": unknown scaleCategory " + e.ScaleCategory);
+            }
+
             foreach (StageDef s in m.Stages.Values)
             {
                 string at = "stage " + s.Id;

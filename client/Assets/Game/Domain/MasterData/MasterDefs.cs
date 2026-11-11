@@ -110,7 +110,11 @@ namespace Game.Domain.MasterData
     public sealed class EnemyDef
     {
         public string Id;
+        public string Name;              // loc key
+        public string Faction;           // dark_elf / goblin / monster
+        public string SubCategory;
         public string Type;              // normal / flying / armored ...
+        public string ScaleCategory = "normal"; // small / normal / boss
         public BattleStats Battle;
         public int DefeatGold;
     }

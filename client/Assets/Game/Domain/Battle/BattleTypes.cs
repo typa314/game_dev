@@ -18,6 +18,7 @@ namespace Game.Domain.Battle
     {
         public string Id;
         public string Type = "normal";
+        public string ScaleCategory;       // null (legacy fallback) / "small" / "normal" / "boss"
         public int Cost;
         public int CooldownTicks;
         public int Hp;
@@ -31,12 +32,13 @@ namespace Game.Domain.Battle
         public CharacterSkillDef Skill;
         public int SkillChargeTicks;
 
-        public static UnitTemplate From(string id, string type, BattleStats s, int hp, int atk, int ticksPerSecond)
+        public static UnitTemplate From(string id, string type, BattleStats s, int hp, int atk, int ticksPerSecond, string scaleCategory = null)
         {
             return new UnitTemplate
             {
                 Id = id,
                 Type = type ?? "normal",
+                ScaleCategory = string.IsNullOrEmpty(scaleCategory) ? null : scaleCategory,
                 Cost = s.Cost,
                 CooldownTicks = SecToTicks(s.CooldownSec, ticksPerSecond),
                 Hp = Math.Max(1, hp),
